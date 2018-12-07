@@ -1,7 +1,7 @@
 {
     "name": "nativescript-mtmobile-sqlite",
     "version": "1.0.0",
-    "description": "Your awesome NativeScript plugin.",
+    "description": "SQLite for Nativescript",
     "main": "mtmobile-sqlite",
     "typings": "index.d.ts",
     "nativescript": {
@@ -12,7 +12,7 @@
     },
     "scripts": {
         "tsc": "tsc",
-        "build": "npm run tsc && npm run build.native",
+        "build": "npm i && tsc",
         "build.native": "node scripts/build-native.js",
         "postclone": "npm i && node scripts/postclone.js && cd ../demo && npm i && npx rimraf -- package-lock.json && cd ../src",
         "test.android": "npm run tsc && npm run tslint && cd ../demo && tns build android && tns test android --justlaunch",
@@ -24,8 +24,9 @@
         "demo.reset": "cd ../demo && npx rimraf -- hooks node_modules platforms package-lock.json",
         "plugin.prepare": "npm run build && cd ../demo && tns plugin remove nativescript-mtmobile-sqlite && tns plugin add ../src",
         "clean": "npm run demo.reset && npx rimraf -- node_modules package-lock.json && npm i",
-        "ci.tslint": "npm i && tslint '**/*.ts' --config '../tslint.json' --exclude '**/node_modules/**'",
-        "prepack": "npm run build.native"
+        "ci.tslint": "npm i && tslint '**/*.ts' --config ../tslint.json --exclude '**/node_modules/**'",
+        "prepack": "npm run build.native",
+        "prepublishOnly": "npm run build"
     },
     "keywords": [
         "NativeScript",
@@ -34,15 +35,16 @@
         "iOS"
     ],
     "author": {
-        "name": "Your Name",
-        "email": "youremail@yourdomain.com"
+        "name": "Josep Bergay",
+        "email": "josep.bergay@gmail.com"
     },
     "bugs": {
-        "url": "https://github.com/JosepBergay/nativescript-mtmobile-sqlite/issues"
+        "url": "https://github.com/TestJG/nativescript-mtmobile-sqlite/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/JosepBergay/nativescript-mtmobile-sqlite",
+    "homepage": "https://github.com/TestJG/nativescript-mtmobile-sqlite",
     "readmeFilename": "README.md",
+    "repository": "TestJG/nativescript-mtmobile-sqlite",
     "devDependencies": {
         "tns-core-modules": "^5.0.1",
         "tns-platform-declarations": "^5.0.0",
