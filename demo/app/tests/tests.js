@@ -1,11 +1,13 @@
-// var MtmobileSqlite = require("nativescript-mtmobile-sqlite");
+var MtmobileSqlite = require("nativescript-mtmobile-sqlite");
 
-// describe("openOrCreate", function() {
-//     it("exists", function() {
-//         expect(mtmobileSqlite.greet).toBeDefined();
-//     });
+describe("openOrCreate", function() {
+    it("exists", function() {
+        expect(MtmobileSqlite.openOrCreate).toBeDefined();
+    });
+});
 
-//     it("returns a string", function() {
-//         expect(mtmobileSqlite.greet()).toEqual("Hello, NS");
-//     });
-// });
+describe("deleteDatabase", function() {
+    it("exists", function() {
+        expect(MtmobileSqlite.deleteDatabase).toBeDefined();
+    });
+});
