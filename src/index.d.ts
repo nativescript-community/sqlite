@@ -9,7 +9,9 @@ export interface SQLiteDatabase {
     isOpen: () => boolean;
     close: () => void;
     select: (query: string, params?: SqliteParams) => SqliteRow[];
-    selectArray: (query: string, params?: SqliteParams) => SqliteParams[][];
+    selectArray: (query: string, params?: SqliteParams) => SqliteParam[][];
+    get: (query: string, params?: SqliteParams) => SqliteRow;
+    getArray: (query: string, params?: SqliteParams) => SqliteParam[];
     execute(query: string, params?: SqliteParams): void;
     transaction<T = any>(action: (cancel?: () => void) => T): T;
 }

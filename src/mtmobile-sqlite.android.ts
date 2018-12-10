@@ -5,6 +5,7 @@ export type SqliteParams = SqliteParam | SqliteParam[];
 export type SqliteRow = {
     [name: string]: SqliteParam;
 };
+
 type Db = android.database.sqlite.SQLiteDatabase;
 
 type SqliteUpgrade = (db: Db) => void;
@@ -20,7 +21,11 @@ export interface SQLiteDatabase {
 
     select: (query: string, params?: SqliteParams) => SqliteRow[];
 
-    selectArray: (query: string, params?: SqliteParams) => SqliteParams[][];
+    selectArray: (query: string, params?: SqliteParams) => SqliteParam[][];
+
+    get: (query: string, params?: SqliteParams) => SqliteRow;
+
+    getArray: (query: string, params?: SqliteParams) => SqliteParam[];
 
     execute(query: string, params?: SqliteParams): void;
 
@@ -133,8 +138,8 @@ const transact = <T = any>(db: Db, action: (cancel?: (() => void)) => T) => {
             db.setTransactionSuccessful();
         }
         return result;
-    // } catch (error) {
-    //     console.log("Transaction failed due to: " + error);
+        // } catch (error) {
+        //     console.log("Transaction failed due to: " + error);
     } finally {
         db.endTransaction();
     }
@@ -157,6 +162,10 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
         db.execSQL(query, paramsToStringArray(params));
     const transaction = <T = any>(action: (cancel?: () => void) => T) =>
         transact(db, action);
+    const get = (query: string, params?: SqliteParams) =>
+        rawSql(dataFromCursor)(db)(query, params)[0] || null;
+    const getArray = (query: string, params?: SqliteParams) =>
+        rawSql(arrayFromCursor)(db)(query, params)[0] || null;
 
     return {
         getVersion,
@@ -165,6 +174,8 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
         setVersion,
         select,
         selectArray,
+        get,
+        getArray,
         execute,
         transaction,
     };
