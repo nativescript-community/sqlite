@@ -1,0 +1,12 @@
+{
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/app/**/*.js": { "when": "$(basename).ts" },
+    "**/src/**/*.js": { "when": "$(basename).ts" },
+    "**/*.js.map": true
+  },
+  "prettier.tabWidth": 4,
+  "prettier.trailingComma": "es5",
+  "editor.tabSize": 4,
+  "editor.rulers": [80]
+}
