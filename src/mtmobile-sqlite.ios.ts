@@ -6,7 +6,7 @@ import {
 } from "./mtmobile-sqlite.common";
 import { SqliteParam } from ".";
 
-declare const sqlitehelper;
+declare const sqlitehelper: { getTrans: () => interop.FunctionReference<any> };
 
 type DbPtr = interop.Reference<any>;
 
@@ -147,18 +147,17 @@ const getResultsAsArray = (
 };
 
 const open = (filePath: string): DbPtr => {
-    const _db = new interop.Reference<any>();
-    const charPtr = toCharPtr(filePath);
-    const result = sqlite3_open_v2(filePath, _db, 65542, null);
+    const db = new interop.Reference<any>();
+    const result = sqlite3_open_v2(toCharPtr(filePath), db, 65542, null);
     if (result) {
         throwError(`open: ${result}`);
     }
-    return _db.value;
+    return db.value;
 };
 
-const prepareStatement = (_db: DbPtr, query: string) => {
+const prepareStatement = (db: DbPtr, query: string) => {
     const statement = new interop.Reference<any>();
-    const result = sqlite3_prepare_v2(_db, query, -1, statement, null);
+    const result = sqlite3_prepare_v2(db, query, -1, statement, null);
     if (result) {
         finalize(statement);
         throwError(`prepareStatement: ${result}`);
@@ -203,12 +202,12 @@ const finalize = (statement: interop.Reference<any>) => {
 };
 
 const getRaw = (
-    _db: DbPtr,
+    db: DbPtr,
     query: string,
     params: SqliteParams,
     asObject: boolean
 ): SqliteRow | SqliteParam[] => {
-    const statement = prepareStatement(_db, query);
+    const statement = prepareStatement(db, query);
     bind(params, statement);
     step(statement);
     const cursorSt = new CursorStatement(statement);
@@ -220,12 +219,12 @@ const getRaw = (
 };
 
 const selectRaw = (
-    _db: DbPtr,
+    db: DbPtr,
     query: string,
     params: SqliteParams,
     asObject: boolean
 ): SqliteRow[] | SqliteParam[][] => {
-    const statement = prepareStatement(_db, query);
+    const statement = prepareStatement(db, query);
     bind(params, statement);
     const cursorSt = new CursorStatement(statement);
     let result;
@@ -248,16 +247,39 @@ const selectRaw = (
     return rows;
 };
 
-// TODO remove partial from signature
-export const openOrCreate = (filePath: string): Partial<SQLiteDatabase> => {
-    let _db = open(filePath);
+const execRaw = (db: DbPtr, query: string) => {
+    const result = sqlite3_exec(db, query, null, null, null);
+    if (result) {
+        throwError(`exec: ${result}`);
+    }
+};
+
+const transact = <T = any>(db: DbPtr, action: (cancel?: () => void) => T): T => {
+    try {
+        execRaw(db, "BEGIN TRANSACTION");
+        const cancelled = { value: false };
+        const cancel = () => {
+            cancelled.value = true;
+        };
+        const result = action(cancel);
+        if (!cancelled.value) {
+            execRaw(db, "COMMIT TRANSACTION");
+        }
+        return result;
+    } finally {
+        execRaw(db, "ROLLBACK TRANSACTION");
+    }
+};
+
+export const openOrCreate = (filePath: string): SQLiteDatabase => {
+    let db = open(filePath);
     let _isOpen = true;
 
     const isOpen = () => _isOpen;
     const close = () => {
         if (!_isOpen) return;
-        sqlite3_close_v2(_db);
-        _db = null;
+        sqlite3_close_v2(db);
+        db = null;
         _isOpen = false;
     };
     const setVersion = (version: number) => {
@@ -270,19 +292,21 @@ export const openOrCreate = (filePath: string): Partial<SQLiteDatabase> => {
         return result && (result[0] as number);
     };
     const execute = (query: string, params?: SqliteParams) => {
-        const statement = prepareStatement(_db, query);
+        const statement = prepareStatement(db, query);
         bind(params, statement);
         step(statement);
         finalize(statement);
     };
     const get = (query: string, params?: SqliteParams) =>
-        getRaw(_db, query, params, true) as SqliteRow;
+        getRaw(db, query, params, true) as SqliteRow;
     const getArray = (query: string, params?: SqliteParams) =>
-        getRaw(_db, query, params, false) as SqliteParam[];
+        getRaw(db, query, params, false) as SqliteParam[];
     const select = (query: string, params?: SqliteParams) =>
-        selectRaw(_db, query, params, true) as SqliteRow[];
+        selectRaw(db, query, params, true) as SqliteRow[];
     const selectArray = (query: string, params?: SqliteParams) =>
-        selectRaw(_db, query, params, false) as SqliteParam[][];
+        selectRaw(db, query, params, false) as SqliteParam[][];
+    const transaction = <T = any>(action: (cancel?: () => void) => T): T =>
+        transact(db, action);
 
     return {
         isOpen,
@@ -294,6 +318,7 @@ export const openOrCreate = (filePath: string): Partial<SQLiteDatabase> => {
         getArray,
         select,
         selectArray,
+        transaction,
     };
 };
 
