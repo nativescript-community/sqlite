@@ -8,5 +8,6 @@
   "prettier.tabWidth": 4,
   "prettier.trailingComma": "es5",
   "editor.tabSize": 4,
-  "editor.rulers": [80]
+  "editor.rulers": [80],
+  "typescript.tsdk": "src/node_modules/typescript/lib"
 }
