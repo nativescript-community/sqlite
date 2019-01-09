@@ -1,50 +1,12 @@
-export type SqliteParam = null | number | string;
-
-export type SqliteParams = SqliteParam | SqliteParam[];
-
-export type SqliteRow = {
-    [name: string]: SqliteParam;
-};
+import {
+    SqliteRow,
+    SqliteParam,
+    SqliteParams,
+    SQLiteDatabase,
+    paramsToStringArray,
+} from "./mtmobile-sqlite.common";
 
 type Db = android.database.sqlite.SQLiteDatabase;
-
-type SqliteUpgrade = (db: Db) => void;
-
-export interface SQLiteDatabase {
-    getVersion: () => number;
-
-    setVersion: (version: number) => void;
-
-    isOpen: () => boolean;
-
-    close: () => void;
-
-    select: (query: string, params?: SqliteParams) => SqliteRow[];
-
-    selectArray: (query: string, params?: SqliteParams) => SqliteParam[][];
-
-    get: (query: string, params?: SqliteParams) => SqliteRow;
-
-    getArray: (query: string, params?: SqliteParams) => SqliteParam[];
-
-    execute(query: string, params?: SqliteParams): void;
-
-    transaction<T = any>(action: (cancel?: () => void) => T): T;
-}
-
-const isNothing = (x: any) => x === undefined || x === null;
-
-const paramToString = (p: SqliteParam) => (isNothing(p) ? null : p.toString());
-
-const paramsToStringArray = (params?: SqliteParams) => {
-    if (isNothing(params)) {
-        return [];
-    }
-    if (params instanceof Array) {
-        return params.map(paramToString);
-    }
-    return [paramToString(params)];
-};
 
 type FromCursor<T> = (cursor: android.database.Cursor) => T;
 

@@ -1,0 +1,6 @@
+framework module sqlitewrapper {
+  umbrella header "sqlitewrapper.h"
+
+  export *
+  module * { export * }
+}
