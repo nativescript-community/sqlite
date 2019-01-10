@@ -12,8 +12,8 @@ export interface SQLiteDatabase {
     selectArray: (query: string, params?: SqliteParams) => SqliteParam[][];
     get: (query: string, params?: SqliteParams) => SqliteRow;
     getArray: (query: string, params?: SqliteParams) => SqliteParam[];
-    execute(query: string, params?: SqliteParams): void;
-    transaction<T = any>(action: (cancel?: () => void) => T): T;
+    execute: (query: string, params?: SqliteParams) => void;
+    transaction: <T = any>(action: (cancel?: () => void) => T) => T;
 }
 export declare const openOrCreate: (filePath: string) => SQLiteDatabase;
 export declare const deleteDatabase: (filePath: string) => boolean;
