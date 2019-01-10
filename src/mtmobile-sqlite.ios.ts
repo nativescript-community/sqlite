@@ -32,22 +32,24 @@ const toCharPtr = (str: string) => {
     return buffer;
 };
 
-class CursorStatement {
+interface CursorStatement {
     built: boolean;
     columns: any[];
     count: number;
-    constructor(public statement, public resultType?, public valuesType?) {
-        // this.statement = statement;
-        // this.resultType = resultType;
-        // this.valuesType = valuesType;
-        this.built = false;
-        this.columns = [];
-    }
+    statement: interop.Reference<any>;
 }
+
+const getNewCursorStatement = (
+    statement: interop.Reference<any>
+): CursorStatement => ({
+    statement,
+    built: false,
+    columns: [],
+    count: undefined,
+});
 
 const getValues = (statement: interop.Reference<any>, column: number) => {
     const resultType = sqlite3_column_type(statement, column);
-    console.log("resultType: " + resultType);
     switch (resultType) {
         case 1: // Int
             return sqlite3_column_int64(statement, column);
@@ -73,7 +75,6 @@ const getValuesAsString = (
     column: number
 ) => {
     const resultType = sqlite3_column_type(statement, column);
-    console.log("resultType: " + resultType);
     switch (resultType) {
         case 4: // Blob
             return NSData.dataWithBytesLength(
@@ -126,7 +127,6 @@ const getResultsAsObject = (
     for (let index = 0; index < count; index++) {
         data[cursorSt.columns[index]] = getValues(statement, index);
     }
-    console.log("Data: " + JSON.stringify(data));
     return data;
 };
 
@@ -142,7 +142,6 @@ const getResultsAsArray = (
     for (let index = 0; index < count; index++) {
         data = [...data, getValues(statement, index)];
     }
-    console.log("Data: " + JSON.stringify(data));
     return data;
 };
 
@@ -159,7 +158,6 @@ const prepareStatement = (db: DbPtr, query: string) => {
     const statement = new interop.Reference<any>();
     const result = sqlite3_prepare_v2(db, query, -1, statement, null);
     if (result) {
-        finalize(statement);
         throwError(`prepareStatement: ${result}`);
     }
     return statement.value as interop.Reference<any>;
@@ -210,7 +208,7 @@ const getRaw = (
     const statement = prepareStatement(db, query);
     bind(params, statement);
     step(statement);
-    const cursorSt = new CursorStatement(statement);
+    const cursorSt = getNewCursorStatement(statement);
     const data = asObject
         ? getResultsAsObject(statement, cursorSt)
         : getResultsAsArray(statement, cursorSt);
@@ -226,7 +224,7 @@ const selectRaw = (
 ): SqliteRow[] | SqliteParam[][] => {
     const statement = prepareStatement(db, query);
     bind(params, statement);
-    const cursorSt = new CursorStatement(statement);
+    const cursorSt = getNewCursorStatement(statement);
     let result;
     let rows = [];
     const getResults = asObject ? getResultsAsObject : getResultsAsArray;
@@ -247,14 +245,17 @@ const selectRaw = (
     return rows;
 };
 
-const execRaw = (db: DbPtr, query: string) => {
-    const result = sqlite3_exec(db, query, null, null, null);
-    if (result) {
-        throwError(`exec: ${result}`);
-    }
+const execRaw = (db: DbPtr, query: string, params?: SqliteParams) => {
+    const statement = prepareStatement(db, query);
+    bind(params, statement);
+    step(statement);
+    finalize(statement);
 };
 
-const transact = <T = any>(db: DbPtr, action: (cancel?: () => void) => T): T => {
+const transactionRaw = <T = any>(
+    db: DbPtr,
+    action: (cancel?: () => void) => T
+): T => {
     try {
         execRaw(db, "BEGIN TRANSACTION");
         const cancelled = { value: false };
@@ -266,8 +267,9 @@ const transact = <T = any>(db: DbPtr, action: (cancel?: () => void) => T): T => 
             execRaw(db, "COMMIT TRANSACTION");
         }
         return result;
-    } finally {
+    } catch (e) {
         execRaw(db, "ROLLBACK TRANSACTION");
+        return throwError(`transaction: ${e}`);
     }
 };
 
@@ -284,19 +286,15 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
     };
     const setVersion = (version: number) => {
         const query = "PRAGMA user_version=" + (version + 0).toString();
-        execute(query);
+        execRaw(db, query);
     };
     const getVersion = () => {
         const query = "PRAGMA user_version";
         const result = getArray(query);
         return result && (result[0] as number);
     };
-    const execute = (query: string, params?: SqliteParams) => {
-        const statement = prepareStatement(db, query);
-        bind(params, statement);
-        step(statement);
-        finalize(statement);
-    };
+    const execute = (query: string, params?: SqliteParams) =>
+        execRaw(db, query, params);
     const get = (query: string, params?: SqliteParams) =>
         getRaw(db, query, params, true) as SqliteRow;
     const getArray = (query: string, params?: SqliteParams) =>
@@ -306,7 +304,7 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
     const selectArray = (query: string, params?: SqliteParams) =>
         selectRaw(db, query, params, false) as SqliteParam[][];
     const transaction = <T = any>(action: (cancel?: () => void) => T): T =>
-        transact(db, action);
+        transactionRaw(db, action);
 
     return {
         isOpen,
@@ -330,5 +328,5 @@ export const deleteDatabase = (filePath: string) => {
     if (fileManager.fileExistsAtPath(filePath)) {
         return fileManager.removeItemAtPathError(filePath);
     }
-    return true;
+    return false;
 };
