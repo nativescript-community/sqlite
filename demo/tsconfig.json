@@ -17,7 +17,7 @@
         "noEmitHelpers": true,
         "noEmitOnError": false,
         "noImplicitAny": false,
-        "noImplicitReturns": true,
+        "noImplicitReturns": false,
         "noImplicitUseStrict": false,
         "noFallthroughCasesInSwitch": true,
         "baseUrl": ".",
