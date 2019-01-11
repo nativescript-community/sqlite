@@ -4,6 +4,7 @@ import {
     SqliteParams,
     SQLiteDatabase,
     paramsToStringArray,
+    throwError,
 } from "./mtmobile-sqlite.common";
 
 type Db = android.database.sqlite.SQLiteDatabase;
@@ -17,24 +18,28 @@ const dataFromCursor = (cursor: android.database.Cursor) => {
         const type = cursor.getType(i);
         const name = cursor.getColumnName(i);
         switch (type) {
-            case android.database.Cursor.FIELD_TYPE_NULL:
-                data[name] = null;
-                break;
-
-            case android.database.Cursor.FIELD_TYPE_STRING:
-                data[name] = cursor.getString(i);
+            case android.database.Cursor.FIELD_TYPE_INTEGER:
+                data[name] = cursor.getDouble(i);
                 break;
 
             case android.database.Cursor.FIELD_TYPE_FLOAT:
                 data[name] = cursor.getDouble(i);
                 break;
 
-            case android.database.Cursor.FIELD_TYPE_INTEGER:
-                data[name] = cursor.getDouble(i);
+            case android.database.Cursor.FIELD_TYPE_STRING:
+                data[name] = cursor.getString(i);
+                break;
+
+            case android.database.Cursor.FIELD_TYPE_BLOB:
+                data[name] = cursor.getBlob(i) as any;
+                break;
+
+            case android.database.Cursor.FIELD_TYPE_NULL:
+                data[name] = null;
                 break;
 
             default:
-                throw new Error("sqlite.unknown.type:" + type);
+                throwError(`unknown.type: ${type}`);
         }
     }
     return data;
@@ -63,7 +68,7 @@ const arrayFromCursor = (cursor: android.database.Cursor) => {
                 break;
 
             default:
-                throw new Error("sqlite.unknown.type:" + type);
+                throwError(`unknown.type: ${type}`);
         }
     }
     return data;
@@ -74,21 +79,19 @@ const rawSql = <T>(onCursor: FromCursor<T>) => (
     log?: typeof console.log
 ) => (sql: string, params?: SqliteParams) => {
     const parameters = paramsToStringArray(params);
-    // l(log)('SQL: QUERY: ', sql, capString(JSON.stringify(parameters), 240));
     const cursor = db.rawQuery(sql, parameters);
     try {
         const result: T[] = [];
         while (cursor.moveToNext()) {
             result.push(onCursor(cursor));
         }
-        // l(log)(`SQL: QUERY-RESULT: ${result.length} rows`);
         return result;
     } finally {
         cursor.close();
     }
 };
 
-const transact = <T = any>(db: Db, action: (cancel?: (() => void)) => T) => {
+const transactionRaw = <T = any>(db: Db, action: (cancel?: (() => void)) => T) => {
     db.beginTransaction();
     try {
         const cancelled = { value: false };
@@ -100,8 +103,6 @@ const transact = <T = any>(db: Db, action: (cancel?: (() => void)) => T) => {
             db.setTransactionSuccessful();
         }
         return result;
-        // } catch (error) {
-        //     console.log("Transaction failed due to: " + error);
     } finally {
         db.endTransaction();
     }
@@ -123,7 +124,7 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
     const execute = (query: string, params?: SqliteParams) =>
         db.execSQL(query, paramsToStringArray(params));
     const transaction = <T = any>(action: (cancel?: () => void) => T) =>
-        transact(db, action);
+        transactionRaw(db, action);
     const get = (query: string, params?: SqliteParams) =>
         rawSql(dataFromCursor)(db)(query, params)[0] || null;
     const getArray = (query: string, params?: SqliteParams) =>

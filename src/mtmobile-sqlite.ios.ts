@@ -3,16 +3,13 @@ import {
     SqliteParams,
     paramsToStringArray,
     SqliteRow,
+    throwError,
 } from "./mtmobile-sqlite.common";
 import { SqliteParam } from ".";
 
 declare const sqlitehelper: { getTrans: () => interop.FunctionReference<any> };
 
 type DbPtr = interop.Reference<any>;
-
-const throwError = (msg: string) => {
-    throw `MtMobile-Sqlite-Error on ${msg}`;
-};
 
 const iosProperty = <T extends any>(_self, property: T): T => {
     if (typeof property === "function") {
@@ -48,48 +45,58 @@ const getNewCursorStatement = (
     count: undefined,
 });
 
-const getValues = (statement: interop.Reference<any>, column: number) => {
-    const resultType = sqlite3_column_type(statement, column);
-    switch (resultType) {
-        case 1: // Int
-            return sqlite3_column_int64(statement, column);
-        case 2: // Float
-            return sqlite3_column_double(statement, column);
-        case 4: // Blob
-            return NSData.dataWithBytesLength(
-                sqlite3_column_blob(statement, column),
-                sqlite3_column_bytes(statement, column)
-            );
-        case 5: // Null
-            return null;
-        case 3: // Text
-        default:
-            return NSString.stringWithUTF8String(
-                sqlite3_column_text(statement, column)
-            ).toString();
-    }
-};
-
 const getValuesAsString = (
     statement: interop.Reference<any>,
     column: number
 ) => {
-    const resultType = sqlite3_column_type(statement, column);
-    switch (resultType) {
+    const type = sqlite3_column_type(statement, column);
+    switch (type) {
+        case 1: // Int
+        case 2: // Float
+        case 3: // Text
+            return NSString.stringWithUTF8String(
+                sqlite3_column_text(statement, column)
+            ).toString();
+
         case 4: // Blob
             return NSData.dataWithBytesLength(
                 sqlite3_column_blob(statement, column),
                 sqlite3_column_bytes(statement, column)
             );
+
         case 5: // Null
             return null;
-        case 1: // Int
-        case 2: // Float
-        case 3: // Text
+
         default:
+            throwError(`unknown.type: ${type}`);
+    }
+};
+
+const getValues = (statement: interop.Reference<any>, column: number) => {
+    const type = sqlite3_column_type(statement, column);
+    switch (type) {
+        case 1: // Int
+            return sqlite3_column_int64(statement, column);
+
+        case 2: // Float
+            return sqlite3_column_double(statement, column);
+
+        case 3: // Text
             return NSString.stringWithUTF8String(
                 sqlite3_column_text(statement, column)
             ).toString();
+
+        case 4: // Blob
+            return NSData.dataWithBytesLength(
+                sqlite3_column_blob(statement, column),
+                sqlite3_column_bytes(statement, column)
+            );
+
+        case 5: // Null
+            return null;
+
+        default:
+            throwError(`unknown.type: ${type}`);
     }
 };
 
@@ -221,9 +228,8 @@ const selectRaw = (
     asObject: boolean
 ): SqliteRow[] | SqliteParam[][] => {
     const statement = prepareStatement(db, query);
-    bind(params, statement);
     const cursorSt = getNewCursorStatement(statement);
-    let result;
+    bind(params, statement);
     let rows = [];
     const getResults = asObject ? getResultsAsObject : getResultsAsArray;
     const getAll = () => {
@@ -267,7 +273,7 @@ const transactionRaw = <T = any>(
         return result;
     } catch (e) {
         execRaw(db, "ROLLBACK TRANSACTION");
-        return throwError(`transaction: ${e}`);
+        throwError(`transaction: ${e}`);
     }
 };
 
@@ -303,6 +309,7 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
         selectRaw(db, query, params, false) as SqliteParam[][];
     const transaction = <T = any>(action: (cancel?: () => void) => T): T =>
         transactionRaw(db, action);
+
     return {
         isOpen,
         close,
