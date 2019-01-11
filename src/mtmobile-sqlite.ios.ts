@@ -105,42 +105,37 @@ const getColumns = (
                 let colName = NSString.stringWithUTF8String(
                     sqlite3_column_name(statement, index)
                 ).toString();
-                if (!colName) {
+                if (!colName || cursorSt.columns.indexOf(colName) >= 0) {
                     colName = `column[${index}]`;
                 }
                 cursorSt.columns = [...cursorSt.columns, colName];
             }
         }
+        cursorSt.built = true;
     }
     return cursorSt.count;
 };
 
-const getResultsAsObject = (
-    statement: interop.Reference<any>,
-    cursorSt: CursorStatement
-): SqliteRow => {
-    const count = getColumns(statement, cursorSt, true);
-    if (count === 0) {
+const getResultsAsObject = (cursorSt: CursorStatement): SqliteRow => {
+    const count = getColumns(cursorSt.statement, cursorSt, true);
+    if (!count) {
         return null;
     }
     let data = {};
     for (let index = 0; index < count; index++) {
-        data[cursorSt.columns[index]] = getValues(statement, index);
+        data[cursorSt.columns[index]] = getValues(cursorSt.statement, index);
     }
     return data;
 };
 
-const getResultsAsArray = (
-    statement: interop.Reference<any>,
-    cursorSt: CursorStatement
-): SqliteParam[] => {
-    const count = getColumns(statement, cursorSt, false);
+const getResultsAsArray = (cursorSt: CursorStatement): SqliteParam[] => {
+    const count = getColumns(cursorSt.statement, cursorSt, false);
     if (count === 0) {
         return null;
     }
     let data = [];
     for (let index = 0; index < count; index++) {
-        data = [...data, getValues(statement, index)];
+        data = [...data, getValues(cursorSt.statement, index)];
     }
     return data;
 };
@@ -206,12 +201,15 @@ const getRaw = (
     asObject: boolean
 ): SqliteRow | SqliteParam[] => {
     const statement = prepareStatement(db, query);
-    bind(params, statement);
-    step(statement);
     const cursorSt = getNewCursorStatement(statement);
-    const data = asObject
-        ? getResultsAsObject(statement, cursorSt)
-        : getResultsAsArray(statement, cursorSt);
+    bind(params, statement);
+    const result = step(statement);
+    let data;
+    if (result === 100) {
+        data = asObject
+            ? getResultsAsObject(cursorSt)
+            : getResultsAsArray(cursorSt);
+    }
     finalize(statement);
     return data;
 };
@@ -231,7 +229,7 @@ const selectRaw = (
     const getAll = () => {
         const result = step(statement);
         if (result === 100) {
-            const row = getResults(statement, cursorSt);
+            const row = getResults(cursorSt);
             if (row) {
                 rows = [...rows, row];
             }
@@ -296,16 +294,15 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
     const execute = (query: string, params?: SqliteParams) =>
         execRaw(db, query, params);
     const get = (query: string, params?: SqliteParams) =>
-        getRaw(db, query, params, true) as SqliteRow;
+        (getRaw(db, query, params, true) || null) as SqliteRow;
     const getArray = (query: string, params?: SqliteParams) =>
-        getRaw(db, query, params, false) as SqliteParam[];
+        (getRaw(db, query, params, false) || null) as SqliteParam[];
     const select = (query: string, params?: SqliteParams) =>
         selectRaw(db, query, params, true) as SqliteRow[];
     const selectArray = (query: string, params?: SqliteParams) =>
         selectRaw(db, query, params, false) as SqliteParam[][];
     const transaction = <T = any>(action: (cancel?: () => void) => T): T =>
         transactionRaw(db, action);
-
     return {
         isOpen,
         close,

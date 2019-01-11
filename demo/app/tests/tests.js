@@ -103,10 +103,7 @@ describe("openOrCreate =>", function() {
         });
         expectValidResult(
             () => sqlite.get("SELECT * FROM names WHERE id = (?)", 2),
-            {
-                id: null,
-                name: null,
-            }
+            null
         );
     });
 
@@ -120,7 +117,7 @@ describe("openOrCreate =>", function() {
         ]);
         expectValidResult(
             () => sqlite.getArray("SELECT * FROM names WHERE id = (?)", 2),
-            [null, null]
+            null
         );
     });
 

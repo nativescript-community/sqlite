@@ -17,7 +17,6 @@ export class HelloWorldModel extends Observable {
         this.resetDb();
         this.sqlite.setVersion(1);
         this.message = `version = ${this.sqlite.getVersion()}`;
-        console.log("MESSAGE = " + this.message);
     }
 
     resetDb() {
