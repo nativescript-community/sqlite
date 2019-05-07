@@ -41,7 +41,6 @@ matrix:
         - cd src && npm i && npm run tsc && cd ../demo && tns build ios
     - os: linux
       language: android
-      dist: precise
       sudo: required
       jdk: oraclejdk8
       before_script:
