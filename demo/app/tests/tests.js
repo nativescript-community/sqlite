@@ -238,7 +238,7 @@ describe("openOrCreate =>", function() {
                 } catch (error) {
                     e = error;
                 } finally {
-                    expect(e).toEqual("CUSTOM ERROR");
+                    expect(e.message).toContain("CUSTOM ERROR");
                 }
             });
         });
