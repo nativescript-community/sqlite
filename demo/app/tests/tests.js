@@ -183,7 +183,7 @@ describe("openOrCreate =>", function() {
                     );
                 })
                 .then(done, done);
-        it("should rollback inserts if there are errors", done => {
+        it("should rollback if there are errors", done => {
             let promises = [];
             sqlite.transaction(cancel => {
                 generateFourDataRecords().forEach(record => {
@@ -196,7 +196,16 @@ describe("openOrCreate =>", function() {
             });
             return expectLength(promises, 1, done);
         });
-        it("should commit inserts if there are no errors", done => {
+        it("should rollback if cancel is called", done => {
+            let promises = [];
+            sqlite.transaction(cancel => {
+                promises = generateFourDataRecords().map(insertPromise);
+                expectLength(promises, 5);
+                cancel();
+            });
+            expectLength(promises, 1, done);
+        });
+        it("should commit if there are no errors", done => {
             let promises = [];
             sqlite.transaction(cancel => {
                 generateFourDataRecords().forEach(record => {
@@ -204,6 +213,34 @@ describe("openOrCreate =>", function() {
                 });
             });
             return expectLength(promises, 5, done);
+        });
+        describe("nested transactions", () => {
+            expectNotToThrow(() =>
+                sqlite.transaction(() => {
+                    sqlite.transaction(() => {});
+                })
+            );
+            expectToThrow(() =>
+                sqlite.transaction(() => {
+                    sqlite.transaction(() => {
+                        throw new Error("");
+                    });
+                })
+            );
+            it("should bubble up inner errors", () => {
+                let e;
+                try {
+                    sqlite.transaction(() => {
+                        sqlite.transaction(() => {
+                            throw new Error("CUSTOM ERROR");
+                        });
+                    });
+                } catch (error) {
+                    e = error;
+                } finally {
+                    expect(e.message).toContain("CUSTOM ERROR");
+                }
+            });
         });
     });
 

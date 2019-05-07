@@ -258,21 +258,28 @@ const execRaw = (db: DbPtr, query: string, params?: SqliteParams) => {
 
 const transactionRaw = <T = any>(
     db: DbPtr,
-    action: (cancel?: () => void) => T
+    action: (cancel?: () => void) => T,
+    isFirstTransaction: boolean,
 ): T => {
     try {
-        execRaw(db, "BEGIN TRANSACTION");
+        if (isFirstTransaction) {
+            execRaw(db, "BEGIN EXCLUSIVE TRANSACTION");
+        }
         const cancelled = { value: false };
         const cancel = () => {
             cancelled.value = true;
         };
         const result = action(cancel);
-        if (!cancelled.value) {
+        if (!cancelled.value && isFirstTransaction) {
             execRaw(db, "COMMIT TRANSACTION");
+        } else if (cancelled.value && isFirstTransaction) {
+            execRaw(db, "ROLLBACK TRANSACTION");
         }
         return result;
     } catch (e) {
-        execRaw(db, "ROLLBACK TRANSACTION");
+        if (isFirstTransaction) {
+            execRaw(db, "ROLLBACK TRANSACTION");
+        }
         throwError(`transaction: ${e}`);
     }
 };
@@ -280,6 +287,7 @@ const transactionRaw = <T = any>(
 export const openOrCreate = (filePath: string): SQLiteDatabase => {
     let db = open(filePath);
     let _isOpen = true;
+    let _isInTransaction = false;
 
     const isOpen = () => _isOpen;
     const close = () => {
@@ -307,8 +315,17 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
         selectRaw(db, query, params, true) as SqliteRow[];
     const selectArray = (query: string, params?: SqliteParams) =>
         selectRaw(db, query, params, false) as SqliteParam[][];
-    const transaction = <T = any>(action: (cancel?: () => void) => T): T =>
-        transactionRaw(db, action);
+    const transaction = <T = any>(action: (cancel?: () => void) => T): T => {
+        let res;
+        if (!_isInTransaction) {
+            _isInTransaction = true;
+            res = transactionRaw(db, action, true);
+            _isInTransaction = false;
+        } else {
+            res = transactionRaw(db, action, false);
+        }
+        return res;
+    };
 
     return {
         isOpen,
