@@ -263,7 +263,7 @@ const transactionRaw = <T = any>(
 ): T => {
     try {
         if (isFirstTransaction) {
-            execRaw(db, "BEGIN TRANSACTION");
+            execRaw(db, "BEGIN EXCLUSIVE TRANSACTION");
         }
         const cancelled = { value: false };
         const cancel = () => {
