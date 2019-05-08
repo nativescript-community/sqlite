@@ -232,19 +232,17 @@ const selectRaw = (
     bind(params, statement);
     let rows = [];
     const getResults = asObject ? getResultsAsObject : getResultsAsArray;
-    const getAll = () => {
+    while (true) {
         const result = step(statement);
         if (result === 100) {
             const row = getResults(cursorSt);
             if (row) {
                 rows = [...rows, row];
             }
-            getAll();
-        } else if (result === 101) {
-            return;
+        } else {
+            break;
         }
-    };
-    getAll();
+    }
     finalize(statement);
     return rows;
 };
@@ -259,7 +257,7 @@ const execRaw = (db: DbPtr, query: string, params?: SqliteParams) => {
 const transactionRaw = <T = any>(
     db: DbPtr,
     action: (cancel?: () => void) => T,
-    isFirstTransaction: boolean,
+    isFirstTransaction: boolean
 ): T => {
     try {
         if (isFirstTransaction) {
