@@ -5,7 +5,7 @@ import {
     SQLiteDatabase,
     paramsToStringArray,
     throwError,
-} from "./mtmobile-sqlite.common";
+} from "./sqlite.common";
 
 type Db = android.database.sqlite.SQLiteDatabase;
 
@@ -90,8 +90,42 @@ const rawSql = <T>(onCursor: FromCursor<T>) => (
         cursor.close();
     }
 };
+const eachRaw = <T>(onCursor: FromCursor<T>) => (
+    db: Db,
+    log?: typeof console.log
+) => (
+    sql: string,
+    params: SqliteParams,
+    callback: (error: Error, result: T) => void,
+    complete: (error: Error, count: number) => void
+) => {
+    const parameters = paramsToStringArray(params);
+    const cursor = db.rawQuery(sql, parameters);
+    return Promise.resolve()
+        .then(() => {
+            let count = 0;
+            while (cursor.moveToNext()) {
+                const result = onCursor(cursor);
+                callback(null, result);
+            }
+            cursor.close();
+            complete && complete(null, count);
+            return count;
+        })
+        .catch(err => {
+            cursor.close();
+            let errorCB = complete || callback;
+            if (errorCB) {
+                errorCB(err, null);
+            }
+            return Promise.reject(err);
+        });
+};
 
-const transactionRaw = <T = any>(db: Db, action: (cancel?: (() => void)) => T) => {
+const transactionRaw = <T = any>(
+    db: Db,
+    action: (cancel?: () => void) => T
+) => {
     db.beginTransaction();
     try {
         const cancelled = { value: false };
@@ -130,6 +164,13 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
     const getArray = (query: string, params?: SqliteParams) =>
         rawSql(arrayFromCursor)(db)(query, params)[0] || null;
 
+    const each = (
+        query: string,
+        params: SqliteParams,
+        callback: (error: Error, result: any[]) => void,
+        complete: (error: Error, count: number) => void
+    ) => eachRaw(arrayFromCursor)(db)(query, params, callback, complete);
+
     return {
         getVersion,
         close,
@@ -141,6 +182,7 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
         getArray,
         execute,
         transaction,
+        each
     };
 };
 

@@ -1,11 +1,11 @@
 import {
     SQLiteDatabase,
+    SqliteParam,
     SqliteParams,
     paramsToStringArray,
     SqliteRow,
     throwError,
-} from "./mtmobile-sqlite.common";
-import { SqliteParam } from ".";
+} from "./sqlite.common";
 
 declare const sqlitehelper: { getTrans: () => interop.FunctionReference<any> };
 
@@ -45,32 +45,32 @@ const getNewCursorStatement = (
     count: undefined,
 });
 
-const getValuesAsString = (
-    statement: interop.Reference<any>,
-    column: number
-) => {
-    const type = sqlite3_column_type(statement, column);
-    switch (type) {
-        case 1: // Int
-        case 2: // Float
-        case 3: // Text
-            return NSString.stringWithUTF8String(
-                sqlite3_column_text(statement, column)
-            ).toString();
+// const getValuesAsString = (
+//     statement: interop.Reference<any>,
+//     column: number
+// ) => {
+//     const type = sqlite3_column_type(statement, column);
+//     switch (type) {
+//         case 1: // Int
+//         case 2: // Float
+//         case 3: // Text
+//             return NSString.stringWithUTF8String(
+//                 sqlite3_column_text(statement, column)
+//             ).toString();
 
-        case 4: // Blob
-            return NSData.dataWithBytesLength(
-                sqlite3_column_blob(statement, column),
-                sqlite3_column_bytes(statement, column)
-            );
+//         case 4: // Blob
+//             return NSData.dataWithBytesLength(
+//                 sqlite3_column_blob(statement, column),
+//                 sqlite3_column_bytes(statement, column)
+//             );
 
-        case 5: // Null
-            return null;
+//         case 5: // Null
+//             return null;
 
-        default:
-            throwError(`unknown.type: ${type}`);
-    }
-};
+//         default:
+//             throwError(`unknown.type: ${type}`);
+//     }
+// };
 
 const getValues = (statement: interop.Reference<any>, column: number) => {
     const type = sqlite3_column_type(statement, column);
@@ -97,6 +97,7 @@ const getValues = (statement: interop.Reference<any>, column: number) => {
 
         default:
             throwError(`unknown.type: ${type}`);
+            return null;
     }
 };
 
@@ -221,6 +222,51 @@ const getRaw = (
     return data;
 };
 
+const eachRaw = (
+    db: DbPtr,
+    query: string,
+    params: SqliteParams,
+    asObject: boolean,
+    callback: (error: Error, result: SqliteRow | SqliteParam[]) => void,
+    complete: (error: Error, count: number) => void
+) => {
+    const statement = prepareStatement(db, query);
+    const cursorSt = getNewCursorStatement(statement);
+    bind(params, statement);
+    let rows = [];
+    const getResults = asObject ? getResultsAsObject : getResultsAsArray;
+    return Promise.resolve()
+        .then(() => {
+            let count = 0;
+            while (true) {
+                const result = step(statement);
+                if (result === 100) {
+                    const row = getResults(cursorSt);
+                    if (row) {
+                        count++;
+                        callback(null, row);
+                    }
+                } else if (result && result !== 101) {
+                    finalize(statement);
+                    throw new Error("db_error " + result);
+                } else {
+                    break;
+                }
+            }
+            finalize(statement);
+            complete && complete(null, count);
+            return count;
+        })
+        .catch(err => {
+            let errorCB = complete || callback;
+            if (errorCB) {
+                errorCB(err, null);
+            }
+            return Promise.reject(err);
+        });
+
+    // return rows;
+};
 const selectRaw = (
     db: DbPtr,
     query: string,
@@ -279,6 +325,7 @@ const transactionRaw = <T = any>(
             execRaw(db, "ROLLBACK TRANSACTION");
         }
         throwError(`transaction: ${e}`);
+        return null;
     }
 };
 
@@ -311,6 +358,20 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
         (getRaw(db, query, params, false) || null) as SqliteParam[];
     const select = (query: string, params?: SqliteParams) =>
         selectRaw(db, query, params, true) as SqliteRow[];
+    const each = (
+        query: string,
+        params: SqliteParams,
+        callback: (error: Error, result: SqliteRow[]) => void,
+        complete: (error: Error, count: number) => void
+    ) =>
+        eachRaw(
+            db,
+            query,
+            params,
+            true,
+            callback as (error: Error, result: any[]) => void,
+            complete
+        );
     const selectArray = (query: string, params?: SqliteParams) =>
         selectRaw(db, query, params, false) as SqliteParam[][];
     const transaction = <T = any>(action: (cancel?: () => void) => T): T => {
@@ -336,6 +397,7 @@ export const openOrCreate = (filePath: string): SQLiteDatabase => {
         select,
         selectArray,
         transaction,
+        each,
     };
 };
 

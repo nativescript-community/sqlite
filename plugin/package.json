@@ -1,0 +1,31 @@
+{
+    "name": "nativescript-akylas-sqlite",
+    "version": "1.3.0",
+    "description": "SQLite for Nativescript",
+    "main": "sqlite",
+    "typings": "sqlite.d.ts",
+    "nativescript": {
+        "platforms": {
+            "android": "6.2.0",
+            "ios": "6.2.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Josep Bergay",
+        "email": "josep.bergay@gmail.com"
+    },
+    "bugs": {
+        "url": "https://github.com/TestJG/nativescript-akylas-sqlite/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/TestJG/nativescript-akylas-sqlite",
+    "readmeFilename": "README.md",
+    "repository": "TestJG/nativescript-akylas-sqlite",
+    "dependencies": {}
+}

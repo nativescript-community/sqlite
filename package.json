@@ -1,0 +1,63 @@
+{
+    "name": "nativescript-mtmobile-sqlite",
+    "version": "1.3.0",
+    "description": "SQLite for Nativescript",
+    "nativescript": {
+        "platforms": {
+            "android": "5.0.0",
+            "ios": "5.0.0"
+        }
+    },
+    "scripts": {
+        "tsc": "cp src/sqlite.d.ts plugin && cp README.md plugin && tsc -skipLibCheck",
+        "build": "pnpm i && pnpm run tsc",
+        "demo.ios": "pnpm i && pnpm run tsc && cd demo && tns run ios",
+        "demo.android": "pnpm i && pnpm run tsc && cd demo && tns run android",
+        "clean.demo": "rimraf demo/hooks demo/node_modules demo/platforms",
+        "clean": "rimraf plugin/ios plugin/android plugin/**/*.d.ts plugin/**/*.js plugin/**/*.js.map plugin/node_modules plugin/package-lock.json",
+        "plugin.watch": "pnpm run tsc -- -w",
+        "publish": "pnpm run build && lerna publish",
+        "test.android": "pnpm run build && cd ./demo && tns build android && tns test android --justlaunch",
+        "test.ios": "pnpm run build && cd ./demo && tns build ios && tns test ios --justlaunch",
+        "test.android.verbose": "pnpm run build  && cd ./demo && tns build android && tns test android",
+        "test.ios.verbose": "pnpm run build  && cd ./demo && tns build ios && tns test ios",
+        "commitmsg": "commitlint -e $GIT_PARAMS"
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Josep Bergay",
+        "email": "josep.bergay@gmail.com"
+    },
+    "bugs": {
+        "url": "https://github.com/TestJG/nativescript-mtmobile-sqlite/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/TestJG/nativescript-mtmobile-sqlite",
+    "readmeFilename": "README.md",
+    "repository": "TestJG/nativescript-mtmobile-sqlite",
+    "devDependencies": {
+        "@commitlint/cli": "^8.2.0",
+        "@commitlint/config-conventional": "^8.2.0",
+        "@nano-sql/core": "^2.3.7",
+        "@nativescript/core": "^6.2.3",
+        "husky": "^3.1.0",
+        "lerna": "^3.19.0",
+        "tns-platform-declarations": "^6.2.3",
+        "typescript": "~3.7.3",
+        "prompt": "^1.0.0",
+        "rimraf": "^3.0.0",
+        "tslint": "^5.20.1",
+        "semver": "^6.3.0"
+    },
+    "bootstrapper": "nativescript-plugin-seed",
+    "commitlint": {
+        "extends": [
+            "@commitlint/config-conventional"
+        ]
+    }
+}

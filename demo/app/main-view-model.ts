@@ -1,10 +1,10 @@
-import { Observable } from "tns-core-modules/data/observable";
+import { Observable } from "@nativescript/core/data/observable";
 import {
     openOrCreate,
     SQLiteDatabase,
     deleteDatabase,
-} from "nativescript-mtmobile-sqlite";
-import { path, knownFolders } from "tns-core-modules/file-system";
+} from "nativescript-akylas-sqlite";
+import { path, knownFolders } from "@nativescript/core/file-system";
 
 type DataExample = { id: number; name: string };
 

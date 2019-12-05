@@ -1,5 +1,5 @@
-const MtmobileSqlite = require("nativescript-mtmobile-sqlite");
-const fs = require("tns-core-modules/file-system");
+const Sqlite = require("nativescript-akylas-sqlite");
+const fs = require("@nativescript/core/file-system");
 
 const expectFunc = func => {
     it("is defined", () => expect(func).toBeDefined());
@@ -46,11 +46,11 @@ const generateFourDataRecords = () => {
 
 describe("openOrCreate =>", function() {
     // 1
-    expectFunc(MtmobileSqlite.openOrCreate);
-    expectToThrow(() => MtmobileSqlite.openOrCreate("\\\\"));
+    expectFunc(Sqlite.openOrCreate);
+    expectToThrow(() => Sqlite.openOrCreate("\\\\"));
     describe("Sqlite", () => {
         // 4
-        const sqlite = MtmobileSqlite.openOrCreate(filePath);
+        const sqlite = Sqlite.openOrCreate(filePath);
         it("is defined", () => expect(sqlite).toBeDefined());
         expectProperty("close", sqlite);
         expectProperty("execute", sqlite);
@@ -62,12 +62,12 @@ describe("openOrCreate =>", function() {
         expectProperty("selectArray", sqlite);
         expectProperty("setVersion", sqlite);
         expectProperty("transaction", sqlite);
-        MtmobileSqlite.deleteDatabase(filePath);
+        Sqlite.deleteDatabase(filePath);
     });
 
     describe("Sqlite.close =>", () => {
         // 15
-        const sqlite = MtmobileSqlite.openOrCreate(filePath);
+        const sqlite = Sqlite.openOrCreate(filePath);
         expectFunc(sqlite.close);
         it("db should be open before calling close", () =>
             expect(sqlite.isOpen()).toEqual(true));
@@ -76,10 +76,10 @@ describe("openOrCreate =>", function() {
             expect(sqlite.isOpen()).toEqual(false));
         it("any call to db after close should throw", () =>
             expect(sqlite.getVersion).toThrow());
-        MtmobileSqlite.deleteDatabase(filePath);
+        Sqlite.deleteDatabase(filePath);
     });
 
-    const sqlite = MtmobileSqlite.openOrCreate(filePath);
+    const sqlite = Sqlite.openOrCreate(filePath);
     describe("Sqlite.execute =>", () => {
         // 21
         expectFunc(sqlite.execute);
@@ -257,7 +257,7 @@ describe("openOrCreate =>", function() {
 
 describe("deleteDatabase =>", function() {
     // 65
-    expectFunc(MtmobileSqlite.deleteDatabase);
-    expectValidResult(() => MtmobileSqlite.deleteDatabase("\\\\"), false);
-    expectValidResult(() => MtmobileSqlite.deleteDatabase(filePath), true);
+    expectFunc(Sqlite.deleteDatabase);
+    expectValidResult(() => Sqlite.deleteDatabase("\\\\"), false);
+    expectValidResult(() => Sqlite.deleteDatabase(filePath), true);
 });

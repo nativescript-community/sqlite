@@ -2,42 +2,29 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "declaration": false,
-        "removeComments": true,
-        "noLib": false,
-        "emitDecoratorMetadata": true,
+        "moduleResolution": "node",
+        "incremental": true,
+        "tsBuildInfoFile": ".tsbuildinfo",
+        "removeComments": false,
         "experimentalDecorators": true,
-        "lib": [
-            "es6",
-            "dom"
-        ],
-        "pretty": true,
-        "allowUnreachableCode": false,
-        "allowUnusedLabels": false,
+        "emitDecoratorMetadata": true,
+        "sourceMap": true,
+        "importHelpers": true,
         "noEmitHelpers": true,
-        "noEmitOnError": false,
-        "noImplicitAny": false,
-        "noImplicitReturns": false,
-        "noImplicitUseStrict": false,
-        "noFallthroughCasesInSwitch": true,
+        "noEmitOnError": true,
+        "preserveSymlinks": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "noImplicitUseStrict": true,
+        "lib": ["es6", "dom", "es2015.iterable"],
         "baseUrl": ".",
         "paths": {
-            "*": [
-                "./node_modules/*"
-            ],
-            "~/*": [
-                "app/*"
-            ]
+            "tns-core-modules": ["./node_modules/@nativescript/core"],
+            "tns-core-modules/*": ["./node_modules/@nativescript/core/*"],
+            "~/*": ["app/*"],
+            "*": ["./node_modules/*"]
         }
     },
-    "include": [
-        "../src",
-        "**/*"
-    ],
-    "exclude": [
-        "../src/node_modules",
-        "node_modules",
-        "platforms"
-    ],
-    "compileOnSave": false
+    "include": ["app/**/*", "references.d.ts"],
+    "exclude": ["node_modules", "platforms", "**/angular"]
 }

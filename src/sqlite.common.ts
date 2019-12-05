@@ -30,6 +30,13 @@ export interface SQLiteDatabase {
     execute(query: string, params?: SqliteParams): void;
 
     transaction<T = any>(action: (cancel?: () => void) => T): T;
+
+    each(
+        query: string,
+        params: SqliteParams,
+        callback: (error: Error, result: SqliteRow[]) => void,
+        complete: (error: Error, count: number) => void
+    ): void;
 }
 
 const isNothing = (x: any) => x === undefined || x === null;
@@ -47,5 +54,11 @@ export const paramsToStringArray = (params?: SqliteParams) => {
 };
 
 export const throwError = (msg: string) => {
-    throw new Error(`MtMobileSqlite Error: ${msg}`);
+    throw new Error(`NSqlite Error: ${msg}`);
+};
+export const openOrCreate = (filePath: string): SQLiteDatabase => {
+    return null;
+};
+export const deleteDatabase = (filePath: string) => {
+    return false;
 };
