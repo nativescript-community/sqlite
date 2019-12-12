@@ -1,6 +1,6 @@
 {
     "name": "nativescript-akylas-sqlite",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "description": "SQLite for Nativescript",
     "main": "sqlite",
     "typings": "sqlite.d.ts",
