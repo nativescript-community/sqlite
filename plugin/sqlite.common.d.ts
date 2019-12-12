@@ -6,19 +6,21 @@ export declare type SqliteRow = {
 export declare type Db = any;
 export declare type SqliteUpgrade = (db: Db) => void;
 export interface SQLiteDatabase {
-    getVersion: () => number;
-    setVersion: (version: number) => void;
-    isOpen: () => boolean;
-    close: () => void;
-    select: (query: string, params?: SqliteParams) => SqliteRow[];
-    selectArray: (query: string, params?: SqliteParams) => SqliteParam[][];
-    get: (query: string, params?: SqliteParams) => SqliteRow;
-    getArray: (query: string, params?: SqliteParams) => SqliteParam[];
-    execute(query: string, params?: SqliteParams): void;
+    getVersion(): Promise<number>;
+    setVersion(version: number): Promise<void>;
+    isOpen(): boolean;
+    close(): Promise<void>;
+    select(query: string, params?: SqliteParams): Promise<SqliteRow[]>;
+    selectArray(query: string, params?: SqliteParams): Promise<SqliteParam[][]>;
+    get(query: string, params?: SqliteParams): Promise<SqliteRow>;
+    getArray(query: string, params?: SqliteParams): Promise<SqliteParam[]>;
+    execute(query: string, params?: SqliteParams): Promise<void>;
     transaction<T = any>(action: (cancel?: () => void) => T): T;
-    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow[]) => void, complete: (error: Error, count: number) => void): void;
+    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow[]) => void, complete: (error: Error, count: number) => void): Promise<void>;
 }
-export declare const paramsToStringArray: (params?: SqliteParams) => string[];
-export declare const throwError: (msg: string) => never;
-export declare const openOrCreate: (filePath: string) => SQLiteDatabase;
-export declare const deleteDatabase: (filePath: string) => boolean;
+export declare function isNothing(x: any): boolean;
+export declare function paramToString(p: SqliteParam): string;
+export declare function paramsToStringArray(params?: SqliteParams): string[];
+export declare function throwError(msg: string): void;
+export declare function openOrCreate(filePath: string, flags?: number): SQLiteDatabase;
+export declare function deleteDatabase(filePath: string): boolean;

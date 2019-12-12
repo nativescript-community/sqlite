@@ -2,10 +2,11 @@ import {
     SqliteRow,
     SqliteParam,
     SqliteParams,
-    SQLiteDatabase,
     paramsToStringArray,
     throwError,
 } from "./sqlite.common";
+
+import * as application from "@nativescript/core/application";
 
 type Db = android.database.sqlite.SQLiteDatabase;
 
@@ -142,48 +143,107 @@ const transactionRaw = <T = any>(
     }
 };
 
-export const openOrCreate = (filePath: string): SQLiteDatabase => {
-    const db = android.database.sqlite.SQLiteDatabase.openOrCreateDatabase(
-        filePath,
-        null
-    );
-    const getVersion = () => db.getVersion();
-    const close = () => db.close();
-    const isOpen = () => db.isOpen();
-    const setVersion = version => db.setVersion(version);
-    const select = (query: string, params?: SqliteParams) =>
-        rawSql(dataFromCursor)(db)(query, params);
-    const selectArray = (query: string, params?: SqliteParams) =>
-        rawSql(arrayFromCursor)(db)(query, params);
-    const execute = (query: string, params?: SqliteParams) =>
-        db.execSQL(query, paramsToStringArray(params));
-    const transaction = <T = any>(action: (cancel?: () => void) => T) =>
-        transactionRaw(db, action);
-    const get = (query: string, params?: SqliteParams) =>
-        rawSql(dataFromCursor)(db)(query, params)[0] || null;
-    const getArray = (query: string, params?: SqliteParams) =>
-        rawSql(arrayFromCursor)(db)(query, params)[0] || null;
+function createDb(dbName: string, flags) {
+    if (dbName === ":memory:") {
+        //noinspection JSUnresolvedVariable
+        return android.database.sqlite.SQLiteDatabase.create(flags);
+    }
+    if (dbName.indexOf("/") >= 0) {
+        return android.database.sqlite.SQLiteDatabase.openDatabase(
+            dbName,
+            null,
+            flags ||
+                android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY |
+                    android.database.sqlite.SQLiteDatabase
+                        .NO_LOCALIZED_COLLATORS
+        );
+    } else {
+        //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+        const activity =
+            application.android.foregroundActivity ||
+            application.android.startActivity;
+        return activity.openOrCreateDatabase(
+            dbName,
+            flags | activity.MODE_PRIVATE,
+            null
+        );
+    }
+}
 
-    const each = (
+export class SQLiteDatabase {
+    db: android.database.sqlite.SQLiteDatabase;
+    constructor(public filePath: string, public flags?: number) {}
+    get isOpen() {
+        return this.db.isOpen();
+    }
+    async open() {
+        if (!this.db) {
+            this.db = createDb(this.filePath, this.flags);
+        }
+        // if (!this.isOpen) {
+        // }
+        return this.isOpen;
+    }
+    async close() {
+        if (!this.isOpen) return;
+        this.db.close();
+        // sqlite3_close_v2(db);
+        this.db = null;
+    }
+    async setVersion(version: number) {
+        this.db.setVersion(version);
+        // const query = "PRAGMA user_version=" + (version + 0).toString();
+        // execRaw(this.db, query);
+    }
+    async getVersion() {
+        // const query = "PRAGMA user_version";
+        // const result = this.getArray(query);
+        // return result && (result[0] as number);
+        return this.db.getVersion();
+    }
+    async execute(query: string, params?: SqliteParams) {
+        console.log("SQLiteDatabase", query, params);
+        return this.db.execSQL(query, paramsToStringArray(params));
+    }
+    async get(query: string, params?: SqliteParams) {
+        return rawSql(dataFromCursor)(this.db)(query, params)[0] || null;
+    }
+    async getArray(query: string, params?: SqliteParams) {
+        return rawSql(arrayFromCursor)(this.db)(query, params)[0] || null;
+    }
+    async select(query: string, params?: SqliteParams) {
+        return rawSql(dataFromCursor)(this.db)(query, params);
+    }
+    async selectArray(query: string, params?: SqliteParams) {
+        return rawSql(arrayFromCursor)(this.db)(query, params);
+    }
+    async each(
         query: string,
         params: SqliteParams,
         callback: (error: Error, result: any[]) => void,
         complete: (error: Error, count: number) => void
-    ) => eachRaw(arrayFromCursor)(db)(query, params, callback, complete);
+    ) {
+        return eachRaw(arrayFromCursor)(this.db)(
+            query,
+            params,
+            callback,
+            complete
+        );
+    }
+    _isInTransaction = false;
+    transaction<T = any>(action: (cancel?: () => void) => T): T {
+        return transactionRaw(this.db, action);
+    }
+}
 
-    return {
-        getVersion,
-        close,
-        isOpen,
-        setVersion,
-        select,
-        selectArray,
-        get,
-        getArray,
-        execute,
-        transaction,
-        each
-    };
+export const openOrCreate = (
+    filePath: string,
+    flags?: number
+): SQLiteDatabase => {
+    console.log("openOrCreate", filePath, flags);
+    const obj = new SQLiteDatabase(filePath);
+    obj.open();
+    return obj;
 };
 
 export const deleteDatabase = (filePath: string) =>

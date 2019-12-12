@@ -51,7 +51,7 @@ export class HelloWorldModel extends Observable {
         try {
             this.insert(generateData(10000));
         } catch (error) {
-            console.log("Error onInsert: " + error);
+            alert("Error onInsert: " + error);
         }
     }
 
@@ -59,14 +59,14 @@ export class HelloWorldModel extends Observable {
         try {
             this.sqlite.transaction(() => this.insert(generateData(10000)));
         } catch (error) {
-            console.log("Error onInsertWithTrans: " + error);
+            alert("Error onInsertWithTrans: " + error);
         }
     }
 
     onSelect() {
         const select = "SELECT * FROM names WHERE id < 20";
         const data = this.sqlite.select(select);
-        console.log(`Received data: ${JSON.stringify(data)}`);
+        alert(`Received data: ${JSON.stringify(data)}`);
     }
 
     onReset() {

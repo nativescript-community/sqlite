@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "jasmine-core": "^3.5.0",
-    "loader-utils":"1.2.3",
+    "loader-utils": "1.2.3",
     "karma": "^4.4.1",
     "karma-jasmine": "^2.0.1",
     "karma-nativescript-launcher": "^0.4.0",

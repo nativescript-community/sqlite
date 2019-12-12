@@ -11,23 +11,23 @@ export type Db = any;
 export type SqliteUpgrade = (db: Db) => void;
 
 export interface SQLiteDatabase {
-    getVersion: () => number;
+    getVersion(): Promise<number>;
 
-    setVersion: (version: number) => void;
+    setVersion(version: number): Promise<void>;
 
-    isOpen: () => boolean;
+    isOpen(): boolean;
 
-    close: () => void;
+    close(): Promise<void>;
 
-    select: (query: string, params?: SqliteParams) => SqliteRow[];
+    select(query: string, params?: SqliteParams): Promise<SqliteRow[]>;
 
-    selectArray: (query: string, params?: SqliteParams) => SqliteParam[][];
+    selectArray(query: string, params?: SqliteParams): Promise<SqliteParam[][]>;
 
-    get: (query: string, params?: SqliteParams) => SqliteRow;
+    get(query: string, params?: SqliteParams): Promise<SqliteRow>;
 
-    getArray: (query: string, params?: SqliteParams) => SqliteParam[];
+    getArray(query: string, params?: SqliteParams): Promise<SqliteParam[]>;
 
-    execute(query: string, params?: SqliteParams): void;
+    execute(query: string, params?: SqliteParams): Promise<void>;
 
     transaction<T = any>(action: (cancel?: () => void) => T): T;
 
@@ -36,14 +36,18 @@ export interface SQLiteDatabase {
         params: SqliteParams,
         callback: (error: Error, result: SqliteRow[]) => void,
         complete: (error: Error, count: number) => void
-    ): void;
+    ): Promise<void>;
 }
 
-const isNothing = (x: any) => x === undefined || x === null;
+export function isNothing(x: any) {
+    return x === undefined || x === null;
+}
 
-const paramToString = (p: SqliteParam) => (isNothing(p) ? null : p.toString());
+export function paramToString(p: SqliteParam) {
+    return isNothing(p) ? null : p.toString();
+}
 
-export const paramsToStringArray = (params?: SqliteParams) => {
+export function paramsToStringArray(params?: SqliteParams) {
     if (isNothing(params)) {
         return [];
     }
@@ -51,14 +55,14 @@ export const paramsToStringArray = (params?: SqliteParams) => {
         return params.map(paramToString);
     }
     return [paramToString(params)];
-};
+}
 
-export const throwError = (msg: string) => {
+export function throwError(msg: string) {
     throw new Error(`NSqlite Error: ${msg}`);
-};
-export const openOrCreate = (filePath: string): SQLiteDatabase => {
+}
+export function openOrCreate(filePath: string, flags?: number): SQLiteDatabase {
     return null;
-};
-export const deleteDatabase = (filePath: string) => {
+}
+export function deleteDatabase(filePath: string) {
     return false;
-};
+}

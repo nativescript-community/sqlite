@@ -47,17 +47,20 @@
         "@nativescript/core": "^6.2.3",
         "husky": "^3.1.0",
         "lerna": "^3.19.0",
-        "tns-platform-declarations": "^6.2.3",
-        "typescript": "~3.7.3",
         "prompt": "^1.0.0",
         "rimraf": "^3.0.0",
+        "semver": "^6.3.0",
+        "tns-platform-declarations": "^6.2.3",
         "tslint": "^5.20.1",
-        "semver": "^6.3.0"
+        "typescript": "~3.7.3"
     },
     "bootstrapper": "nativescript-plugin-seed",
     "commitlint": {
         "extends": [
             "@commitlint/config-conventional"
         ]
+    },
+    "dependencies": {
+        "typeorm": "^0.2.21"
     }
 }

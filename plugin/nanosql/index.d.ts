@@ -2,6 +2,8 @@ import { InanoSQLTable, InanoSQLPlugin, InanoSQLInstance, SQLiteAbstractFns } fr
 import { nanoSQLMemoryIndex } from "@nano-sql/core/lib/adapters/memoryIndex";
 import * as NSSqlite from "../sqlite";
 export declare class NativeSQLite extends nanoSQLMemoryIndex {
+    private filePath;
+    private flags?;
     plugin: InanoSQLPlugin;
     nSQL: InanoSQLInstance;
     _id: string;
@@ -13,8 +15,7 @@ export declare class NativeSQLite extends nanoSQLMemoryIndex {
     _tableConfigs: {
         [tableName: string]: InanoSQLTable;
     };
-    _filename: string;
-    constructor(fileName?: string);
+    constructor(filePath: string, flags?: number);
     connect(id: string, complete: () => void, error: (err: any) => void): void;
     createTable(tableName: string, tableData: InanoSQLTable, complete: () => void, error: (err: any) => void): void;
     _query(allowWrite: boolean, sql: string, args: any[], onRow: (row: any, i: number) => void, complete: () => void, error: (err: any) => void): void;

@@ -25,13 +25,10 @@ export class NativeSQLite extends nanoSQLMemoryIndex {
         [tableName: string]: InanoSQLTable;
     };
 
-    public _filename: string;
-
-    constructor(fileName?: string) {
+    constructor(private filePath: string, private flags?: number) {
         super(false, true);
         this._ai = {};
         this._query = this._query.bind(this);
-        this._filename = fileName || "";
         this._tableConfigs = {};
         this._sqlite = SQLiteAbstract(this._query, 500);
     }
@@ -40,7 +37,8 @@ export class NativeSQLite extends nanoSQLMemoryIndex {
         this._id = id;
         try {
             this._db = NSSqlite.openOrCreate(
-                this._filename && this._filename.length ? this._filename : id
+                this.filePath && this.filePath.length ? this.filePath : id,
+                this.flags
             );
             this._sqlite.createAI(() => {
                 // this._db.resultType(NSSQLite.RESULTSASOBJECT);
