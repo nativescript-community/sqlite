@@ -1,4 +1,4 @@
-# Nativescript: MtMobile Sqlite
+# Nativescript: Akylas Sqlite
 
 [![Build Status](https://travis-ci.com/TestJG/nativescript-akylas-sqlite.svg?branch=master)](https://travis-ci.com/TestJG/nativescript-akylas-sqlite) [![npm version](https://badge.fury.io/js/nativescript-akylas-sqlite.svg)](https://badge.fury.io/js/nativescript-akylas-sqlite)
 
