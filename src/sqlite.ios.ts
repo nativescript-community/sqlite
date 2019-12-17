@@ -288,7 +288,6 @@ function getRaw(
         //     }
         // }
     } else {
-        console.log("eachRaw error", db.lastError());
         throw db.lastError();
     }
 }
@@ -324,7 +323,6 @@ function eachRaw(
                     }
                 }
             } else {
-                console.log("eachRaw error", db.lastError());
                 throw db.lastError();
             }
 
@@ -381,7 +379,6 @@ function selectRaw(
             }
         }
     } else {
-        console.log("eachRaw error", db.lastError());
         throw db.lastError();
     }
     // while (true) {
@@ -408,7 +405,6 @@ function execRaw(db: FMDatabase, query: string, params?: SqliteParams) {
         query,
         paramsToStringArray(params)
     );
-    console.log("execRaw", query, params, s);
     if (!s) {
         // while (s.next()) {
         //     //retrieve values for each record
@@ -418,7 +414,6 @@ function execRaw(db: FMDatabase, query: string, params?: SqliteParams) {
         //     }
         // }
         // } else {
-        console.log("eachRaw error", db.lastError());
         throw db.lastError();
     }
 }
@@ -532,7 +527,6 @@ export function openOrCreate(
     flags?: number,
     readOnly?: boolean
 ): SQLiteDatabase {
-    console.log("openOrCreate", filePath, flags, getRealPath(filePath));
     const obj = new SQLiteDatabase(getRealPath(filePath));
     obj.open();
     return obj;

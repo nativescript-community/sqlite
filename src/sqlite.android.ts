@@ -202,7 +202,6 @@ export class SQLiteDatabase {
         return this.db.getVersion();
     }
     async execute(query: string, params?: SqliteParams) {
-        console.log("SQLiteDatabase", query, params);
         return this.db.execSQL(query, paramsToStringArray(params));
     }
     async get(query: string, params?: SqliteParams) {
@@ -240,7 +239,6 @@ export const openOrCreate = (
     filePath: string,
     flags?: number
 ): SQLiteDatabase => {
-    console.log("openOrCreate", filePath, flags);
     const obj = new SQLiteDatabase(filePath);
     obj.open();
     return obj;
