@@ -484,7 +484,6 @@ export class SQLiteDatabase {
         return this.db.userVersion;
     }
     async execute(query: string, params?: SqliteParams) {
-        console.log("SQLiteDatabase", query, params);
         return execRaw(this.db, query, params);
     }
     async get(query: string, params?: SqliteParams) {
