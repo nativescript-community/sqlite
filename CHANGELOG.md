@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.2](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.0.1...v3.0.2) (2019-12-18)
+
+
+### Bug Fixes
+
+* more logs cleanup ([58ef7d3](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/58ef7d3c27bf898bb865b8b80e20e55585bb0f42))
+
+
+
+
+
 ## [3.0.1](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.0.0...v3.0.1) (2019-12-17)
 
 
