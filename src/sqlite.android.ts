@@ -75,10 +75,10 @@ const arrayFromCursor = (cursor: android.database.Cursor) => {
     return data;
 };
 
-const rawSql = <T>(onCursor: FromCursor<T>) => (
-    db: Db,
-    log?: typeof console.log
-) => (sql: string, params?: SqliteParams) => {
+const rawSql = <T>(onCursor: FromCursor<T>) => (db: Db) => (
+    sql: string,
+    params?: SqliteParams
+) => {
     const parameters = paramsToStringArray(params);
     const cursor = db.rawQuery(sql, parameters);
     try {
@@ -91,10 +91,7 @@ const rawSql = <T>(onCursor: FromCursor<T>) => (
         cursor.close();
     }
 };
-const eachRaw = <T>(onCursor: FromCursor<T>) => (
-    db: Db,
-    log?: typeof console.log
-) => (
+const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
     sql: string,
     params: SqliteParams,
     callback: (error: Error, result: T) => void,

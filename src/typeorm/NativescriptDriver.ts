@@ -91,11 +91,11 @@ export class NativescriptDriver extends AbstractSqliteDriver {
     sqlite: typeof NSQlite;
     protected async createDatabaseConnection() {
         try {
-            console.log(
-                "createDatabaseConnection",
-                this.options.database,
-                this.options.extra
-            );
+            // console.log(
+            //     "createDatabaseConnection",
+            //     this.options.database,
+            //     this.options.extra
+            // );
             const db = await this.sqlite.openOrCreate(
                 this.options.database,
                 this.options.extra
