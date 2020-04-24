@@ -15,7 +15,7 @@ export interface SQLiteDatabase {
 
     setVersion(version: number): Promise<void>;
 
-    isOpen(): boolean;
+    isOpen: boolean;
 
     close(): Promise<void>;
 
