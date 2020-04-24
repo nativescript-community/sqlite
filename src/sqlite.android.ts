@@ -110,7 +110,7 @@ const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
             complete && complete(null, count);
             return count;
         })
-        .catch(err => {
+        .catch((err) => {
             cursor.close();
             let errorCB = complete || callback;
             if (errorCB) {
@@ -149,19 +149,20 @@ function createDb(dbName: string, flags) {
         return android.database.sqlite.SQLiteDatabase.openDatabase(
             dbName,
             null,
-            flags ||
-                android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY |
-                    android.database.sqlite.SQLiteDatabase
-                        .NO_LOCALIZED_COLLATORS
+            flags !== undefined
+                ? flags
+                : android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY |
+                      android.database.sqlite.SQLiteDatabase
+                          .NO_LOCALIZED_COLLATORS
         );
     } else {
         //noinspection JSUnresolvedVariable,JSUnresolvedFunction
-        const activity =
+        const activity: android.app.Activity =
             application.android.foregroundActivity ||
             application.android.startActivity;
         return activity.openOrCreateDatabase(
             dbName,
-            flags | activity.MODE_PRIVATE,
+            flags !== undefined ? flags : android.app.Activity.MODE_PRIVATE,
             null
         );
     }
@@ -171,11 +172,13 @@ export class SQLiteDatabase {
     db: android.database.sqlite.SQLiteDatabase;
     constructor(public filePath: string, public flags?: number) {}
     get isOpen() {
-        return this.db.isOpen();
+        return this.db && this.db.isOpen();
     }
     async open() {
         if (!this.db) {
+            console.log("createDb", this.filePath, this.flags);
             this.db = createDb(this.filePath, this.flags);
+            console.log("createDb done ", this.db);
         }
         // if (!this.isOpen) {
         // }
@@ -236,7 +239,7 @@ export const openOrCreate = (
     filePath: string,
     flags?: number
 ): SQLiteDatabase => {
-    const obj = new SQLiteDatabase(filePath);
+    const obj = new SQLiteDatabase(filePath, flags);
     obj.open();
     return obj;
 };
