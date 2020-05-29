@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.5](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.0.4...v3.0.5) (2020-05-29)
+
+
+### Bug Fixes
+
+* nano sql fi ([db275c1](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/db275c12bf0042c0e7e790978acd63af3873b7f4))
+
+
+
+
+
 ## [3.0.4](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.0.3...v3.0.4) (2020-05-29)
 
 **Note:** Version bump only for package nativescript-akylas-sqlite
