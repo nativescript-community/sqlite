@@ -25,3 +25,7 @@ demo/report/stats.json
 src/package-lock.json
 demo/package-lock.json
 plugin/*.d.ts
+
+/plugin/README.md
+plugin/**/*js.map
+plugin/**/*js

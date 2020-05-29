@@ -2,10 +2,11 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "declaration": true,
-        "removeComments": false,
+        "declaration": false,
+        "moduleResolution": "node",
+        "removeComments": true,
         "noLib": false,
-        "emitDecoratorMetadata": true,
+        "emitDecoratorMetadata": false,
         "experimentalDecorators": true,
         "lib": ["es6", "dom"],
         "sourceMap": true,
@@ -16,19 +17,23 @@
         "noEmitOnError": false,
         "noImplicitAny": false,
         "noImplicitReturns": true,
-        "noImplicitUseStrict": false,
+        "noImplicitUseStrict": true,
         "noFallthroughCasesInSwitch": true,
+        "sourceRoot": "../src",
         "baseUrl": ".",
         "outDir": "./plugin",
-        "rootDir": "src",
         "paths": {
             "tns-core-modules": ["./node_modules/@nativescript/core"],
             "tns-core-modules/*": ["./node_modules/@nativescript/core/*"],
-            "nativescript-akylas-sqlite": ["./src"],
-            "*": ["./node_modules/*"]
+            "nativescript-perms": ["src/permissions"],
+            "nativescript-perms/*": ["src/*"],
+            "*": ["node_modules/*"]
         }
     },
-    "include": ["src/**/*.ts", "references.d.ts", "src/references.d.ts"],
-    "exclude": ["node_modules", ".git", "dist"],
-    "compileOnSave": false
+    "include": ["src/**/*", "./references.d.ts"],
+    "exclude": ["node_modules", "platforms"],
+    "compileOnSave": false,
+    "angularCompilerOptions": {
+        "skipTemplateCodegen": true
+    }
 }

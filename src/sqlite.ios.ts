@@ -5,7 +5,6 @@ import {
     SqliteRow,
     throwError,
 } from "./sqlite.common";
-import { File, knownFolders } from "@nativescript/core/file-system";
 // declare const sqlitehelper: { getTrans: () => interop.FunctionReference<any> };
 
 // type FMDatabase = interop.Reference<any>;

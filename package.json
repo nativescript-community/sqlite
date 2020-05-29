@@ -9,8 +9,9 @@
         }
     },
     "scripts": {
-        "tsc": "cp src/sqlite.d.ts plugin && cp README.md plugin && tsc -skipLibCheck",
-        "build": "pnpm i && pnpm run tsc",
+        "tsc": "cp src/sqlite.d.ts plugin && tsc -skipLibCheck -d",
+        "build": " cp README.md plugin/ && rm -f .tsbuildinfo && npm run tsc && npm run build.esm",
+        "build.esm": "tsc -skipLibCheck --target es2017 --module esnext --removeComments --outDir build/esm && node ./build.esm.js",
         "demo.ios": "pnpm i && pnpm run tsc && cd demo && tns run ios",
         "demo.android": "pnpm i && pnpm run tsc && cd demo && tns run android",
         "clean.demo": "rimraf demo/hooks demo/node_modules demo/platforms",
@@ -41,18 +42,20 @@
     "readmeFilename": "README.md",
     "repository": "TestJG/nativescript-mtmobile-sqlite",
     "devDependencies": {
-        "@commitlint/cli": "^8.2.0",
-        "@commitlint/config-conventional": "^8.2.0",
+        "@commitlint/cli": "^8.3.5",
+        "@commitlint/config-conventional": "^8.3.4",
         "@nano-sql/core": "^2.3.7",
-        "@nativescript/core": "^6.2.3",
-        "husky": "^3.1.0",
-        "lerna": "^3.19.0",
+        "@nativescript/core": "^6.5.2",
+        "husky": "^4.2.5",
+        "lerna": "^3.22.0",
         "prompt": "^1.0.0",
-        "rimraf": "^3.0.0",
-        "semver": "^6.3.0",
-        "tns-platform-declarations": "^6.2.3",
-        "tslint": "^5.20.1",
-        "typescript": "~3.7.3"
+        "recursive-copy": "^2.0.10",
+        "rimraf": "^3.0.2",
+        "through2": "^3.0.1",
+        "semver": "^7.3.2",
+        "tns-platform-declarations": "^6.5.2",
+        "tslint": "^6.1.2",
+        "typescript": "~3.7.5"
     },
     "bootstrapper": "nativescript-plugin-seed",
     "commitlint": {

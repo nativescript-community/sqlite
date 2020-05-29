@@ -6,7 +6,7 @@ import {
     throwError,
 } from "./sqlite.common";
 
-import * as application from "@nativescript/core/application";
+import { android as androidApp } from "@nativescript/core/application";
 
 type Db = android.database.sqlite.SQLiteDatabase;
 
@@ -158,8 +158,7 @@ function createDb(dbName: string, flags) {
     } else {
         //noinspection JSUnresolvedVariable,JSUnresolvedFunction
         const activity: android.app.Activity =
-            application.android.foregroundActivity ||
-            application.android.startActivity;
+            androidApp.foregroundActivity || androidApp.startActivity;
         return activity.openOrCreateDatabase(
             dbName,
             flags !== undefined ? flags : android.app.Activity.MODE_PRIVATE,
