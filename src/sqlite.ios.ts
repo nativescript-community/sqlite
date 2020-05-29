@@ -492,7 +492,7 @@ export class SQLiteDatabase {
     async each(
         query: string,
         params: SqliteParams,
-        callback: (error: Error, result: SqliteRow[]) => void,
+        callback: (error: Error, result: SqliteRow) => void,
         complete: (error: Error, count: number) => void
     ) {
         return eachRaw(
@@ -500,7 +500,7 @@ export class SQLiteDatabase {
             query,
             params,
             true,
-            callback as (error: Error, result: any[]) => void,
+            callback as (error: Error, result: any) => void,
             complete
         );
     }

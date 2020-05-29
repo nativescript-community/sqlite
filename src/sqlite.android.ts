@@ -218,10 +218,10 @@ export class SQLiteDatabase {
     async each(
         query: string,
         params: SqliteParams,
-        callback: (error: Error, result: any[]) => void,
+        callback: (error: Error, result: any) => void,
         complete: (error: Error, count: number) => void
     ) {
-        return eachRaw(arrayFromCursor)(this.db)(
+        return eachRaw(dataFromCursor)(this.db)(
             query,
             params,
             callback,

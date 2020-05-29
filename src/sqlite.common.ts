@@ -34,7 +34,7 @@ export interface SQLiteDatabase {
     each(
         query: string,
         params: SqliteParams,
-        callback: (error: Error, result: SqliteRow[]) => void,
+        callback: (error: Error, result: SqliteRow) => void,
         complete: (error: Error, count: number) => void
     ): Promise<void>;
 }
