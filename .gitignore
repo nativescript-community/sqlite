@@ -29,3 +29,4 @@ plugin/*.d.ts
 /plugin/README.md
 plugin/**/*js.map
 plugin/**/*js
+plugin/**/*.d.ts
