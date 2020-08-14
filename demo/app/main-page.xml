@@ -2,11 +2,14 @@
   xmlns:ui="nativescript-akylas-sqlite">
   <StackLayout class="p-20">
     <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
-    <ActivityIndicator busy="true" verticalAlignment="center" class="m-20"></ActivityIndicator>
+    <!-- <ActivityIndicator busy="true" verticalAlignment="center" class="m-20"></ActivityIndicator> -->
     <Button text="Generate and Insert Data!" tap="{{ onInsert }}" class="m-20"></Button>
     <Button text="Generate and Insert Data (with transaction)!" tap="{{ onInsertWithTrans }}"
       class="m-20"></Button>
     <Button text="Select Data!" tap="{{ onSelect }}" class="m-20"></Button>
     <Button text="Reset Data!" tap="{{ onReset }}" class="m-20"></Button>
+    <Button text="blobl test!" tap="{{ blobTest }}" class="m-20"></Button>
+    <Button text="typeorm test!" tap="{{ typeORMTest }}" class="m-20"></Button>
+    <Image imageSource="{{imageSource}}" class="m-20" width="100%" backgroundColor="red"></Image>
   </StackLayout>
 </Page>

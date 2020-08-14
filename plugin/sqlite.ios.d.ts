@@ -12,7 +12,7 @@ export declare class SQLiteDatabase {
     get(query: string, params?: SqliteParams): Promise<SqliteRow>;
     getArray(query: string, params?: SqliteParams): Promise<SqliteParam[]>;
     select(query: string, params?: SqliteParams): Promise<SqliteRow[]>;
-    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow[]) => void, complete: (error: Error, count: number) => void): Promise<number>;
+    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow) => void, complete: (error: Error, count: number) => void): Promise<number>;
     selectArray(query: string, params?: SqliteParams): Promise<SqliteParam[][]>;
     _isInTransaction: boolean;
     transaction<T = any>(action: (cancel?: () => void) => T): T;

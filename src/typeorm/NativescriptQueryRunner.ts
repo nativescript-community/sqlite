@@ -1,10 +1,12 @@
-import { ObjectLiteral } from "typeorm/browser/common/ObjectLiteral";
-import { QueryRunnerAlreadyReleasedError } from "typeorm/browser/error/QueryRunnerAlreadyReleasedError";
-import { QueryFailedError } from "typeorm/browser/error/QueryFailedError";
-import { AbstractSqliteQueryRunner } from "typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner";
-import { Broadcaster } from "typeorm/browser/subscriber/Broadcaster";
-import { NativescriptDriver } from "./NativescriptDriver";
-import * as NSQlite from "../sqlite";
+import { ObjectLiteral } from '@akylas/typeorm/browser/common/ObjectLiteral';
+import { QueryRunnerAlreadyReleasedError } from '@akylas/typeorm/browser/error/QueryRunnerAlreadyReleasedError';
+import { QueryFailedError } from '@akylas/typeorm/browser/error/QueryFailedError';
+import { AbstractSqliteQueryRunner } from '@akylas/typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner';
+import { Broadcaster } from '@akylas/typeorm/browser/subscriber/Broadcaster';
+import { NativescriptDriver } from './NativescriptDriver';
+import * as NSQlite from '../sqlite';
+
+
 /**
  * Runs queries on a single sqlite database connection.
  */
@@ -30,7 +32,7 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
             throw new QueryRunnerAlreadyReleasedError();
         }
         const connection = this.driver.connection;
-        const isInsertQuery = query.substr(0, 11) === "INSERT INTO";
+        const isInsertQuery = query.substr(0, 11) === 'INSERT INTO';
         connection.logger.logQuery(query, parameters, this);
         try {
             const db: NSQlite.SQLiteDatabase = await this.connect();
@@ -42,13 +44,11 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
             const queryExecutionTime = queryEndTime - queryStartTime;
             const maxQueryExecutionTime = connection.options.maxQueryExecutionTime;
             // log slow queries if maxQueryExecution time is set
-            if (maxQueryExecutionTime &&
-                queryExecutionTime > maxQueryExecutionTime) {
+            if (maxQueryExecutionTime && queryExecutionTime > maxQueryExecutionTime) {
                 connection.logger.logQuerySlow(queryExecutionTime, query, parameters, this);
             }
             return result;
-        }
-        catch (err) {
+        } catch (err) {
             connection.logger.logQueryError(err, query, parameters, this);
             throw new QueryFailedError(query, parameters, err);
         }
@@ -60,6 +60,6 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
      * Parametrizes given object of values. Used to create column=value queries.
      */
     protected parametrize(objectLiteral: ObjectLiteral, startIndex: number = 0): string[] {
-        return Object.keys(objectLiteral).map((key, index) => `"${key}"` + "=?");
+        return Object.keys(objectLiteral).map((key, index) => `"${key}"` + '=?');
     }
 }

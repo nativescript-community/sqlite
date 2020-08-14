@@ -1,16 +1,16 @@
 import {
     SqliteParam,
     SqliteParams,
-    paramsToStringArray,
     SqliteRow,
+    paramsToStringArray,
     throwError,
-} from "./sqlite.common";
+} from './sqlite.common';
 // declare const sqlitehelper: { getTrans: () => interop.FunctionReference<any> };
 
 // type FMDatabase = interop.Reference<any>;
 
 const iosProperty = <T extends any>(_self, property: T): T => {
-    if (typeof property === "function") {
+    if (typeof property === 'function') {
         // xCode < 8
         return property.call(_self);
     } else {
@@ -127,7 +127,7 @@ const getResultsAsObject = (cursorSt: FMResultSet): SqliteRow => {
     // if (!count) {
     //     return null;
     // }
-    let data = {};
+    const data = {};
     const dict = cursorSt.resultDictionary;
     dict.enumerateKeysAndObjectsUsingBlock((key: any, value: any) => {
         data[key] = value;
@@ -139,7 +139,7 @@ const getResultsAsObject = (cursorSt: FMResultSet): SqliteRow => {
 };
 
 const getResultsAsArray = (cursorSt: FMResultSet): SqliteParam[] => {
-    let data = [];
+    const data = [];
     const dict = cursorSt.resultDictionary;
     dict.enumerateKeysAndObjectsUsingBlock((key: any, value: any) => {
         data.push(value);
@@ -151,7 +151,7 @@ const getResultsAsArray = (cursorSt: FMResultSet): SqliteParam[] => {
 };
 
 function getRealPath(dbname: string, create = false) {
-    if (dbname === ":memory:") {
+    if (dbname === ':memory:') {
         return null;
     }
     return dbname;
@@ -345,7 +345,7 @@ function eachRaw(
             return count;
         })
         .catch(err => {
-            let errorCB = complete || callback;
+            const errorCB = complete || callback;
             if (errorCB) {
                 errorCB(err, null);
             }
@@ -424,7 +424,7 @@ function transactionRaw<T = any>(
 ): T {
     try {
         if (isFirstTransaction) {
-            execRaw(db, "BEGIN EXCLUSIVE TRANSACTION");
+            execRaw(db, 'BEGIN EXCLUSIVE TRANSACTION');
         }
         const cancelled = { value: false };
         const cancel = () => {
@@ -432,14 +432,14 @@ function transactionRaw<T = any>(
         };
         const result = action(cancel);
         if (!cancelled.value && isFirstTransaction) {
-            execRaw(db, "COMMIT TRANSACTION");
+            execRaw(db, 'COMMIT TRANSACTION');
         } else if (cancelled.value && isFirstTransaction) {
-            execRaw(db, "ROLLBACK TRANSACTION");
+            execRaw(db, 'ROLLBACK TRANSACTION');
         }
         return result;
     } catch (e) {
         if (isFirstTransaction) {
-            execRaw(db, "ROLLBACK TRANSACTION");
+            execRaw(db, 'ROLLBACK TRANSACTION');
         }
         throwError(`transaction: ${e}`);
         return null;
@@ -481,7 +481,7 @@ export class SQLiteDatabase {
         return execRaw(this.db, query, params);
     }
     async get(query: string, params?: SqliteParams) {
-        return (getRaw(this.db, query, params, true) || null) as SqliteRow;
+        return (getRaw(this.db, query, params, true) || null);
     }
     async getArray(query: string, params?: SqliteParams) {
         return (getRaw(this.db, query, params, false) || null) as SqliteParam[];
@@ -526,6 +526,7 @@ export function openOrCreate(
     flags?: number,
     readOnly?: boolean
 ): SQLiteDatabase {
+    console.log('openOrCreate', filePath, getRealPath(filePath));
     const obj = new SQLiteDatabase(getRealPath(filePath));
     obj.open();
     return obj;

@@ -1,8 +1,7 @@
-import { Connection } from "typeorm/browser/connection/Connection";
-import { BaseConnectionOptions } from "typeorm/browser/connection/BaseConnectionOptions";
+import { Connection } from '@akylas/typeorm/browser/connection/Connection';
+import { BaseConnectionOptions } from '@akylas/typeorm/browser/connection/BaseConnectionOptions';
 
-
-import { NativescriptDriver } from "./NativescriptDriver";
+import { NativescriptDriver } from './NativescriptDriver';
 
 let installed = false;
 export function installMixins() {
@@ -11,15 +10,15 @@ export function installMixins() {
     }
     installed = true;
     // console.log('nativescript-akylas-sqlite"','typeorm','install');
-    const DriverFactory = require("typeorm/browser/driver/DriverFactory")
-        .DriverFactory;
+    const DriverFactory = require('@akylas/typeorm/browser/driver/DriverFactory').DriverFactory;
     const oldFunc = DriverFactory.prototype.create;
 
-    DriverFactory.prototype.create = function(connection: Connection) {
+    DriverFactory.prototype.create = function (connection: Connection) {
         const { type } = connection.options;
-        // console.log("DriverFactory", "create", connection.options);
+        console.log('DriverFactory', 'create', connection.options);
         switch (type) {
-            case "nativescript-akylas-sqlite" as any:
+            case 'nativescript' as any:
+            case '@akylas/nativescript-sqlite' as any:
                 return new NativescriptDriver(connection);
             default:
                 return oldFunc.call(this, connection);
@@ -34,7 +33,7 @@ export interface NativescriptConnectionOptions extends BaseConnectionOptions {
     /**
      * Database type.
      */
-    readonly type: "nativescript";
+    readonly type: 'nativescript';
 
     /**
      * Database name.
@@ -47,4 +46,3 @@ export interface NativescriptConnectionOptions extends BaseConnectionOptions {
      */
     readonly driver?: any;
 }
-

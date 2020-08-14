@@ -1,12 +1,6 @@
-import {
-    SqliteRow,
-    SqliteParam,
-    SqliteParams,
-    paramsToStringArray,
-    throwError,
-} from "./sqlite.common";
+import { SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 
-import { android as androidApp } from "@nativescript/core/application";
+import { android as androidApp } from '@nativescript/core/application';
 
 type Db = android.database.sqlite.SQLiteDatabase;
 
@@ -75,11 +69,8 @@ const arrayFromCursor = (cursor: android.database.Cursor) => {
     return data;
 };
 
-const rawSql = <T>(onCursor: FromCursor<T>) => (db: Db) => (
-    sql: string,
-    params?: SqliteParams
-) => {
-    const parameters = paramsToStringArray(params);
+const rawSql = <T>(onCursor: FromCursor<T>) => (db: Db) => (sql: string, params?: SqliteParams) => {
+    const parameters = paramsToStringArray(params) as string[];
     const cursor = db.rawQuery(sql, parameters);
     try {
         const result: T[] = [];
@@ -98,10 +89,10 @@ const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
     complete: (error: Error, count: number) => void
 ) => {
     const parameters = paramsToStringArray(params);
-    const cursor = db.rawQuery(sql, parameters);
+    const cursor = db.rawQuery(sql, parameters as string[]);
     return Promise.resolve()
         .then(() => {
-            let count = 0;
+            const count = 0;
             while (cursor.moveToNext()) {
                 const result = onCursor(cursor);
                 callback(null, result);
@@ -112,7 +103,7 @@ const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
         })
         .catch((err) => {
             cursor.close();
-            let errorCB = complete || callback;
+            const errorCB = complete || callback;
             if (errorCB) {
                 errorCB(err, null);
             }
@@ -120,10 +111,7 @@ const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
         });
 };
 
-const transactionRaw = <T = any>(
-    db: Db,
-    action: (cancel?: () => void) => T
-) => {
+const transactionRaw = <T = any>(db: Db, action: (cancel?: () => void) => T) => {
     db.beginTransaction();
     try {
         const cancelled = { value: false };
@@ -141,29 +129,23 @@ const transactionRaw = <T = any>(
 };
 
 function createDb(dbName: string, flags) {
-    if (dbName === ":memory:") {
+    if (dbName === ':memory:') {
         //noinspection JSUnresolvedVariable
         return android.database.sqlite.SQLiteDatabase.create(flags);
     }
-    if (dbName.indexOf("/") >= 0) {
+    if (dbName.indexOf('/') >= 0) {
         return android.database.sqlite.SQLiteDatabase.openDatabase(
             dbName,
             null,
             flags !== undefined
                 ? flags
                 : android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY |
-                      android.database.sqlite.SQLiteDatabase
-                          .NO_LOCALIZED_COLLATORS
+                      android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS
         );
     } else {
         //noinspection JSUnresolvedVariable,JSUnresolvedFunction
-        const activity: android.app.Activity =
-            androidApp.foregroundActivity || androidApp.startActivity;
-        return activity.openOrCreateDatabase(
-            dbName,
-            flags !== undefined ? flags : android.app.Activity.MODE_PRIVATE,
-            null
-        );
+        const activity: android.app.Activity = androidApp.foregroundActivity || androidApp.startActivity;
+        return activity.openOrCreateDatabase(dbName, flags !== undefined ? flags : android.app.Activity.MODE_PRIVATE, null);
     }
 }
 
@@ -175,12 +157,8 @@ export class SQLiteDatabase {
     }
     async open() {
         if (!this.db) {
-            console.log("createDb", this.filePath, this.flags);
             this.db = createDb(this.filePath, this.flags);
-            console.log("createDb done ", this.db);
         }
-        // if (!this.isOpen) {
-        // }
         return this.isOpen;
     }
     async close() {
@@ -191,16 +169,12 @@ export class SQLiteDatabase {
     }
     async setVersion(version: number) {
         this.db.setVersion(version);
-        // const query = "PRAGMA user_version=" + (version + 0).toString();
-        // execRaw(this.db, query);
     }
     async getVersion() {
-        // const query = "PRAGMA user_version";
-        // const result = this.getArray(query);
-        // return result && (result[0] as number);
         return this.db.getVersion();
     }
     async execute(query: string, params?: SqliteParams) {
+        console.log('execute', query, params);
         return this.db.execSQL(query, paramsToStringArray(params));
     }
     async get(query: string, params?: SqliteParams) {
@@ -221,12 +195,7 @@ export class SQLiteDatabase {
         callback: (error: Error, result: any) => void,
         complete: (error: Error, count: number) => void
     ) {
-        return eachRaw(dataFromCursor)(this.db)(
-            query,
-            params,
-            callback,
-            complete
-        );
+        return eachRaw(dataFromCursor)(this.db)(query, params, callback, complete);
     }
     _isInTransaction = false;
     transaction<T = any>(action: (cancel?: () => void) => T): T {
@@ -234,16 +203,11 @@ export class SQLiteDatabase {
     }
 }
 
-export const openOrCreate = (
-    filePath: string,
-    flags?: number
-): SQLiteDatabase => {
+export const openOrCreate = (filePath: string, flags?: number): SQLiteDatabase => {
     const obj = new SQLiteDatabase(filePath, flags);
     obj.open();
     return obj;
 };
 
 export const deleteDatabase = (filePath: string) =>
-    android.database.sqlite.SQLiteDatabase.deleteDatabase(
-        new java.io.File(filePath)
-    );
+    android.database.sqlite.SQLiteDatabase.deleteDatabase(new java.io.File(filePath));

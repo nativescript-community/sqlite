@@ -1,6 +1,6 @@
-import { InanoSQLTable, InanoSQLPlugin, InanoSQLInstance, SQLiteAbstractFns } from "@nano-sql/core/lib/interfaces";
-import { nanoSQLMemoryIndex } from "@nano-sql/core/lib/adapters/memoryIndex";
-import * as NSSqlite from "../sqlite";
+import { InanoSQLTable, InanoSQLPlugin, InanoSQLInstance, SQLiteAbstractFns } from '@nano-sql/core/lib/interfaces';
+import { nanoSQLMemoryIndex } from '@nano-sql/core/lib/adapters/memoryIndex';
+import * as NSSqlite from '../sqlite';
 export declare class NativeSQLite extends nanoSQLMemoryIndex {
     private filePath;
     private flags?;
@@ -12,13 +12,13 @@ export declare class NativeSQLite extends nanoSQLMemoryIndex {
         [table: string]: number;
     };
     _sqlite: SQLiteAbstractFns;
-    _tableConfigs: {
+    _tables: {
         [tableName: string]: InanoSQLTable;
     };
     constructor(filePath: string, flags?: number);
     connect(id: string, complete: () => void, error: (err: any) => void): void;
     createTable(tableName: string, tableData: InanoSQLTable, complete: () => void, error: (err: any) => void): void;
-    _query(allowWrite: boolean, sql: string, args: any[], onRow: (row: any, i: number) => void, complete: () => void, error: (err: any) => void): void;
+    _query(allowWrite: boolean, sql: string, args: any[], onRow: (row: any, i: number) => void, complete: () => void, error: (err: any) => void): Promise<void>;
     dropTable(table: string, complete: () => void, error: (err: any) => void): void;
     disconnect(complete: () => void, error: (err: any) => void): void;
     write(table: string, pk: any, row: {
@@ -28,7 +28,7 @@ export declare class NativeSQLite extends nanoSQLMemoryIndex {
         [key: string]: any;
     } | undefined) => void, error: (err: any) => void): void;
     delete(table: string, pk: any, complete: () => void, error: (err: any) => void): void;
-    readMulti(table: string, type: "range" | "offset" | "all", offsetOrLow: any, limitOrHigh: any, reverse: boolean, onRow: (row: {
+    readMulti(table: string, type: 'range' | 'offset' | 'all', offsetOrLow: any, limitOrHigh: any, reverse: boolean, onRow: (row: {
         [key: string]: any;
     }, i: number) => void, complete: () => void, error: (err: any) => void): void;
     getTableIndex(table: string, complete: (index: any[]) => void, error: (err: any) => void): void;

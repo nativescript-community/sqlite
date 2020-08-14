@@ -1,10 +1,10 @@
-export type SqliteParam = null | number | string;
+export type SqliteParam = null | number | string | ArrayBuffer | any;
 
 export type SqliteParams = SqliteParam | SqliteParam[];
 
-export type SqliteRow = {
+export interface SqliteRow {
     [name: string]: SqliteParam;
-};
+}
 
 export type Db = any;
 
@@ -44,7 +44,30 @@ export function isNothing(x: any) {
 }
 
 export function paramToString(p: SqliteParam) {
-    return isNothing(p) ? null : p.toString();
+    if (isNothing(p)) {
+        return null;
+    }
+    if (global.isAndroid) {
+        if (p instanceof java.nio.ByteBuffer) {
+            return (p as java.nio.ByteBuffer).array();
+        }
+        if (p instanceof java.io.ByteArrayOutputStream) {
+            return (p as java.io.ByteArrayOutputStream).toByteArray();
+        }
+    } else {
+        if (p instanceof NSData) {
+            return p;
+        }
+    }
+    if (p.hasOwnProperty('length') && !Array.isArray(p)) {
+        console.log('native array', p);
+        return p;
+    }
+
+    if (p['toString']) {
+        return p['toString']();
+    }
+    return p;
 }
 
 export function paramsToStringArray(params?: SqliteParams) {

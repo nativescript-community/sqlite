@@ -1,4 +1,4 @@
-import { InanoSQLTable, InanoSQLPlugin, InanoSQLInstance, SQLiteAbstractFns } from '@nano-sql/core/lib/interfaces';
+import { InanoSQLInstance, InanoSQLPlugin, InanoSQLTable, SQLiteAbstractFns } from '@nano-sql/core/lib/interfaces';
 import { nanoSQLMemoryIndex } from '@nano-sql/core/lib/adapters/memoryIndex';
 import { SQLiteAbstract } from '@nano-sql/core/lib/adapters/webSQL';
 
@@ -6,7 +6,7 @@ import * as NSSqlite from '../sqlite';
 
 export class NativeSQLite extends nanoSQLMemoryIndex {
     plugin: InanoSQLPlugin = {
-        name: 'NativeScript Akylas SQLite Adapter',
+        name: 'Akylas NativeScript SQLite Adapter',
         version: 2.37,
     };
 
