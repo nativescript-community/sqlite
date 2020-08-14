@@ -1,15 +1,15 @@
-import { AbstractSqliteDriver } from "typeorm/browser/driver/sqlite-abstract/AbstractSqliteDriver";
-import { QueryRunner } from "typeorm/browser/query-runner/QueryRunner";
-import { Connection } from "typeorm/browser/connection/Connection";
-import { ColumnType } from "typeorm/browser/driver/types/ColumnTypes";
-import { NativescriptConnectionOptions } from "./index";
-import * as NSQlite from "../sqlite";
+import { Connection } from '@akylas/typeorm/browser/connection/Connection';
+import { AbstractSqliteDriver } from '@akylas/typeorm/browser/driver/sqlite-abstract/AbstractSqliteDriver';
+import { ColumnType } from '@akylas/typeorm/browser/driver/types/ColumnTypes';
+import { QueryRunner } from '@akylas/typeorm/browser/query-runner/QueryRunner';
+import * as NSQlite from '../sqlite';
+import { NativescriptConnectionOptions } from './index';
 export declare class NativescriptDriver extends AbstractSqliteDriver {
     options: NativescriptConnectionOptions;
     driver: any;
     constructor(connection: Connection);
     disconnect(): Promise<any>;
-    createQueryRunner(mode?: "master" | "slave"): QueryRunner;
+    createQueryRunner(mode?: 'master' | 'slave'): QueryRunner;
     normalizeType(column: {
         type?: ColumnType;
         length?: number | string;
