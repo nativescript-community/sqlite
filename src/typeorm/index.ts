@@ -15,7 +15,6 @@ export function installMixins() {
 
     DriverFactory.prototype.create = function (connection: Connection) {
         const { type } = connection.options;
-        console.log('DriverFactory', 'create', connection.options);
         switch (type) {
             case 'nativescript' as any:
             case '@akylas/nativescript-sqlite' as any:

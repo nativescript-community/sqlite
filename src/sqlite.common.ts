@@ -60,7 +60,6 @@ export function paramToString(p: SqliteParam) {
         }
     }
     if (p.hasOwnProperty('length') && !Array.isArray(p)) {
-        console.log('native array', p);
         return p;
     }
 
