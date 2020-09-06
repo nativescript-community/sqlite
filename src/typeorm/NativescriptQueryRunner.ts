@@ -1,8 +1,8 @@
-import { ObjectLiteral } from '@akylas/typeorm/browser/common/ObjectLiteral';
-import { QueryRunnerAlreadyReleasedError } from '@akylas/typeorm/browser/error/QueryRunnerAlreadyReleasedError';
-import { QueryFailedError } from '@akylas/typeorm/browser/error/QueryFailedError';
-import { AbstractSqliteQueryRunner } from '@akylas/typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner';
-import { Broadcaster } from '@akylas/typeorm/browser/subscriber/Broadcaster';
+import { ObjectLiteral } from '@nativescript-community/typeorm/browser/common/ObjectLiteral';
+import { QueryRunnerAlreadyReleasedError } from '@nativescript-community/typeorm/browser/error/QueryRunnerAlreadyReleasedError';
+import { QueryFailedError } from '@nativescript-community/typeorm/browser/error/QueryFailedError';
+import { AbstractSqliteQueryRunner } from '@nativescript-community/typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner';
+import { Broadcaster } from '@nativescript-community/typeorm/browser/subscriber/Broadcaster';
 import { NativescriptDriver } from './NativescriptDriver';
 import * as NSQlite from '../sqlite';
 
@@ -32,7 +32,7 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
             throw new QueryRunnerAlreadyReleasedError();
         }
         const connection = this.driver.connection;
-        const isInsertQuery = query.substr(0, 11) === 'INSERT INTO';
+        const isInsertQuery = query.startsWith('INSERT INTO') || query.startsWith('UPDATE');
         connection.logger.logQuery(query, parameters, this);
         try {
             const db: NSQlite.SQLiteDatabase = await this.connect();

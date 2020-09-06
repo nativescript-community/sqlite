@@ -174,7 +174,6 @@ export class SQLiteDatabase {
         return this.db.getVersion();
     }
     async execute(query: string, params?: SqliteParams) {
-        console.log('execute', query, params);
         return this.db.execSQL(query, paramsToStringArray(params));
     }
     async get(query: string, params?: SqliteParams) {

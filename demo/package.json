@@ -13,7 +13,7 @@
     "@akylas/nativescript-sqlite": "file:../plugin",
     "nativescript-theme-core": "^2.0.24",
     "nativescript-unit-test-runner": "0.7.1-next-2019-07-19-122824-01",
-    "@akylas/typeorm": "latest"
+    "@nativescript-community/typeorm": "latest"
   },
   "devDependencies": {
     "@nativescript/types": "rc",

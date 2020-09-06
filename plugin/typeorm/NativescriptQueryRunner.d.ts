@@ -1,5 +1,5 @@
-import { ObjectLiteral } from '@akylas/typeorm/browser/common/ObjectLiteral';
-import { AbstractSqliteQueryRunner } from '@akylas/typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner';
+import { ObjectLiteral } from '@nativescript-community/typeorm/browser/common/ObjectLiteral';
+import { AbstractSqliteQueryRunner } from '@nativescript-community/typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner';
 import { NativescriptDriver } from './NativescriptDriver';
 import * as NSQlite from '../sqlite';
 export declare class NativescriptQueryRunner extends AbstractSqliteQueryRunner {

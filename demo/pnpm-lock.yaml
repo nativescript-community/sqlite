@@ -1,6 +1,6 @@
 dependencies:
   '@akylas/nativescript-sqlite': 'link:../plugin'
-  '@akylas/typeorm': 'link:../../../../../usr/local/pnpm-global/node_modules/@akylas/typeorm'
+  '@nativescript-community/typeorm': 'link:../../../../../usr/local/pnpm-global/node_modules/@nativescript-community/typeorm'
   '@nativescript/core': 7.0.0-rc.51
   nativescript-theme-core: 2.0.24
   nativescript-unit-test-runner: 0.7.1-next-2019-07-19-122824-01
@@ -5044,7 +5044,7 @@ packages:
       integrity: sha1-AI4G2AlDIMNy28L47XagymyKxBk=
 specifiers:
   '@akylas/nativescript-sqlite': 'file:../plugin'
-  '@akylas/typeorm': latest
+  '@nativescript-community/typeorm': latest
   '@nativescript/core': rc
   '@nativescript/types': rc
   '@nativescript/webpack': rc

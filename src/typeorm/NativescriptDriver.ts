@@ -1,9 +1,9 @@
-import { Connection } from '@akylas/typeorm/browser/connection/Connection';
-import { AbstractSqliteDriver } from '@akylas/typeorm/browser/driver/sqlite-abstract/AbstractSqliteDriver';
-import { ColumnType } from '@akylas/typeorm/browser/driver/types/ColumnTypes';
-import { DriverOptionNotSetError } from '@akylas/typeorm/browser/error/DriverOptionNotSetError';
-import { DriverPackageNotInstalledError } from '@akylas/typeorm/browser/error/DriverPackageNotInstalledError';
-import { QueryRunner } from '@akylas/typeorm/browser/query-runner/QueryRunner';
+import { Connection } from '@nativescript-community/typeorm/browser/connection/Connection';
+import { AbstractSqliteDriver } from '@nativescript-community/typeorm/browser/driver/sqlite-abstract/AbstractSqliteDriver';
+import { ColumnType } from '@nativescript-community/typeorm/browser/driver/types/ColumnTypes';
+import { DriverOptionNotSetError } from '@nativescript-community/typeorm/browser/error/DriverOptionNotSetError';
+import { DriverPackageNotInstalledError } from '@nativescript-community/typeorm/browser/error/DriverPackageNotInstalledError';
+import { QueryRunner } from '@nativescript-community/typeorm/browser/query-runner/QueryRunner';
 import * as NSQlite from '../sqlite';
 import { NativescriptConnectionOptions } from './index';
 import { NativescriptQueryRunner } from './NativescriptQueryRunner';

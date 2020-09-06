@@ -26,5 +26,9 @@
     "license": "Apache-2.0",
     "homepage": "https://github.com/TestJG/nativescript-akylas-sqlite",
     "readmeFilename": "README.md",
-    "repository": "TestJG/nativescript-akylas-sqlite"
+    "repository": "TestJG/nativescript-akylas-sqlite",
+    "dependencies": {
+        "@nano-sql/core": "^2.3.7",
+        "@nativescript-community/typeorm": "latest"
+    }
 }

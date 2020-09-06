@@ -1,5 +1,5 @@
-import { Connection } from '@akylas/typeorm/browser/connection/Connection';
-import { BaseConnectionOptions } from '@akylas/typeorm/browser/connection/BaseConnectionOptions';
+import { Connection } from '@nativescript-community/typeorm/browser/connection/Connection';
+import { BaseConnectionOptions } from '@nativescript-community/typeorm/browser/connection/BaseConnectionOptions';
 
 import { NativescriptDriver } from './NativescriptDriver';
 
@@ -10,7 +10,7 @@ export function installMixins() {
     }
     installed = true;
     // console.log('nativescript-akylas-sqlite"','typeorm','install');
-    const DriverFactory = require('@akylas/typeorm/browser/driver/DriverFactory').DriverFactory;
+    const DriverFactory = require('@nativescript-community/typeorm/browser/driver/DriverFactory').DriverFactory;
     const oldFunc = DriverFactory.prototype.create;
 
     DriverFactory.prototype.create = function (connection: Connection) {
