@@ -9,7 +9,6 @@ export function installMixins() {
         return;
     }
     installed = true;
-    // console.log('nativescript-akylas-sqlite"','typeorm','install');
     const DriverFactory = require('@nativescript-community/typeorm/browser/driver/DriverFactory').DriverFactory;
     const oldFunc = DriverFactory.prototype.create;
 

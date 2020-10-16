@@ -30,3 +30,4 @@ plugin/*.d.ts
 plugin/**/*js.map
 plugin/**/*js
 plugin/**/*.d.ts
+*.aar

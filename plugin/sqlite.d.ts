@@ -1,1 +1,1 @@
-export * from "./sqlite.common";
+export * from './sqlite.android';

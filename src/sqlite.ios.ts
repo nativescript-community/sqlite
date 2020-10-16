@@ -448,7 +448,10 @@ function transactionRaw<T = any>(
 
 export class SQLiteDatabase {
     db: FMDatabase;
-    constructor(public filePath: string) {}
+    constructor(public filePath: string, options?: {
+        threading?: boolean;
+        readOnly?: boolean;
+    }) {}
     isOpen = false;
     async open() {
         if (!this.db) {
@@ -523,85 +526,16 @@ export class SQLiteDatabase {
 
 export function openOrCreate(
     filePath: string,
-    flags?: number,
-    readOnly?: boolean
+    flags?: number, options?: {
+        readOnly?: boolean;
+        threading?: boolean;
+    },
 ): SQLiteDatabase {
     console.log('openOrCreate', filePath, getRealPath(filePath));
-    const obj = new SQLiteDatabase(getRealPath(filePath));
+    const obj = new SQLiteDatabase(getRealPath(filePath), options);
     obj.open();
     return obj;
 
-    // let db = FMDatabase.databaseWithPath(getRealPath(filePath));
-    // // let db = open(filePath, flags, readOnly);
-    // let _isOpen = db.open();
-    // let _isInTransaction = false;
-
-    // // const isOpen = () => _isOpen;
-    // // const close = () => {
-    // //     if (!_isOpen) return;
-    // //     db.close();
-    // //     // sqlite3_close_v2(db);
-    // //     db = null;
-    // //     _isOpen = false;
-    // // };
-    // const setVersion = (version: number) => {
-    //     const query = "PRAGMA user_version=" + (version + 0).toString();
-    //     execRaw(db, query);
-    // };
-    // const getVersion = () => {
-    //     const query = "PRAGMA user_version";
-    //     const result = getArray(query);
-    //     return result && (result[0] as number);
-    // };
-    // const execute = (query: string, params?: SqliteParams) =>
-    //     execRaw(db, query, params);
-    // const get = (query: string, params?: SqliteParams) =>
-    //     (getRaw(db, query, params, true) || null) as SqliteRow;
-    // const getArray = (query: string, params?: SqliteParams) =>
-    //     (getRaw(db, query, params, false) || null) as SqliteParam[];
-    // const select = (query: string, params?: SqliteParams) =>
-    //     selectRaw(db, query, params, true) as SqliteRow[];
-    // const each = (
-    //     query: string,
-    //     params: SqliteParams,
-    //     callback: (error: Error, result: SqliteRow[]) => void,
-    //     complete: (error: Error, count: number) => void
-    // ) =>
-    //     eachRaw(
-    //         db,
-    //         query,
-    //         params,
-    //         true,
-    //         callback as (error: Error, result: any[]) => void,
-    //         complete
-    //     );
-    // const selectArray = (query: string, params?: SqliteParams) =>
-    //     selectRaw(db, query, params, false) as SqliteParam[][];
-    // const transaction = <T = any>(action: (cancel?: () => void) => T): T => {
-    //     let res;
-    //     if (!_isInTransaction) {
-    //         _isInTransaction = true;
-    //         res = transactionRaw(db, action, true);
-    //         _isInTransaction = false;
-    //     } else {
-    //         res = transactionRaw(db, action, false);
-    //     }
-    //     return res;
-    // };
-
-    // return {
-    //     isOpen,
-    //     close,
-    //     setVersion,
-    //     getVersion,
-    //     execute,
-    //     get,
-    //     getArray,
-    //     select,
-    //     selectArray,
-    //     transaction,
-    //     each,
-    // };
 }
 
 export const deleteDatabase = (filePath: string) => {

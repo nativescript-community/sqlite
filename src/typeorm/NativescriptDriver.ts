@@ -29,7 +29,6 @@ export class NativescriptDriver extends AbstractSqliteDriver {
     // -------------------------------------------------------------------------
     constructor(connection: Connection) {
         super(connection);
-        console.log('NativescriptDriver', 'connection', connection.options);
         this.connection = connection;
         this.options = connection.options as NativescriptConnectionOptions;
         this.database = this.options.database;
@@ -86,12 +85,7 @@ export class NativescriptDriver extends AbstractSqliteDriver {
     sqlite: typeof NSQlite;
     protected async createDatabaseConnection() {
         try {
-            // console.log(
-            //     "createDatabaseConnection",
-            //     this.options.database,
-            //     this.options.extra
-            // );
-            const db = this.sqlite.openOrCreate(this.options.database, this.options.extra);
+            const db = this.sqlite.openOrCreate(this.options.database, this.options.extra? { ... this.options.extra}: {});
             // use object mode to work with TypeORM
             // db.resultType(this.sqlite.RESULTSASOBJECT);
             // we need to enable foreign keys in sqlite to make sure all foreign key related features

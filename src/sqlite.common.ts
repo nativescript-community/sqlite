@@ -49,10 +49,10 @@ export function paramToString(p: SqliteParam) {
     }
     if (global.isAndroid) {
         if (p instanceof java.nio.ByteBuffer) {
-            return (p as java.nio.ByteBuffer).array();
+            return p.array();
         }
         if (p instanceof java.io.ByteArrayOutputStream) {
-            return (p as java.io.ByteArrayOutputStream).toByteArray();
+            return p.toByteArray();
         }
     } else {
         if (p instanceof NSData) {

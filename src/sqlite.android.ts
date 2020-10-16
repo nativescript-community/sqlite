@@ -149,20 +149,115 @@ function createDb(dbName: string, flags) {
     }
 }
 
+const messagePromises: { [key: string]: { resolve: Function; reject: Function; timeoutTimer: NodeJS.Timer }[] } = {};
+
 export class SQLiteDatabase {
     db: android.database.sqlite.SQLiteDatabase;
-    constructor(public filePath: string, public flags?: number) {}
+    flags;
+    constructor(public filePath: string, options?: {
+        threading?: boolean;
+        readOnly?: boolean;
+        flags?: number;
+    }) {
+        this.threading = options && options.threading === true;
+        this.flags = options?.flags;
+    }
+    _isInTransaction = false;
+    threading = false;
+    worker: Worker;
+    onWorkerMessage(event: {
+        data: {
+            result?: any;
+            error?: any;
+            id?: number;
+        };
+    }) {
+        const data = event.data;
+        const id = data.id;
+        // console.log('onWorkerMessage', id, data);
+
+        if (id && messagePromises.hasOwnProperty(id)) {
+            messagePromises[id].forEach(function (executor) {
+                executor.timeoutTimer && clearTimeout(executor.timeoutTimer);
+                // console.log('resolving worker message', id, data);
+                if (data.error) {
+                    executor.reject(data.error);
+                } else {
+                    executor.resolve(data.result);
+                }
+                // }
+            });
+            delete messagePromises[id];
+        }
+    }
+    lastId: number;
+    sendMessageToWorker(
+        nativeData,
+        messageData,
+        timeout = 0
+    ): Promise<{
+            id: number;
+            nativeDatas?: { [k: string]: any };
+            [k: string]: any;
+        }> {
+        return new Promise((resolve, reject) => {
+            let id = Date.now().valueOf();
+            if (id <= this.lastId ) {
+                id = this.lastId+1;
+            }
+            this.lastId= id;
+            messagePromises[id] = messagePromises[id] || [];
+            let timeoutTimer;
+            if (timeout > 0) {
+                timeoutTimer = setTimeout(() => {
+                    // we need to try catch because the simple fact of creating a new Error actually throws.
+                    // so we will get an uncaughtException
+                    try {
+                        reject(new Error('timeout'));
+                    } catch {}
+                    delete messagePromises[id];
+                }, timeout);
+            }
+            messagePromises[id].push({ resolve, reject, timeoutTimer });
+
+            const keys = Object.keys(nativeData);
+            keys.forEach((k) => {
+                (com as any).akylas.sqlite.WorkersContext.setValue(`${id}_${k}`, nativeData[k]._native || nativeData[k]);
+            });
+            // console.log('sending message to worker', messageData, keys);
+            const mData = Object.assign(
+                {
+                    type: 'call',
+                    id,
+                    nativeDataKeys: keys,
+                },
+                messageData
+            );
+            this.worker.postMessage(mData);
+        });
+    }
     get isOpen() {
         return this.db && this.db.isOpen();
     }
     async open() {
         if (!this.db) {
             this.db = createDb(this.filePath, this.flags);
+            if (this.threading && !this.worker) {
+                const Worker = require('nativescript-worker-loader!./worker');
+                this.worker = new Worker();
+                this.worker.onmessage = this.onWorkerMessage;
+            }
         }
         return this.isOpen;
     }
     async close() {
         if (!this.isOpen) return;
+        if (this.worker) {
+            this.worker.postMessage({
+                type: 'terminate',
+            });
+            this.worker = null;
+        }
         this.db.close();
         // sqlite3_close_v2(db);
         this.db = null;
@@ -174,18 +269,73 @@ export class SQLiteDatabase {
         return this.db.getVersion();
     }
     async execute(query: string, params?: SqliteParams) {
+        if (this.threading) {
+            return this.sendMessageToWorker(
+                {
+                    db: this.db,
+                },
+                {
+                    callName: 'execute',
+                    args: [query, params],
+                }
+            );
+        }
         return this.db.execSQL(query, paramsToStringArray(params));
     }
     async get(query: string, params?: SqliteParams) {
+        if (this.threading) {
+            return this.sendMessageToWorker(
+                {
+                    db: this.db,
+                },
+                {
+                    callName: 'get',
+                    args: [query, params],
+                }
+            );
+        }
         return rawSql(dataFromCursor)(this.db)(query, params)[0] || null;
     }
     async getArray(query: string, params?: SqliteParams) {
+        if (this.threading) {
+            return this.sendMessageToWorker(
+                {
+                    db: this.db,
+                },
+                {
+                    callName: 'getArray',
+                    args: [query, params],
+                }
+            );
+        }
         return rawSql(arrayFromCursor)(this.db)(query, params)[0] || null;
     }
     async select(query: string, params?: SqliteParams) {
+        if (this.threading) {
+            return this.sendMessageToWorker(
+                {
+                    db: this.db,
+                },
+                {
+                    callName: 'select',
+                    args: [query, params],
+                }
+            );
+        }
         return rawSql(dataFromCursor)(this.db)(query, params);
     }
     async selectArray(query: string, params?: SqliteParams) {
+        if (this.threading) {
+            return this.sendMessageToWorker(
+                {
+                    db: this.db,
+                },
+                {
+                    callName: 'selectArray',
+                    args: [query, params],
+                }
+            );
+        }
         return rawSql(arrayFromCursor)(this.db)(query, params);
     }
     async each(
@@ -196,14 +346,16 @@ export class SQLiteDatabase {
     ) {
         return eachRaw(dataFromCursor)(this.db)(query, params, callback, complete);
     }
-    _isInTransaction = false;
     transaction<T = any>(action: (cancel?: () => void) => T): T {
         return transactionRaw(this.db, action);
     }
 }
 
-export const openOrCreate = (filePath: string, flags?: number): SQLiteDatabase => {
-    const obj = new SQLiteDatabase(filePath, flags);
+export const openOrCreate = (filePath: string, options?: {
+    threading?: boolean;
+    flags?: number;
+}): SQLiteDatabase => {
+    const obj = new SQLiteDatabase(filePath, options);
     obj.open();
     return obj;
 };

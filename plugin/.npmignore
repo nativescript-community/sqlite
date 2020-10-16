@@ -1,9 +1,10 @@
-*.map
+node_modules/
+src/
+bin/
+hooks/
 *.ts
-!*.d.ts
+*.old
 tsconfig.json
-scripts/*
-platforms/android/*
-!platforms/android/include.gradle
-!platforms/android/*.aar
-!platforms/android/*.jar
+!*.d.ts
+.smooth-releaserc
+*.jar
