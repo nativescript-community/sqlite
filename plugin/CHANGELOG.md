@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.2.0...v3.3.0) (2020-10-16)
+
+
+### Features
+
+* working threading on android ([3c4e538](https://github.com/TestJG/nativescript-akylas-sqlite/commit/3c4e538c54a26c05f780cb947ee80955f83aebc6))
+
+
+
+
+
 # [3.2.0](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.1.1...v3.2.0) (2020-09-06)
 
 
