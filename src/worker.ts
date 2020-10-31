@@ -1,5 +1,5 @@
 const context: Worker = self as any;
-import { SQLiteDatabase } from './sqlite';
+import { SQLiteDatabaseBase } from './sqlitedatabase';
 
 // function nativeArray(array) {
 //     if (global.isAndroid) {
@@ -15,7 +15,7 @@ import { SQLiteDatabase } from './sqlite';
 //     processing = false;
 // }
 // const worker = new DBWorker();
-const fakeDatabase = new SQLiteDatabase(null);
+const fakeDatabase = new SQLiteDatabaseBase(null);
 context.onmessage = (async (event: { data }) => {
     const data = event.data;
     switch (data.type) {

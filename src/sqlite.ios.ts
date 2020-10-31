@@ -5,9 +5,7 @@ import {
     paramsToStringArray,
     throwError,
 } from './sqlite.common';
-// declare const sqlitehelper: { getTrans: () => interop.FunctionReference<any> };
 
-// type FMDatabase = interop.Reference<any>;
 
 const iosProperty = <T extends any>(_self, property: T): T => {
     if (typeof property === 'function') {
