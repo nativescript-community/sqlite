@@ -1,4 +1,3 @@
-import '@nativescript/core/globals';
 const context: Worker = self as any;
 import { SQLiteDatabase } from './sqlite';
 
