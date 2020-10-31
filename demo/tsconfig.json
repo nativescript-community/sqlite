@@ -16,15 +16,35 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "noImplicitUseStrict": true,
-        "lib": ["es6", "dom", "es2015.iterable"],
+        "lib": [
+            "es6",
+            "dom",
+            "es2015.iterable",
+            "es2017"
+        ],
         "baseUrl": ".",
         "paths": {
-            "tns-core-modules": ["./node_modules/@nativescript/core"],
-            "tns-core-modules/*": ["./node_modules/@nativescript/core/*"],
-            "~/*": ["app/*"],
-            "*": ["./node_modules/*"]
+            "tns-core-modules": [
+                "./node_modules/@nativescript/core"
+            ],
+            "tns-core-modules/*": [
+                "./node_modules/@nativescript/core/*"
+            ],
+            "~/*": [
+                "app/*"
+            ],
+            "*": [
+                "./node_modules/*"
+            ]
         }
     },
-    "include": ["app/**/*", "references.d.ts"],
-    "exclude": ["node_modules", "platforms", "**/angular"]
+    "include": [
+        "app/**/*",
+        "references.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "platforms",
+        "**/angular"
+    ]
 }

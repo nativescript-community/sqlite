@@ -1,7 +1,0 @@
-{
-  "name": "nativescript.sqlite.demo",
-  "main": "app.js",
-  "android": {
-    "markingMode": "none"
-  }
-}
