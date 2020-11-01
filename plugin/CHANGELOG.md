@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.3](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.2...v3.3.3) (2020-11-01)
+
+
+### Bug Fixes
+
+* hook fix ([dbf049a](https://github.com/TestJG/nativescript-akylas-sqlite/commit/dbf049ab94ee0074cf89ee4b85cddbb54ffe1a20))
+
+
+
+
+
 ## [3.3.2](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.1...v3.3.2) (2020-11-01)
 
 
