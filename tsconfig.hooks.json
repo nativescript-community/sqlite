@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node"
+    },
+    "include": ["src/scripts/**/*.ts", "src/references.d.ts"],
+    "exclude": ["node_modules"]
+}

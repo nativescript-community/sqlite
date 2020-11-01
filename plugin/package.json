@@ -8,7 +8,14 @@
         "platforms": {
             "android": "6.2.0",
             "ios": "6.2.0"
-        }
+        },
+        "hooks": [
+            {
+                "type": "before-prepare",
+                "script": "scripts/before-prepare.js",
+                "inject": true
+            }
+        ]
     },
     "keywords": [
         "NativeScript",

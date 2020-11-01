@@ -11,7 +11,9 @@
     "scripts": {
         "setup": "ts-patch install",
         "tsc": "cp src/sqlite.d.ts plugin && tsc -skipLibCheck -d",
-        "build": " cp README.md plugin/ && rm -f .tsbuildinfo && npm run tsc",
+        "build.plugin": "cp README.md plugin/ && npm run tsc",
+        "build.hooks": "tsc -skipLibCheck -p tsconfig.hooks.json",
+        "build": "npm run build.plugin && npm run build.hooks",
         "demo.ios": "pnpm i && pnpm run tsc && cd demo && tns run ios",
         "demo.android": "pnpm i && pnpm run tsc && cd demo && tns run android",
         "clean.demo": "rimraf demo/hooks demo/node_modules demo/platforms",
