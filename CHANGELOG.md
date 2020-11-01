@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.2](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.1...v3.3.2) (2020-11-01)
+
+
+### Bug Fixes
+
+* hook for aliases to get smaller bundle ([954b1d9](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/954b1d9591882f8943edc28c70ba7f2c6ce2f150))
+* thank you eslitn ([45400e4](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/45400e4028e631e61dfeb16862edf419153ce088))
+
+
+
+
+
 ## [3.3.1](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.0...v3.3.1) (2020-10-31)
 
 
