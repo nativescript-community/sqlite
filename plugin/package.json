@@ -4,6 +4,10 @@
     "description": "SQLite for Nativescript",
     "main": "sqlite",
     "typings": "sqlite.d.ts",
+    "scripts": {
+        "preuninstall": "node preuninstall.js",
+        "postinstall": "node postinstall.js"
+    },
     "nativescript": {
         "platforms": {
             "android": "6.2.0",
@@ -36,6 +40,7 @@
     "repository": "TestJG/nativescript-akylas-sqlite",
     "dependencies": {
         "@nano-sql/core": "^2.3.7",
+        "@nativescript/hook": "~2.0.0",
         "@nativescript-community/typeorm": "latest"
     }
 }

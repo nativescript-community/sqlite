@@ -27,6 +27,7 @@ module.exports = function ($logger, projectData, injector, hookArgs) {
         './sqlserver/SqlServerDriver': '@akylas/nativescript-sqlite/typeorm/NativescriptDriver',
         './mongodb/MongoDriver': '@akylas/nativescript-sqlite/typeorm/NativescriptDriver',
         '../driver/mongodb/MongoDriver': '@akylas/nativescript-sqlite/typeorm/NativescriptDriver',
-        '../driver/cordova/CordovaDriver': '@akylas/nativescript-sqlite/typeorm/NativescriptDriver'
+        '../driver/cordova/CordovaDriver': '@akylas/nativescript-sqlite/typeorm/NativescriptDriver',
+        '../driver/better-sqlite3/BetterSqlite3Driver': '@akylas/nativescript-sqlite/typeorm/NativescriptDriver'
     });
 };
