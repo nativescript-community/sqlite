@@ -51,7 +51,7 @@
         "@nativescript/types-android": "7.0.2",
         "@nativescript/types-ios": "7.0.1",
         "@nativescript/webpack": "~3.0.1",
-        "@nativescript-community/typeorm": "latest",
+        "@nativescript-community/typeorm": "0.2.28",
         "@typescript-eslint/eslint-plugin": "4.0.1",
         "@typescript-eslint/parser": "4.0.1",
         "eslint": "7.8.1",

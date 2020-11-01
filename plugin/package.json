@@ -40,7 +40,7 @@
     "repository": "TestJG/nativescript-akylas-sqlite",
     "dependencies": {
         "@nano-sql/core": "^2.3.7",
-        "@nativescript-community/typeorm": "latest",
+        "@nativescript-community/typeorm": "^0.2.28",
         "@nativescript/hook": "~2.0.0"
     }
 }
