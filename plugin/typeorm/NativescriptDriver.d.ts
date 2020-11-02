@@ -20,19 +20,3 @@ export declare class NativescriptDriver extends AbstractSqliteDriver {
     protected createDatabaseConnection(): Promise<NSQlite.SQLiteDatabase>;
     protected loadDependencies(): void;
 }
-export declare class MongoDriver {
-}
-export declare class SqljsDriver {
-}
-export declare class PostgresDriver {
-}
-export declare class CockroachDriver {
-}
-export declare class MysqlDriver {
-}
-export declare class AuroraDataApiDriver {
-}
-export declare class OracleDriver {
-}
-export declare class SqlServerDriver {
-}
