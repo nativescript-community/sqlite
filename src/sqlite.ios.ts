@@ -529,7 +529,6 @@ export function openOrCreate(
         threading?: boolean;
     },
 ): SQLiteDatabase {
-    console.log('openOrCreate', filePath, getRealPath(filePath));
     const obj = new SQLiteDatabase(getRealPath(filePath), options);
     obj.open();
     return obj;
