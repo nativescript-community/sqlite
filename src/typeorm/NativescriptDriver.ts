@@ -107,3 +107,13 @@ export class NativescriptDriver extends AbstractSqliteDriver {
         }
     }
 }
+// fake export class for webpack clean up with aliases
+export class MongoDriver {}
+export class SqljsDriver {}
+export class PostgresDriver {}
+export class CockroachDriver {}
+export class MysqlDriver {}
+export class AuroraDataApiDriver {}
+export class OracleDriver {}
+export class SqlServerDriver {}
+export class SapDriver {}
