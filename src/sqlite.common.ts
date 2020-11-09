@@ -54,8 +54,14 @@ export function paramToString(p: SqliteParam) {
         if (p instanceof java.io.ByteArrayOutputStream) {
             return p.toByteArray();
         }
+        if (p instanceof java.lang.Object) {
+            return p;
+        }
     } else {
         if (p instanceof NSData) {
+            return p;
+        }
+        if (p instanceof NSObject) {
             return p;
         }
     }
