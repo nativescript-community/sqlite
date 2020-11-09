@@ -120,7 +120,7 @@ const getNewCursorStatement = (
 //     return cursorSt.count;
 // };
 
-const getResultsAsObject = (cursorSt: FMResultSet): SqliteRow => {
+function getResultsAsObject (cursorSt: FMResultSet): SqliteRow {
     // const count = cursorSt.columnCount;
     // if (!count) {
     //     return null;
@@ -136,7 +136,7 @@ const getResultsAsObject = (cursorSt: FMResultSet): SqliteRow => {
     return data;
 };
 
-const getResultsAsArray = (cursorSt: FMResultSet): SqliteParam[] => {
+function getResultsAsArray (cursorSt: FMResultSet): SqliteParam[] {
     const data = [];
     const dict = cursorSt.resultDictionary;
     dict.enumerateKeysAndObjectsUsingBlock((key: any, value: any) => {
