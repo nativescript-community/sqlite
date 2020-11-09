@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.9](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.8...v3.3.9) (2020-11-09)
+
+
+### Bug Fixes
+
+* for now allow any typeorm version ([96f4a2a](https://github.com/TestJG/nativescript-akylas-sqlite/commit/96f4a2a3fbdcac3c3488bfc054ad7e9c218c9c29))
+
+
+
+
+
 ## [3.3.8](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.7...v3.3.8) (2020-11-04)
 
 **Note:** Version bump only for package @akylas/nativescript-sqlite

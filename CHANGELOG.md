@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.9](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.8...v3.3.9) (2020-11-09)
+
+
+### Bug Fixes
+
+* android handle all data types ([28c0c57](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/28c0c57ab35e43c09d7cca7d6cbd1f269f12ff8d))
+* for now allow any typeorm version ([96f4a2a](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/96f4a2a3fbdcac3c3488bfc054ad7e9c218c9c29))
+* handle for native objects ([c983906](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/c9839069b35f641218516fd98264ed8fdda0318d))
+
+
+
+
+
 ## [3.3.8](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.7...v3.3.8) (2020-11-04)
 
 
