@@ -60,6 +60,13 @@ const arrayFromCursor = (cursor: android.database.Cursor) => {
             case android.database.Cursor.FIELD_TYPE_INTEGER:
                 data.push(cursor.getDouble(i));
                 break;
+            case android.database.Cursor.FIELD_TYPE_BLOB:
+                data.push(cursor.getBlob(i) as any);
+                break;
+
+            case android.database.Cursor.FIELD_TYPE_NULL:
+                data.push( null);
+                break;
 
             default:
                 throwError(`unknown.type: ${type}`);
@@ -152,12 +159,10 @@ export class SQLiteDatabaseBase {
     }) {
         const data = event.data;
         const id = data.id;
-        // console.log('onWorkerMessage', id, data);
 
         if (id && messagePromises.hasOwnProperty(id)) {
             messagePromises[id].forEach(function (executor) {
                 executor.timeoutTimer && clearTimeout(executor.timeoutTimer);
-                // console.log('resolving worker message', id, data);
                 if (data.error) {
                     executor.reject(data.error);
                 } else {
@@ -202,7 +207,6 @@ export class SQLiteDatabaseBase {
             keys.forEach((k) => {
                 (com as any).akylas.sqlite.WorkersContext.setValue(`${id}_${k}`, nativeData[k]._native || nativeData[k]);
             });
-            // console.log('sending message to worker', messageData, keys);
             const mData = Object.assign(
                 {
                     type: 'call',
