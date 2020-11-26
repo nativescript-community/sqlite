@@ -49,16 +49,17 @@ export class HelloWorldModel extends Observable {
         return this.sqlite.execute(createCmd);
     }
 
-    insert(data: DataExample[]) {
-        data.map((data, i) => {
+    async insert(data: DataExample[]) {
+        for (let index = 0; index < data.length; index++) {
+            const d = data[index];
             const insert = 'INSERT INTO names (id, name, json) VALUES (?, ?, ?)';
             // Uncomment to crash it
-            if (i === 1000) {
+            if (index === 1000) {
                 console.log('About to crash!');
-                data.id = 0;
+                d.id = 0;
             }
-            this.sqlite.execute(insert, [data.id, data.name, JSON.stringify(data)]);
-        });
+            await this.sqlite.execute(insert, [d.id, d.name, JSON.stringify(data)]);
+        }
     }
 
     onInsert() {
