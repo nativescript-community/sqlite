@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.11](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.10...v3.3.11) (2020-11-26)
+
+
+### Bug Fixes
+
+* another fix for typeorm ([3f25614](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/3f25614e9d60d78f3a1dbc42b699b93dc8c7a616))
+* transaction is async ([0ec1ced](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/0ec1cedc74be5145e48fb454980d7fe406a45170))
+
+
+
+
+
 ## [3.3.10](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.9...v3.3.10) (2020-11-11)
 
 **Note:** Version bump only for package @akylas/nativescript-sqlite
