@@ -117,14 +117,14 @@ const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
         });
 };
 
-const transactionRaw = <T = any>(db: Db, action: (cancel?: () => void) => T) => {
+const transactionRaw = async <T = any>(db: Db, action: ( (cancel?: () => void) => Promise<T>)) => {
     db.beginTransaction();
     try {
         const cancelled = { value: false };
         const cancel = () => {
             cancelled.value = true;
         };
-        const result = action(cancel);
+        const result = await action(cancel);
         if (!cancelled.value) {
             db.setTransactionSuccessful();
         }
@@ -318,7 +318,7 @@ export class SQLiteDatabaseBase {
     ) {
         return eachRaw(dataFromCursor)(this.db)(query, params, callback, complete);
     }
-    transaction<T = any>(action: (cancel?: () => void) => T): T {
+    async transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T> {
         return transactionRaw(this.db, action);
     }
 }

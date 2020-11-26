@@ -29,7 +29,7 @@ export interface SQLiteDatabase {
 
     execute(query: string, params?: SqliteParams): Promise<void>;
 
-    transaction<T = any>(action: (cancel?: () => void) => T): T;
+    transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T>;
 
     each(
         query: string,

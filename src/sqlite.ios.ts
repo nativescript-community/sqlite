@@ -415,11 +415,11 @@ function execRaw(db: FMDatabase, query: string, params?: SqliteParams) {
     }
 }
 
-function transactionRaw<T = any>(
+async function transactionRaw<T = any>(
     db: FMDatabase,
-    action: (cancel?: () => void) => T,
+    action: (cancel?: () => void) => Promise<T>,
     isFirstTransaction: boolean
-): T {
+) {
     try {
         if (isFirstTransaction) {
             execRaw(db, 'BEGIN EXCLUSIVE TRANSACTION');
@@ -428,7 +428,7 @@ function transactionRaw<T = any>(
         const cancel = () => {
             cancelled.value = true;
         };
-        const result = action(cancel);
+        const result = await action(cancel);
         if (!cancelled.value && isFirstTransaction) {
             execRaw(db, 'COMMIT TRANSACTION');
         } else if (cancelled.value && isFirstTransaction) {
@@ -509,7 +509,7 @@ export class SQLiteDatabase {
         return selectRaw(this.db, query, params, false) as SqliteParam[][];
     }
     _isInTransaction = false;
-    transaction<T = any>(action: (cancel?: () => void) => T): T {
+    async transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T> {
         let res;
         if (!this._isInTransaction) {
             this._isInTransaction = true;
