@@ -116,4 +116,5 @@ export class MysqlDriver {}
 export class AuroraDataApiDriver {}
 export class OracleDriver {}
 export class SqlServerDriver {}
+export class BetterSqlite3Driver {}
 export class SapDriver {}
