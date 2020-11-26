@@ -10,6 +10,7 @@
     },
     "scripts": {
         "setup": "ts-patch install",
+        "prepare": "npm run setup",
         "tsc": "cp src/sqlite.d.ts plugin && tsc -skipLibCheck -d",
         "build.plugin": "cp README.md plugin/ && npm run tsc",
         "build.hooks": "tsc -skipLibCheck -p tsconfig.hooks.json",
