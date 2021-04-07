@@ -31,6 +31,10 @@ context.onmessage = (async (event: { data }) => {
             const db = (com as any).akylas.sqlite.WorkersContext.getValue(`${id}_db`);
             fakeDatabase.db = db;
             fakeDatabase.threading = false;
+            if (data.dbOptions) {
+                Object.assign(fakeDatabase, data.dbOptions);
+
+            }
             try {
                 const result =await (fakeDatabase[call] as Function).apply(fakeDatabase, args);
                 // console.log('Worker.onmessage done ', id, call, !!result);
