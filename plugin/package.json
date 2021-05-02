@@ -33,12 +33,12 @@
         "email": "josep.bergay@gmail.com"
     },
     "bugs": {
-        "url": "https://github.com/TestJG/nativescript-akylas-sqlite/issues"
+        "url": "https://github.com/nativescript-community/sqlite/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/TestJG/nativescript-akylas-sqlite",
+    "homepage": "https://github.com/nativescript-community/sqlite",
     "readmeFilename": "README.md",
-    "repository": "TestJG/nativescript-akylas-sqlite",
+    "repository": "nativescript-community/sqlite",
     "dependencies": {
         "@nano-sql/core": "^2.3.7",
         "@nativescript-community/typeorm": "*",
