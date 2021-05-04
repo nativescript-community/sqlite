@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.12](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.11...v3.3.12) (2021-05-04)
+
+
+### Features
+
+* Correctly transform ArrayBuffer to write in DB ([1fab926](https://github.com/TestJG/nativescript-mtmobile-sqlite/commit/1fab926081c5e086bb602d9036a82adc26c9156c))
+
+
+
+
+
 ## [3.3.11](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.10...v3.3.11) (2020-11-26)
 
 
