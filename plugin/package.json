@@ -6,21 +6,12 @@
     "typings": "sqlite.d.ts",
     "sideEffects": false,
     "scripts": {
-        "preuninstall": "node preuninstall.js",
-        "postinstall": "node postinstall.js"
     },
     "nativescript": {
         "platforms": {
             "android": "6.2.0",
             "ios": "6.2.0"
-        },
-        "hooks": [
-            {
-                "type": "before-prepare",
-                "script": "scripts/before-prepare.js",
-                "inject": true
-            }
-        ]
+        }
     },
     "keywords": [
         "NativeScript",
@@ -39,9 +30,12 @@
     "homepage": "https://github.com/TestJG/nativescript-akylas-sqlite",
     "readmeFilename": "README.md",
     "repository": "TestJG/nativescript-akylas-sqlite",
-    "dependencies": {
+
+    "peerDependencies": {
         "@nano-sql/core": "^2.3.7",
-        "@nativescript-community/typeorm": "*",
+        "@nativescript-community/typeorm": "0.2.28-1"
+    },
+    "dependencies": {
         "@nativescript/hook": "~2.0.0"
     }
 }
