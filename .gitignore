@@ -31,3 +31,4 @@ plugin/**/*js.map
 plugin/**/*js
 plugin/**/*.d.ts
 *.aar
+pnpm-lock.yaml

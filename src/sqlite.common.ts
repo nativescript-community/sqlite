@@ -42,6 +42,14 @@ export interface SQLiteDatabase {
 export function isNothing(x: any) {
     return x === undefined || x === null;
 }
+export function arrayToNativeByteArray(val) {
+    const length = val.length;
+    const result = Array.create('byte', length);
+    for (let i = 0; i < length; i++) {
+        result[i] = val[i];
+    }
+    return result;
+}
 
 export function paramToString(p: SqliteParam) {
     if (isNothing(p)) {
@@ -57,6 +65,14 @@ export function paramToString(p: SqliteParam) {
         if (p instanceof java.lang.Object) {
             return p;
         }
+        if (p instanceof ArrayBuffer) {
+            return arrayToNativeByteArray(new Uint8Array(p));
+        } else if (p.buffer) {
+            return arrayToNativeByteArray(p);
+        } else if (Array.isArray(p)) {
+            return arrayToNativeByteArray(p);
+        }
+
     } else {
         if (p instanceof NSData) {
             return p;
@@ -64,8 +80,18 @@ export function paramToString(p: SqliteParam) {
         if (p instanceof NSObject) {
             return p;
         }
+        if (p instanceof ArrayBuffer) {
+            return NSData.dataWithData(p as any);
+        }
+        if (p.buffer) {
+            return NSData.dataWithData(p.buffer);
+        }
+        if (Array.isArray(p)) {
+            return NSData.dataWithData(new Uint8Array(p).buffer as any);
+        }
     }
     if (p.hasOwnProperty('length') && !Array.isArray(p)) {
+        // native array
         return p;
     }
 

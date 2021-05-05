@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.12](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.11...v3.3.12) (2021-05-04)
+
+**Note:** Version bump only for package @akylas/nativescript-sqlite
+
+
+
+
+
 ## [3.3.11](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.10...v3.3.11) (2020-11-26)
 
 **Note:** Version bump only for package @akylas/nativescript-sqlite

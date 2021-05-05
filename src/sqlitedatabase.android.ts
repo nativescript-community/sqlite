@@ -3,9 +3,22 @@ import { SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError }
 
 type Db = android.database.sqlite.SQLiteDatabase;
 
-type FromCursor<T> = (cursor: android.database.Cursor) => T;
+type FromCursor<T> = (cursor: android.database.Cursor, transformBlobs?: boolean) => T;
 
-const dataFromCursor = (cursor: android.database.Cursor) => {
+export function byteArrayToBuffer(value) {
+    if (!value) {
+        return null;
+    }
+    const length = value.length;
+    const ret = new Uint8Array(length);
+    const isString = typeof value === 'string';
+    for (let i = 0; i < length; i++) {
+        ret[i] = isString ? value.charCodeAt(i) : value[i];
+    }
+    return ret;
+}
+
+const dataFromCursor = (cursor: android.database.Cursor, transformBlobs?: boolean) => {
     const colCount = cursor.getColumnCount();
     const data: SqliteRow = {};
     for (let i = 0; i < colCount; i++) {
@@ -25,7 +38,7 @@ const dataFromCursor = (cursor: android.database.Cursor) => {
                 break;
 
             case android.database.Cursor.FIELD_TYPE_BLOB:
-                data[name] = cursor.getBlob(i) as any;
+                data[name] = transformBlobs ? byteArrayToBuffer(cursor.getBlob(i)): cursor.getBlob(i);
                 break;
 
             case android.database.Cursor.FIELD_TYPE_NULL:
@@ -38,8 +51,7 @@ const dataFromCursor = (cursor: android.database.Cursor) => {
     }
     return data;
 };
-
-const arrayFromCursor = (cursor: android.database.Cursor) => {
+const arrayFromCursor = (cursor: android.database.Cursor, transformBlobs?: boolean) => {
     const colCount = cursor.getColumnCount();
     const data: SqliteParam[] = [];
     for (let i = 0; i < colCount; i++) {
@@ -61,7 +73,7 @@ const arrayFromCursor = (cursor: android.database.Cursor) => {
                 data.push(cursor.getDouble(i));
                 break;
             case android.database.Cursor.FIELD_TYPE_BLOB:
-                data.push(cursor.getBlob(i) as any);
+                data.push(transformBlobs ? byteArrayToBuffer(cursor.getBlob(i)): cursor.getBlob(i));
                 break;
 
             case android.database.Cursor.FIELD_TYPE_NULL:
@@ -75,20 +87,20 @@ const arrayFromCursor = (cursor: android.database.Cursor) => {
     return data;
 };
 
-const rawSql = <T>(onCursor: FromCursor<T>) => (db: Db) => (sql: string, params?: SqliteParams) => {
+const rawSql = <T>(onCursor: FromCursor<T>) => (db: Db, transformBlobs?: boolean) => (sql: string, params?: SqliteParams) => {
     const parameters = paramsToStringArray(params) as string[];
     const cursor = db.rawQuery(sql, parameters);
     try {
         const result: T[] = [];
         while (cursor.moveToNext()) {
-            result.push(onCursor(cursor));
+            result.push(onCursor(cursor, transformBlobs));
         }
         return result;
     } finally {
         cursor.close();
     }
 };
-const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
+const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db, transformBlobs?: boolean) => (
     sql: string,
     params: SqliteParams,
     callback: (error: Error, result: T) => void,
@@ -100,7 +112,7 @@ const eachRaw = <T>(onCursor: FromCursor<T>) => (db: Db) => (
         .then(() => {
             const count = 0;
             while (cursor.moveToNext()) {
-                const result = onCursor(cursor);
+                const result = onCursor(cursor, transformBlobs);
                 callback(null, result);
             }
             cursor.close();
@@ -139,13 +151,16 @@ const messagePromises: { [key: string]: { resolve: Function; reject: Function; t
 export class SQLiteDatabaseBase {
     db: android.database.sqlite.SQLiteDatabase;
     flags;
+    transformBlobs: boolean;
     constructor(public filePath: string, options?: {
         threading?: boolean;
         readOnly?: boolean;
         flags?: number;
+        transformBlobs?: boolean;
     }) {
         this.threading = options && options.threading === true;
         this.flags = options?.flags;
+        this.transformBlobs = !options || options.transformBlobs !== false;
     }
     _isInTransaction = false;
     threading = false;
@@ -211,6 +226,9 @@ export class SQLiteDatabaseBase {
                 {
                     type: 'call',
                     id,
+                    dbOptions: {
+                        transformBlobs:this.transformBlobs
+                    },
                     nativeDataKeys: keys,
                 },
                 messageData
@@ -254,7 +272,7 @@ export class SQLiteDatabaseBase {
         }
         return this.db.execSQL(query, paramsToStringArray(params));
     }
-    async get(query: string, params?: SqliteParams) {
+    async get(query: string, params?: SqliteParams, transformBlobs?: boolean) {
         if (this.threading) {
             return this.sendMessageToWorker(
                 {
@@ -266,9 +284,9 @@ export class SQLiteDatabaseBase {
                 }
             );
         }
-        return rawSql(dataFromCursor)(this.db)(query, params)[0] || null;
+        return rawSql(dataFromCursor)(this.db, transformBlobs ?? this.transformBlobs)(query, params)[0] || null;
     }
-    async getArray(query: string, params?: SqliteParams) {
+    async getArray(query: string, params?: SqliteParams, transformBlobs?: boolean) {
         if (this.threading) {
             return this.sendMessageToWorker(
                 {
@@ -280,9 +298,9 @@ export class SQLiteDatabaseBase {
                 }
             );
         }
-        return rawSql(arrayFromCursor)(this.db)(query, params)[0] || null;
+        return rawSql(arrayFromCursor)(this.db, transformBlobs ?? this.transformBlobs)(query, params)[0] || null;
     }
-    async select(query: string, params?: SqliteParams) {
+    async select(query: string, params?: SqliteParams, transformBlobs?: boolean) {
         if (this.threading) {
             return this.sendMessageToWorker(
                 {
@@ -294,9 +312,9 @@ export class SQLiteDatabaseBase {
                 }
             );
         }
-        return rawSql(dataFromCursor)(this.db)(query, params);
+        return rawSql(dataFromCursor)(this.db, transformBlobs ?? this.transformBlobs)(query, params);
     }
-    async selectArray(query: string, params?: SqliteParams) {
+    async selectArray(query: string, params?: SqliteParams, transformBlobs?: boolean) {
         if (this.threading) {
             return this.sendMessageToWorker(
                 {
@@ -308,15 +326,16 @@ export class SQLiteDatabaseBase {
                 }
             );
         }
-        return rawSql(arrayFromCursor)(this.db)(query, params);
+        return rawSql(arrayFromCursor)(this.db, transformBlobs ?? this.transformBlobs)(query, params);
     }
     async each(
         query: string,
         params: SqliteParams,
         callback: (error: Error, result: any) => void,
-        complete: (error: Error, count: number) => void
+        complete: (error: Error, count: number) => void,
+        transformBlobs?: boolean
     ) {
-        return eachRaw(dataFromCursor)(this.db)(query, params, callback, complete);
+        return eachRaw(dataFromCursor)(this.db, transformBlobs ?? this.transformBlobs)(query, params, callback, complete);
     }
     async transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T> {
         return transactionRaw(this.db, action);

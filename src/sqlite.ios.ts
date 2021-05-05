@@ -120,7 +120,7 @@ const getNewCursorStatement = (
 //     return cursorSt.count;
 // };
 
-function getResultsAsObject (cursorSt: FMResultSet): SqliteRow {
+function getResultsAsObject (cursorSt: FMResultSet, transformBlobs?: boolean): SqliteRow {
     // const count = cursorSt.columnCount;
     // if (!count) {
     //     return null;
@@ -128,7 +128,11 @@ function getResultsAsObject (cursorSt: FMResultSet): SqliteRow {
     const data = {};
     const dict = cursorSt.resultDictionary;
     dict.enumerateKeysAndObjectsUsingBlock((key: any, value: any) => {
-        data[key] = value;
+        if (transformBlobs && value instanceof NSData) {
+
+        } else {
+            data[key] = value;
+        }
     });
     // for (let index = 0; index < count; index++) {
     //     data[cursorSt.columnNameForIndex(index)] = getValues(cursorSt, index);
@@ -136,11 +140,14 @@ function getResultsAsObject (cursorSt: FMResultSet): SqliteRow {
     return data;
 };
 
-function getResultsAsArray (cursorSt: FMResultSet): SqliteParam[] {
+function getResultsAsArray (cursorSt: FMResultSet, transformBlobs?: boolean): SqliteParam[] {
     const data = [];
     const dict = cursorSt.resultDictionary;
     dict.enumerateKeysAndObjectsUsingBlock((key: any, value: any) => {
-        data.push(value);
+        if (transformBlobs && value instanceof NSData) {
+        } else {
+            data.push(value);
+        }
     });
     // for (let index = 0; index < count; index++) {
     //     data[cursorSt.columnNameForIndex(index)] = getValues(cursorSt, index);
@@ -256,7 +263,8 @@ function getRaw(
     db: FMDatabase,
     query: string,
     params: SqliteParams,
-    asObject: boolean
+    asObject: boolean,
+    transformBlobs?: boolean
 ): SqliteRow | SqliteParam[] {
     // const statement = prepareStatement(db, query);
     // const cursorSt = getNewCursorStatement(statement);
@@ -276,7 +284,7 @@ function getRaw(
         paramsToStringArray(params)
     );
     if (s) {
-        return asObject ? getResultsAsObject(s) : getResultsAsArray(s);
+        return asObject ? getResultsAsObject(s, transformBlobs) : getResultsAsArray(s, transformBlobs);
         // while (s.next()) {
         //     //retrieve values for each record
         //     const row = getResults(s);
@@ -295,7 +303,8 @@ function eachRaw(
     params: SqliteParams,
     asObject: boolean,
     callback: (error: Error, result: SqliteRow | SqliteParam[]) => void,
-    complete: (error: Error, count: number) => void
+    complete: (error: Error, count: number) => void,
+    transformBlobs?: boolean
 ) {
     // const statement = prepareStatement(db, query);
     // const cursorSt = getNewCursorStatement(statement);
@@ -313,7 +322,7 @@ function eachRaw(
             if (s) {
                 while (s.next()) {
                     //retrieve values for each record
-                    const row = getResults(s);
+                    const row = getResults(s, transformBlobs);
                     if (row) {
                         count++;
                         callback(null, row);
@@ -356,7 +365,8 @@ function selectRaw(
     db: FMDatabase,
     query: string,
     params: SqliteParams,
-    asObject: boolean
+    asObject: boolean,
+    transformBlobs?: boolean
 ): SqliteRow[] | SqliteParam[][] {
     // const statement = prepareStatement(db, query);
     // const cursorSt = getNewCursorStatement(statement);
@@ -370,7 +380,7 @@ function selectRaw(
     if (s) {
         while (s.next()) {
             //retrieve values for each record
-            const row = getResults(s);
+            const row = getResults(s, transformBlobs);
             if (row) {
                 rows = [...rows, row];
             }
@@ -446,10 +456,14 @@ async function transactionRaw<T = any>(
 
 export class SQLiteDatabase {
     db: FMDatabase;
+    transformBlobs: boolean;
     constructor(public filePath: string, options?: {
         threading?: boolean;
+        transformBlobs?: boolean;
         readOnly?: boolean;
-    }) {}
+    }) {
+        this.transformBlobs = !options || options.transformBlobs !== false;
+    }
     isOpen = false;
     async open() {
         if (!this.db) {
@@ -481,20 +495,21 @@ export class SQLiteDatabase {
     async execute(query: string, params?: SqliteParams) {
         return execRaw(this.db, query, params);
     }
-    async get(query: string, params?: SqliteParams) {
-        return (getRaw(this.db, query, params, true) || null);
+    async get(query: string, params?: SqliteParams, transformBlobs?: boolean) {
+        return (getRaw(this.db, query, params, true, transformBlobs ?? this.transformBlobs) || null);
     }
-    async getArray(query: string, params?: SqliteParams) {
-        return (getRaw(this.db, query, params, false) || null) as SqliteParam[];
+    async getArray(query: string, params?: SqliteParams, transformBlobs?: boolean) {
+        return (getRaw(this.db, query, params, false, transformBlobs ?? this.transformBlobs) || null) as SqliteParam[];
     }
-    async select(query: string, params?: SqliteParams) {
-        return selectRaw(this.db, query, params, true) as SqliteRow[];
+    async select(query: string, params?: SqliteParams, transformBlobs?: boolean) {
+        return selectRaw(this.db, query, params, true, transformBlobs ?? this.transformBlobs) as SqliteRow[];
     }
     async each(
         query: string,
         params: SqliteParams,
         callback: (error: Error, result: SqliteRow) => void,
-        complete: (error: Error, count: number) => void
+        complete: (error: Error, count: number) => void,
+        transformBlobs?: boolean
     ) {
         return eachRaw(
             this.db,
@@ -502,11 +517,11 @@ export class SQLiteDatabase {
             params,
             true,
             callback as (error: Error, result: any) => void,
-            complete
+            complete, transformBlobs ?? this.transformBlobs
         );
     }
-    async selectArray(query: string, params?: SqliteParams) {
-        return selectRaw(this.db, query, params, false) as SqliteParam[][];
+    async selectArray(query: string, params?: SqliteParams, transformBlobs?: boolean) {
+        return selectRaw(this.db, query, params, false, transformBlobs ?? this.transformBlobs) as SqliteParam[][];
     }
     _isInTransaction = false;
     async transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T> {
@@ -526,6 +541,7 @@ export function openOrCreate(
     filePath: string,
     flags?: number, options?: {
         readOnly?: boolean;
+        transformBlobs?: boolean;
         threading?: boolean;
     },
 ): SQLiteDatabase {
