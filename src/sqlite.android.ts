@@ -29,8 +29,7 @@ export class SQLiteDatabase extends SQLiteDatabaseBase {
         if (!this.db) {
             this.db = createDb(this.filePath, this.flags);
             if (this.threading && !this.worker) {
-                const Worker = require('nativescript-worker-loader!./worker');
-                this.worker = new Worker();
+                this.worker = new Worker('./worker');
                 this.worker.onmessage = this.onWorkerMessage;
             }
         }
