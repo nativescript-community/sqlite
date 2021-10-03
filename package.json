@@ -38,12 +38,12 @@
         "email": "josep.bergay@gmail.com"
     },
     "bugs": {
-        "url": "https://github.com/TestJG/nativescript-mtmobile-sqlite/issues"
+        "url": "https://github.com/nativescript-community/sqlite/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/TestJG/nativescript-mtmobile-sqlite",
+    "homepage": "https://github.com/nativescript-community/sqlite",
     "readmeFilename": "README.md",
-    "repository": "TestJG/nativescript-mtmobile-sqlite",
+    "repository": "nativescript-community/sqlite",
     "devDependencies": {
         "@commitlint/cli": "^9.1.2",
         "@commitlint/config-conventional": "^9.1.2",
