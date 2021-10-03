@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/nativescript-community/sqlite/compare/v3.3.12...v3.4.0) (2021-10-03)
+
+
+### Bug Fixes
+
+* N8 /. webpack5 workers ([ea25c67](https://github.com/nativescript-community/sqlite/commit/ea25c67184cc7325c0459f4567abcee05ad350d9))
+
+
+### Features
+
+* **android:** native-api-usage ([ec069b2](https://github.com/nativescript-community/sqlite/commit/ec069b23891bb59aa8582d037190ca31d4729932))
+
+
+
+
+
 ## [3.3.12](https://github.com/TestJG/nativescript-mtmobile-sqlite/compare/v3.3.11...v3.3.12) (2021-05-04)
 
 
