@@ -5,7 +5,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.12](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.11...v3.3.12) (2021-05-04)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -13,7 +13,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.11](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.10...v3.3.11) (2020-11-26)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -21,7 +21,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.10](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.9...v3.3.10) (2020-11-11)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -40,7 +40,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.8](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.7...v3.3.8) (2020-11-04)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -48,7 +48,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.7](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.6...v3.3.7) (2020-11-03)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -56,7 +56,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.6](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.5...v3.3.6) (2020-11-02)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -64,7 +64,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.5](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.4...v3.3.5) (2020-11-01)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -105,7 +105,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.3.1](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.3.0...v3.3.1) (2020-10-31)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -135,7 +135,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.1.1](https://github.com/TestJG/nativescript-akylas-sqlite/compare/v3.1.0...v3.1.1) (2020-08-14)
 
-**Note:** Version bump only for package @akylas/nativescript-sqlite
+**Note:** Version bump only for package @nativescript-community/sqlite
 
 
 
@@ -146,7 +146,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* move to @akylas/nativescript-sqlite ([71ef0c1](https://github.com/TestJG/nativescript-akylas-sqlite/commit/71ef0c1b96b3cbc60b67a63a02fcc38e1428524e))
+* move to @nativescript-community/sqlite ([71ef0c1](https://github.com/TestJG/nativescript-akylas-sqlite/commit/71ef0c1b96b3cbc60b67a63a02fcc38e1428524e))
 
 
 

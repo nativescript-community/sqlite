@@ -39,6 +39,7 @@ export class SQLiteDatabase extends SQLiteDatabaseBase {
 
 export const openOrCreate = (filePath: string, options?: {
     threading?: boolean;
+    transformBlobs?: boolean;
     flags?: number;
 }): SQLiteDatabase => {
     const obj = new SQLiteDatabase(filePath, options);

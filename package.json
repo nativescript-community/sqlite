@@ -1,5 +1,5 @@
 {
-    "name": "@akylas/nativescript-sqlite",
+    "name": "@nativescript-community/sqlite",
     "version": "1.3.0",
     "description": "SQLite for Nativescript",
     "nativescript": {

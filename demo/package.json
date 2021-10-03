@@ -1,21 +1,14 @@
 {
   "dependencies": {
-    "@nativescript/core": "7.0.13",
-    "@akylas/nativescript-sqlite": "file:../plugin",
-    "nativescript-theme-core": "^2.0.24",
-    "nativescript-unit-test-runner": "0.7.1-next-2019-07-19-122824-01",
-    "@nativescript-community/typeorm": "latest",
-    "nativescript-worker-loader": "^0.12.1"
+    "@nativescript-community/sqlite": "file:../plugin",
+    "@nativescript-community/typeorm": "0.2.2-5.1",
+    "@nativescript/core": "8.1.3",
+    "nativescript-theme-core": "^2.0.24"
   },
   "devDependencies": {
+    "@nativescript/ios": "8.1.0",
     "@nativescript/types": "7.0.4",
-    "@nativescript/webpack": "3.0.8",
-    "jasmine-core": "^3.5.0",
-    "karma": "^4.4.1",
-    "karma-jasmine": "^2.0.1",
-    "karma-nativescript-launcher": "^0.4.0",
-    "typescript": "3.9.7",
-    "webpack": "^4.44.2"
+    "@nativescript/webpack": "5.0.0"
   },
   "scripts": {
     "webpack": "webpack --env.android",

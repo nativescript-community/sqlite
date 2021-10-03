@@ -1,144 +1,104 @@
 {
   "program": {
     "fileInfos": {
-      "./node_modules/typescript/lib/lib.es5.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es5.d.ts": {
         "version": "70ae6416528e68c2ee7b62892200d2ca631759943d4429f8b779b947ff1e124d",
         "signature": "70ae6416528e68c2ee7b62892200d2ca631759943d4429f8b779b947ff1e124d",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.d.ts": {
         "version": "dc47c4fa66b9b9890cf076304de2a9c5201e94b740cffdf09f87296d877d71f6",
         "signature": "dc47c4fa66b9b9890cf076304de2a9c5201e94b740cffdf09f87296d877d71f6",
         "affectsGlobalScope": false
       },
-      "./node_modules/typescript/lib/lib.es2016.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2016.d.ts": {
         "version": "7a387c58583dfca701b6c85e0adaf43fb17d590fb16d5b2dc0a2fbd89f35c467",
         "signature": "7a387c58583dfca701b6c85e0adaf43fb17d590fb16d5b2dc0a2fbd89f35c467",
         "affectsGlobalScope": false
       },
-      "./node_modules/typescript/lib/lib.es2017.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.d.ts": {
         "version": "8a12173c586e95f4433e0c6dc446bc88346be73ffe9ca6eec7aa63c8f3dca7f9",
         "signature": "8a12173c586e95f4433e0c6dc446bc88346be73ffe9ca6eec7aa63c8f3dca7f9",
         "affectsGlobalScope": false
       },
-      "./node_modules/typescript/lib/lib.es2018.d.ts": {
-        "version": "5f4e733ced4e129482ae2186aae29fde948ab7182844c3a5a51dd346182c7b06",
-        "signature": "5f4e733ced4e129482ae2186aae29fde948ab7182844c3a5a51dd346182c7b06",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/typescript/lib/lib.dom.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.dom.d.ts": {
         "version": "9affb0a2ddc57df5b8174c0af96c288d697a262e5bc9ca1f544c999dc64a91e6",
         "signature": "9affb0a2ddc57df5b8174c0af96c288d697a262e5bc9ca1f544c999dc64a91e6",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.core.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.core.d.ts": {
         "version": "63e0cc12d0f77394094bd19e84464f9840af0071e5b9358ced30511efef1d8d2",
         "signature": "63e0cc12d0f77394094bd19e84464f9840af0071e5b9358ced30511efef1d8d2",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.collection.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.collection.d.ts": {
         "version": "43fb1d932e4966a39a41b464a12a81899d9ae5f2c829063f5571b6b87e6d2f9c",
         "signature": "43fb1d932e4966a39a41b464a12a81899d9ae5f2c829063f5571b6b87e6d2f9c",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.generator.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.generator.d.ts": {
         "version": "cdccba9a388c2ee3fd6ad4018c640a471a6c060e96f1232062223063b0a5ac6a",
         "signature": "cdccba9a388c2ee3fd6ad4018c640a471a6c060e96f1232062223063b0a5ac6a",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.iterable.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.iterable.d.ts": {
         "version": "42f5e41e5893da663dbf0394268f54f1da4b43dc0ddd2ea4bf471fe5361d6faf",
         "signature": "42f5e41e5893da663dbf0394268f54f1da4b43dc0ddd2ea4bf471fe5361d6faf",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.promise.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.promise.d.ts": {
         "version": "0b7a905675e6cb4211c128f0a3aa47d414b275180a299a9aad5d3ec298abbfc4",
         "signature": "0b7a905675e6cb4211c128f0a3aa47d414b275180a299a9aad5d3ec298abbfc4",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.proxy.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.proxy.d.ts": {
         "version": "dfff68b3c34338f6b307a25d4566de15eed7973b0dc5d69f9fde2bcac1c25315",
         "signature": "dfff68b3c34338f6b307a25d4566de15eed7973b0dc5d69f9fde2bcac1c25315",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.reflect.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.reflect.d.ts": {
         "version": "cb609802a8698aa28b9c56331d4b53f590ca3c1c3a255350304ae3d06017779d",
         "signature": "cb609802a8698aa28b9c56331d4b53f590ca3c1c3a255350304ae3d06017779d",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.symbol.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.symbol.d.ts": {
         "version": "3013574108c36fd3aaca79764002b3717da09725a36a6fc02eac386593110f93",
         "signature": "3013574108c36fd3aaca79764002b3717da09725a36a6fc02eac386593110f93",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts": {
         "version": "4670208dd7da9d6c774ab1b75c1527a810388c7989c4905de6aaea8561cb9dce",
         "signature": "4670208dd7da9d6c774ab1b75c1527a810388c7989c4905de6aaea8561cb9dce",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2016.array.include.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2016.array.include.d.ts": {
         "version": "3be5a1453daa63e031d266bf342f3943603873d890ab8b9ada95e22389389006",
         "signature": "3be5a1453daa63e031d266bf342f3943603873d890ab8b9ada95e22389389006",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2017.object.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.object.d.ts": {
         "version": "17bb1fc99591b00515502d264fa55dc8370c45c5298f4a5c2083557dccba5a2a",
         "signature": "17bb1fc99591b00515502d264fa55dc8370c45c5298f4a5c2083557dccba5a2a",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts": {
         "version": "d0db416bccdb33975548baf09a42ee8c47eace1aac7907351a000f1e568e7232",
         "signature": "d0db416bccdb33975548baf09a42ee8c47eace1aac7907351a000f1e568e7232",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2017.string.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.string.d.ts": {
         "version": "6a6b173e739a6a99629a8594bfb294cc7329bfb7b227f12e1f7c11bc163b8577",
         "signature": "6a6b173e739a6a99629a8594bfb294cc7329bfb7b227f12e1f7c11bc163b8577",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2017.intl.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.intl.d.ts": {
         "version": "12a310447c5d23c7d0d5ca2af606e3bd08afda69100166730ab92c62999ebb9d",
         "signature": "12a310447c5d23c7d0d5ca2af606e3bd08afda69100166730ab92c62999ebb9d",
         "affectsGlobalScope": true
       },
-      "./node_modules/typescript/lib/lib.es2017.typedarrays.d.ts": {
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts": {
         "version": "b0124885ef82641903d232172577f2ceb5d3e60aed4da1153bab4221e1f6dd4e",
         "signature": "b0124885ef82641903d232172577f2ceb5d3e60aed4da1153bab4221e1f6dd4e",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts": {
-        "version": "0eb85d6c590b0d577919a79e0084fa1744c1beba6fd0d4e951432fa1ede5510a",
-        "signature": "0eb85d6c590b0d577919a79e0084fa1744c1beba6fd0d4e951432fa1ede5510a",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/typescript/lib/lib.es2018.asynciterable.d.ts": {
-        "version": "a40c4d82bf13fcded295ac29f354eb7d40249613c15e07b53f2fc75e45e16359",
-        "signature": "a40c4d82bf13fcded295ac29f354eb7d40249613c15e07b53f2fc75e45e16359",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/typescript/lib/lib.es2018.intl.d.ts": {
-        "version": "df9c8a72ca8b0ed62f5470b41208a0587f0f73f0a7db28e5a1272cf92537518e",
-        "signature": "df9c8a72ca8b0ed62f5470b41208a0587f0f73f0a7db28e5a1272cf92537518e",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/typescript/lib/lib.es2018.promise.d.ts": {
-        "version": "bb2d3fb05a1d2ffbca947cc7cbc95d23e1d053d6595391bd325deb265a18d36c",
-        "signature": "bb2d3fb05a1d2ffbca947cc7cbc95d23e1d053d6595391bd325deb265a18d36c",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/typescript/lib/lib.es2018.regexp.d.ts": {
-        "version": "c80df75850fea5caa2afe43b9949338ce4e2de086f91713e9af1a06f973872b8",
-        "signature": "c80df75850fea5caa2afe43b9949338ce4e2de086f91713e9af1a06f973872b8",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/typescript/lib/lib.es2020.bigint.d.ts": {
-        "version": "4f435f794b7853c55e2ae7cff6206025802aa79232d2867544178f2ca8ff5eaa",
-        "signature": "4f435f794b7853c55e2ae7cff6206025802aa79232d2867544178f2ca8ff5eaa",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/typescript/lib/lib.esnext.intl.d.ts": {
-        "version": "89bf2b7a601b73ea4311eda9c41f86a58994fec1bee3b87c4a14d68d9adcdcbd",
-        "signature": "89bf2b7a601b73ea4311eda9c41f86a58994fec1bee3b87c4a14d68d9adcdcbd",
         "affectsGlobalScope": true
       },
       "./node_modules/tslib/tslib.d.ts": {
@@ -327,13 +287,18 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@akylas/nativescript-sqlite/sqlite.common.d.ts": {
-        "version": "5beee7cc952e17ed21cb76222800d70dbc49cde6eef2fcecf186fcedc30ead05",
-        "signature": "5beee7cc952e17ed21cb76222800d70dbc49cde6eef2fcecf186fcedc30ead05",
+        "version": "6ca41bfc71f7af367448a4fafb449799243ca3e5308be073f84adb18b7d546f4",
+        "signature": "6ca41bfc71f7af367448a4fafb449799243ca3e5308be073f84adb18b7d546f4",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@akylas/nativescript-sqlite/sqlitedatabase.android.d.ts": {
+        "version": "90786776457d5ed92df2ad7dc3f03a205e0eba0fe9135f1b95d10802003688df",
+        "signature": "90786776457d5ed92df2ad7dc3f03a205e0eba0fe9135f1b95d10802003688df",
         "affectsGlobalScope": false
       },
       "./node_modules/@akylas/nativescript-sqlite/sqlite.android.d.ts": {
-        "version": "6a87d800452c890663fc218d765c5acbb547fe32b3f5574f76192ccfc6c3c75a",
-        "signature": "6a87d800452c890663fc218d765c5acbb547fe32b3f5574f76192ccfc6c3c75a",
+        "version": "3779a26f9bb1abc3ce4e911c341481fda2743b15f2aa90496f8d857bbef47161",
+        "signature": "3779a26f9bb1abc3ce4e911c341481fda2743b15f2aa90496f8d857bbef47161",
         "affectsGlobalScope": false
       },
       "./node_modules/@akylas/nativescript-sqlite/sqlite.d.ts": {
@@ -867,23 +832,23 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/Alias.d.ts": {
-        "version": "8ce2c478a580e69988240a7ab9f213116889a5ec32665cca4d8eb68ff76346c7",
-        "signature": "8ce2c478a580e69988240a7ab9f213116889a5ec32665cca4d8eb68ff76346c7",
+        "version": "cf4dc15ca9dc6c0995dd2a9264e5ec37d09d9d551c85f395034e812abdf60a99",
+        "signature": "cf4dc15ca9dc6c0995dd2a9264e5ec37d09d9d551c85f395034e812abdf60a99",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/JoinAttribute.d.ts": {
-        "version": "e3d6921618e7c7c17d9300f6d3ba34024d7b101f0c6627591b1d06acc40c770f",
-        "signature": "e3d6921618e7c7c17d9300f6d3ba34024d7b101f0c6627591b1d06acc40c770f",
+        "version": "e74babac0be57a8e13eb69efb67286c6e954625978c67449e679267180ded327",
+        "signature": "e74babac0be57a8e13eb69efb67286c6e954625978c67449e679267180ded327",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/relation-id/RelationIdAttribute.d.ts": {
-        "version": "80fde1c35ef0e78d242d8c627436a25dd8b9f3ae503a8bd7f0da27746666c9d9",
-        "signature": "80fde1c35ef0e78d242d8c627436a25dd8b9f3ae503a8bd7f0da27746666c9d9",
+        "version": "4cb49e79595c6413fcb01af55a8a574705bf385bd2ec5cf8b777778952e2914a",
+        "signature": "4cb49e79595c6413fcb01af55a8a574705bf385bd2ec5cf8b777778952e2914a",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/relation-count/RelationCountAttribute.d.ts": {
-        "version": "baa105533ba19a8fd49b8d2511efe4064b38f7a2aaef8346366177ba98247cdf",
-        "signature": "baa105533ba19a8fd49b8d2511efe4064b38f7a2aaef8346366177ba98247cdf",
+        "version": "d6b44382b2670f38c8473e7c16b6e8a9bfa546b396b920afc4c53410eeb22abf",
+        "signature": "d6b44382b2670f38c8473e7c16b6e8a9bfa546b396b920afc4c53410eeb22abf",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/SelectQuery.d.ts": {
@@ -897,8 +862,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryExpressionMap.d.ts": {
-        "version": "0c9233c6aa33633c047b63621ae8bb09a87e2f2756a97599a5f4aa23dd26607f",
-        "signature": "0c9233c6aa33633c047b63621ae8bb09a87e2f2756a97599a5f4aa23dd26607f",
+        "version": "9522639925e2aa9a79cc813d2662e559feaf704ae462dc02b9923caef4b0a817",
+        "signature": "9522639925e2aa9a79cc813d2662e559feaf704ae462dc02b9923caef4b0a817",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/Brackets.d.ts": {
@@ -917,8 +882,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryPartialEntity.d.ts": {
-        "version": "8a7b4ab9d0b63aa0873dbd3099c5deefe6943bcaee7678c330247238668d4edb",
-        "signature": "8a7b4ab9d0b63aa0873dbd3099c5deefe6943bcaee7678c330247238668d4edb",
+        "version": "4d26f8d4e5c2a8de9285e82ea0ce5f5ed986866b4a77b9082536a732e7f40c36",
+        "signature": "4d26f8d4e5c2a8de9285e82ea0ce5f5ed986866b4a77b9082536a732e7f40c36",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/UpdateQueryBuilder.d.ts": {
@@ -931,79 +896,24 @@
         "signature": "42f44c5a2957b5ebddf155f15c111f281c3446e55bddd6a6cb9505d7a683ee58",
         "affectsGlobalScope": false
       },
+      "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts": {
+        "version": "b19fc2f23b90bdec3fd4c82e4925531bbcb14faf01b5b193177c400589cc3e38",
+        "signature": "b19fc2f23b90bdec3fd4c82e4925531bbcb14faf01b5b193177c400589cc3e38",
+        "affectsGlobalScope": false
+      },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/result/DeleteResult.d.ts": {
         "version": "e1785750052b51cfc48f5b782125479d52645146d58805688b46becabf2f6c81",
         "signature": "e1785750052b51cfc48f5b782125479d52645146d58805688b46becabf2f6c81",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/DeleteQueryBuilder.d.ts": {
-        "version": "0af19f6bf51e8721b99a002de13271a0f544b60ef025bcdaeb09efbf20b7a0f3",
-        "signature": "0af19f6bf51e8721b99a002de13271a0f544b60ef025bcdaeb09efbf20b7a0f3",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaIndexOptions.d.ts": {
-        "version": "733f5fed6c0e8717a32e8f4145566fc9819dd7b39c9d88973c834bcdc111f454",
-        "signature": "733f5fed6c0e8717a32e8f4145566fc9819dd7b39c9d88973c834bcdc111f454",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/ValueTransformer.d.ts": {
-        "version": "b0e6f1b1569779cf567317c2265d67460d1d3b4de4e79126533109d87dc16d50",
-        "signature": "b0e6f1b1569779cf567317c2265d67460d1d3b4de4e79126533109d87dc16d50",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/SpatialColumnOptions.d.ts": {
-        "version": "1cf086abc7abb48f994d986b3cc6bdf70c343a5661315f6bb982378b21b55435",
-        "signature": "1cf086abc7abb48f994d986b3cc6bdf70c343a5661315f6bb982378b21b55435",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaColumnOptions.d.ts": {
-        "version": "4707c2fd3cc63371167c5b935c3dc66b10ed13c0106f4527d910892837929ebd",
-        "signature": "4707c2fd3cc63371167c5b935c3dc66b10ed13c0106f4527d910892837929ebd",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/JoinColumnOptions.d.ts": {
-        "version": "74fe5c4fb7d9ee01e8690638e4b60a14b909240c14632ac4e7662995ad004b90",
-        "signature": "74fe5c4fb7d9ee01e8690638e4b60a14b909240c14632ac4e7662995ad004b90",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/JoinTableMultipleColumnsOptions.d.ts": {
-        "version": "3c725b4c73af44a1eedda6cbbea47d8fdc71d464e13633750aebe0af76bc2469",
-        "signature": "3c725b4c73af44a1eedda6cbbea47d8fdc71d464e13633750aebe0af76bc2469",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaRelationOptions.d.ts": {
-        "version": "40ec6f4d834bd65728739d332cbf9fef3b517971eca426f1d8a846693be171bf",
-        "signature": "40ec6f4d834bd65728739d332cbf9fef3b517971eca426f1d8a846693be171bf",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaUniqueOptions.d.ts": {
-        "version": "76a53f6b4062f3cc3c54d2a8b731f4b8d2782a7d3524115d3c977ca181306f39",
-        "signature": "76a53f6b4062f3cc3c54d2a8b731f4b8d2782a7d3524115d3c977ca181306f39",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaCheckOptions.d.ts": {
-        "version": "b3ded8e50b3cdf548d7c8d3b3b5b2105932b04a2f08b392564f4bc499407e4e5",
-        "signature": "b3ded8e50b3cdf548d7c8d3b3b5b2105932b04a2f08b392564f4bc499407e4e5",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaExclusionOptions.d.ts": {
-        "version": "4ed2d8fb4c598719985b8fbef65f7de9c3f5ae6a233fc0fe20bd00193c490908",
-        "signature": "4ed2d8fb4c598719985b8fbef65f7de9c3f5ae6a233fc0fe20bd00193c490908",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaOptions.d.ts": {
-        "version": "53a86aae1d9aaee78c042d6ed6695f301663114f62b16b9d061fbd711ef69d36",
-        "signature": "53a86aae1d9aaee78c042d6ed6695f301663114f62b16b9d061fbd711ef69d36",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts": {
-        "version": "1e9dd4dc39eb80dacd5573944aa8b3f84854e8397ac3ec0a86feadd4e2ce40d4",
-        "signature": "1e9dd4dc39eb80dacd5573944aa8b3f84854e8397ac3ec0a86feadd4e2ce40d4",
+        "version": "edc60810bdaf64cfc55c1dfa18e1da2057e4cffe392d7096ac399502598e7449",
+        "signature": "edc60810bdaf64cfc55c1dfa18e1da2057e4cffe392d7096ac399502598e7449",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/SoftDeleteQueryBuilder.d.ts": {
-        "version": "68cbd3e1ee32cf46c8e105a62de35e6baf2b6c71a7ed9a7323b15fe0e414f2ce",
-        "signature": "68cbd3e1ee32cf46c8e105a62de35e6baf2b6c71a7ed9a7323b15fe0e414f2ce",
+        "version": "41aba617a085c1a44c755475b21d44fd000b56f64d8d7c0729e46d66e685bb10",
+        "signature": "41aba617a085c1a44c755475b21d44fd000b56f64d8d7c0729e46d66e685bb10",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/result/InsertResult.d.ts": {
@@ -1012,8 +922,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/InsertQueryBuilder.d.ts": {
-        "version": "3963cd6df38ee21c6bc3254d0b9dde9a410590c98c12a74d3344345282a33fc0",
-        "signature": "3963cd6df38ee21c6bc3254d0b9dde9a410590c98c12a74d3344345282a33fc0",
+        "version": "cc9652e05bd8c4bc02a98440201deefa56b432879daed6b41f1595ce702e49f3",
+        "signature": "cc9652e05bd8c4bc02a98440201deefa56b432879daed6b41f1595ce702e49f3",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/RelationQueryBuilder.d.ts": {
@@ -1021,19 +931,29 @@
         "signature": "921274e649ce4eafc40a63f0f155bd5d26d4ed8e6d3002c9f0fc066fbcb718d9",
         "affectsGlobalScope": false
       },
+      "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperatorType.d.ts": {
+        "version": "7d659e9b2e21d1ead6a231cccd32fe699e3010bbd4b12b98557f689eff8ac239",
+        "signature": "7d659e9b2e21d1ead6a231cccd32fe699e3010bbd4b12b98557f689eff8ac239",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts": {
+        "version": "7fb70d7f30c470727131eabaf523607414b952b959f74cc446bbcfead5682e12",
+        "signature": "7fb70d7f30c470727131eabaf523607414b952b959f74cc446bbcfead5682e12",
+        "affectsGlobalScope": false
+      },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts": {
-        "version": "783fa1cef3c7028b40fb34d17ffe2ae23b2ba4714878502ccb30e406798dd789",
-        "signature": "783fa1cef3c7028b40fb34d17ffe2ae23b2ba4714878502ccb30e406798dd789",
+        "version": "2224fbc4f081b1d05545253cb258eef7f1d01aaf33363b9187cf3bcfffd9869e",
+        "signature": "2224fbc4f081b1d05545253cb258eef7f1d01aaf33363b9187cf3bcfffd9869e",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/platform/PlatformTools.d.ts": {
-        "version": "c4a9106e6a2fdb6d865724f4cd5e437d1e979a9406c93f1d0be4141f3f4a3780",
-        "signature": "c4a9106e6a2fdb6d865724f4cd5e437d1e979a9406c93f1d0be4141f3f4a3780",
+        "version": "2646e316872aa61ed09e6272fb07ecd766a7977fbf37080aa6429be40907c1e7",
+        "signature": "2646e316872aa61ed09e6272fb07ecd766a7977fbf37080aa6429be40907c1e7",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/SelectQueryBuilder.d.ts": {
-        "version": "5fdfc31868b8da513d1e2ccfa8ade094cccb71eb4032ede44997783f6afc5fd1",
-        "signature": "5fdfc31868b8da513d1e2ccfa8ade094cccb71eb4032ede44997783f6afc5fd1",
+        "version": "3163241e7064db98f45d8ad03281dad84fdb5124fd104e84aea9747a06ccdd61",
+        "signature": "3163241e7064db98f45d8ad03281dad84fdb5124fd104e84aea9747a06ccdd61",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/RelationIdMetadataArgs.d.ts": {
@@ -1057,8 +977,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/metadata/types/EventListenerTypes.d.ts": {
-        "version": "23aa2adecbe990bd7811b0c65917393a18f9c7a598af3aa7ffea48f8219a1cd6",
-        "signature": "23aa2adecbe990bd7811b0c65917393a18f9c7a598af3aa7ffea48f8219a1cd6",
+        "version": "55f75f5fa3413eb3a94bc35dd1493643a69c8696af0a817166210a80b01841b6",
+        "signature": "55f75f5fa3413eb3a94bc35dd1493643a69c8696af0a817166210a80b01841b6",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/EntityListenerMetadataArgs.d.ts": {
@@ -1084,6 +1004,11 @@
       "./node_modules/@nativescript-community/typeorm/browser/metadata/EmbeddedMetadata.d.ts": {
         "version": "4d2644244dc91caad6af16b433cc6bf3bc3100f560edf8e579d95d6dd21ce10c",
         "signature": "4d2644244dc91caad6af16b433cc6bf3bc3100f560edf8e579d95d6dd21ce10c",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/ValueTransformer.d.ts": {
+        "version": "b0e6f1b1569779cf567317c2265d67460d1d3b4de4e79126533109d87dc16d50",
+        "signature": "b0e6f1b1569779cf567317c2265d67460d1d3b4de4e79126533109d87dc16d50",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/decorator/options/ColumnCommonOptions.d.ts": {
@@ -1122,8 +1047,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts": {
-        "version": "4d6b0705644bcfc1cd5ef0497524bc49626caacb4531591cea2251bbd193de96",
-        "signature": "4d6b0705644bcfc1cd5ef0497524bc49626caacb4531591cea2251bbd193de96",
+        "version": "0ef3d1e3a05c6f183eda47d33b264ab0d44e58b8cf6197966332f91752bb98fb",
+        "signature": "0ef3d1e3a05c6f183eda47d33b264ab0d44e58b8cf6197966332f91752bb98fb",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/IndexMetadataArgs.d.ts": {
@@ -1137,8 +1062,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/schema-builder/options/TableIndexOptions.d.ts": {
-        "version": "e46758f29d06dfd7796a9cba8f3fd98633cdb3472bde2b938cd33427a20f8820",
-        "signature": "e46758f29d06dfd7796a9cba8f3fd98633cdb3472bde2b938cd33427a20f8820",
+        "version": "81dfa060d1bd2af2a0ca909edf133b88c06b783b07378b68f1e7750677aa30ce",
+        "signature": "81dfa060d1bd2af2a0ca909edf133b88c06b783b07378b68f1e7750677aa30ce",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/schema-builder/table/TableIndex.d.ts": {
@@ -1192,23 +1117,13 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/schema-builder/table/Table.d.ts": {
-        "version": "72c486918a7a9315c21dfdeabdd9b6c99aa8480741f18453fe70c86fb43c0431",
-        "signature": "72c486918a7a9315c21dfdeabdd9b6c99aa8480741f18453fe70c86fb43c0431",
+        "version": "38238f963c0d8f15f865c831d3adae1a33ea8773bc8ca55717efd4d9bf2b0165",
+        "signature": "38238f963c0d8f15f865c831d3adae1a33ea8773bc8ca55717efd4d9bf2b0165",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/JoinOptions.d.ts": {
         "version": "5e2a89ac5f4644d52de963080b427a89e0ed32d8c8298587f47ceded4e369d74",
         "signature": "5e2a89ac5f4644d52de963080b427a89e0ed32d8c8298587f47ceded4e369d74",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperatorType.d.ts": {
-        "version": "85067a288adbaff10952e57ac8958e8c04f163378278f7d997e317efea4a1fca",
-        "signature": "85067a288adbaff10952e57ac8958e8c04f163378278f7d997e317efea4a1fca",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts": {
-        "version": "255e17f0fbf96765dcbeffffbe8e388d4c5db0b9532e9c6eee0d4c4c4670a8dd",
-        "signature": "255e17f0fbf96765dcbeffffbe8e388d4c5db0b9532e9c6eee0d4c4c4670a8dd",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindConditions.d.ts": {
@@ -1217,8 +1132,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOneOptions.d.ts": {
-        "version": "34b8cbbc74427f19025ae9a460c7eca4dd57f95861f2b31eb92ca2d958d4ea7c",
-        "signature": "34b8cbbc74427f19025ae9a460c7eca4dd57f95861f2b31eb92ca2d958d4ea7c",
+        "version": "2de27809a0c0af8360a5b927d67fe5f97d154550d3aba449c0a0043d282ef957",
+        "signature": "2de27809a0c0af8360a5b927d67fe5f97d154550d3aba449c0a0043d282ef957",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindManyOptions.d.ts": {
@@ -1227,8 +1142,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts": {
-        "version": "ce45ffa1579ab800e3b64ad4cd3faf87d2ae6a5134def0ae18583b330e067209",
-        "signature": "ce45ffa1579ab800e3b64ad4cd3faf87d2ae6a5134def0ae18583b330e067209",
+        "version": "e48c779f2ed51010907b3be4015586a6c2ab72055edb26897984379d939ede98",
+        "signature": "e48c779f2ed51010907b3be4015586a6c2ab72055edb26897984379d939ede98",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/repository/RemoveOptions.d.ts": {
@@ -1247,8 +1162,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/repository/Repository.d.ts": {
-        "version": "35e9d5e09c047f08d130fd65c9a4089c9b1951a43a66f2f3c158f27c380bd887",
-        "signature": "35e9d5e09c047f08d130fd65c9a4089c9b1951a43a66f2f3c158f27c380bd887",
+        "version": "9b2d89ef407a7cfe40a416b211ae86d07d656274fc7ae0321681dba3ad9937dd",
+        "signature": "9b2d89ef407a7cfe40a416b211ae86d07d656274fc7ae0321681dba3ad9937dd",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/schema-builder/options/ViewOptions.d.ts": {
@@ -1257,8 +1172,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/schema-builder/view/View.d.ts": {
-        "version": "2be4bb81d88501786426a7acc36b8e9167fd491a5ab8d6a825d4c33e4bdf743c",
-        "signature": "2be4bb81d88501786426a7acc36b8e9167fd491a5ab8d6a825d4c33e4bdf743c",
+        "version": "c9b422ed938d62f1af18290949ee2184b9338011f36cb299e1950f6da52621d2",
+        "signature": "c9b422ed938d62f1af18290949ee2184b9338011f36cb299e1950f6da52621d2",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/Query.d.ts": {
@@ -1269,6 +1184,21 @@
       "./node_modules/@nativescript-community/typeorm/browser/driver/SqlInMemory.d.ts": {
         "version": "04d5bfb0a0eecd66c0b3f522477bf69065a9703be8300fbea5566a0fc4a97b9d",
         "signature": "04d5bfb0a0eecd66c0b3f522477bf69065a9703be8300fbea5566a0fc4a97b9d",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionCommitEvent.d.ts": {
+        "version": "09423fcf77b1f327971c2b22ee16e744736a403b33e414fe54325296537ac9ac",
+        "signature": "09423fcf77b1f327971c2b22ee16e744736a403b33e414fe54325296537ac9ac",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionRollbackEvent.d.ts": {
+        "version": "f3f4278ff190e4896f44e1853bb6846be75e2fdca494a6d553f375f97424a516",
+        "signature": "f3f4278ff190e4896f44e1853bb6846be75e2fdca494a6d553f375f97424a516",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionStartEvent.d.ts": {
+        "version": "a945caa7e11a3671c7b9bf3f383e5f8ebeb90f35b66ac395bab48faf9752aec7",
+        "signature": "a945caa7e11a3671c7b9bf3f383e5f8ebeb90f35b66ac395bab48faf9752aec7",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts": {
@@ -1292,8 +1222,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/EntitySubscriberInterface.d.ts": {
-        "version": "262eb90d30862e20554b1956050781c7f5c5a9fc2185bd6cca0bea9603cc083a",
-        "signature": "262eb90d30862e20554b1956050781c7f5c5a9fc2185bd6cca0bea9603cc083a",
+        "version": "bf933fac182d47797b18f8fe63e56a300f924f1bc1fc1243e55ab7ea045a5fd6",
+        "signature": "bf933fac182d47797b18f8fe63e56a300f924f1bc1fc1243e55ab7ea045a5fd6",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/BroadcasterResult.d.ts": {
@@ -1302,18 +1232,18 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/Broadcaster.d.ts": {
-        "version": "4b01863a735368c82c974f53a41bb2fdca7702baf4103550080b9ab59e047700",
-        "signature": "4b01863a735368c82c974f53a41bb2fdca7702baf4103550080b9ab59e047700",
+        "version": "fcdb3b7823e8cd2da703a7eef46e7f7de53470c60b8ea0659c608022e8f6ad68",
+        "signature": "fcdb3b7823e8cd2da703a7eef46e7f7de53470c60b8ea0659c608022e8f6ad68",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/MongoQueryRunner.d.ts": {
-        "version": "e73df42bafe56afa9dcd6829214d8d67156002f3da541beac2715df51508d482",
-        "signature": "e73df42bafe56afa9dcd6829214d8d67156002f3da541beac2715df51508d482",
+        "version": "122e9f53a8b33e20d77f9ac008e74717f9ae4c9e591dd71ccf5c3e62b5e4f60a",
+        "signature": "122e9f53a8b33e20d77f9ac008e74717f9ae4c9e591dd71ccf5c3e62b5e4f60a",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts": {
-        "version": "b619c09075cc47b35ea2f0aaadd4dc02d57e2e56321c15afd57d9b10dbd7025d",
-        "signature": "b619c09075cc47b35ea2f0aaadd4dc02d57e2e56321c15afd57d9b10dbd7025d",
+        "version": "513605feb4e8d5287b7eb33d34587310512d1a47e45e9f081e7ff73effea0bcc",
+        "signature": "513605feb4e8d5287b7eb33d34587310512d1a47e45e9f081e7ff73effea0bcc",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/repository/MongoRepository.d.ts": {
@@ -1337,13 +1267,13 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts": {
-        "version": "d11a0d86b3788ecce628d239bf0cb25431d253b9865a8273ecdf547cf225f6bc",
-        "signature": "d11a0d86b3788ecce628d239bf0cb25431d253b9865a8273ecdf547cf225f6bc",
+        "version": "7b1fd1a15b6561ca774890ef243fd25e49e61eadbc8153517e26c6a7b99c151a",
+        "signature": "7b1fd1a15b6561ca774890ef243fd25e49e61eadbc8153517e26c6a7b99c151a",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts": {
-        "version": "28118d37d5f29244d7738cd05cf922c266fbcf24dc47efaddaf3d60182dfccbf",
-        "signature": "28118d37d5f29244d7738cd05cf922c266fbcf24dc47efaddaf3d60182dfccbf",
+        "version": "0ca3378f33be464877c4c93df0ecadbefa1302bc2bd5cd9f56c19d6efa962913",
+        "signature": "0ca3378f33be464877c4c93df0ecadbefa1302bc2bd5cd9f56c19d6efa962913",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/types/MappedColumnTypes.d.ts": {
@@ -1361,9 +1291,64 @@
         "signature": "de05a488fb501de32c1ec0af2a6ddfe0fdef46935b9f4ffb3922d355b15da674",
         "affectsGlobalScope": false
       },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaIndexOptions.d.ts": {
+        "version": "733f5fed6c0e8717a32e8f4145566fc9819dd7b39c9d88973c834bcdc111f454",
+        "signature": "733f5fed6c0e8717a32e8f4145566fc9819dd7b39c9d88973c834bcdc111f454",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/SpatialColumnOptions.d.ts": {
+        "version": "1cf086abc7abb48f994d986b3cc6bdf70c343a5661315f6bb982378b21b55435",
+        "signature": "1cf086abc7abb48f994d986b3cc6bdf70c343a5661315f6bb982378b21b55435",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaColumnOptions.d.ts": {
+        "version": "4707c2fd3cc63371167c5b935c3dc66b10ed13c0106f4527d910892837929ebd",
+        "signature": "4707c2fd3cc63371167c5b935c3dc66b10ed13c0106f4527d910892837929ebd",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/JoinColumnOptions.d.ts": {
+        "version": "74fe5c4fb7d9ee01e8690638e4b60a14b909240c14632ac4e7662995ad004b90",
+        "signature": "74fe5c4fb7d9ee01e8690638e4b60a14b909240c14632ac4e7662995ad004b90",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/decorator/options/JoinTableMultipleColumnsOptions.d.ts": {
+        "version": "3c725b4c73af44a1eedda6cbbea47d8fdc71d464e13633750aebe0af76bc2469",
+        "signature": "3c725b4c73af44a1eedda6cbbea47d8fdc71d464e13633750aebe0af76bc2469",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaRelationOptions.d.ts": {
+        "version": "40ec6f4d834bd65728739d332cbf9fef3b517971eca426f1d8a846693be171bf",
+        "signature": "40ec6f4d834bd65728739d332cbf9fef3b517971eca426f1d8a846693be171bf",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaUniqueOptions.d.ts": {
+        "version": "76a53f6b4062f3cc3c54d2a8b731f4b8d2782a7d3524115d3c977ca181306f39",
+        "signature": "76a53f6b4062f3cc3c54d2a8b731f4b8d2782a7d3524115d3c977ca181306f39",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaCheckOptions.d.ts": {
+        "version": "b3ded8e50b3cdf548d7c8d3b3b5b2105932b04a2f08b392564f4bc499407e4e5",
+        "signature": "b3ded8e50b3cdf548d7c8d3b3b5b2105932b04a2f08b392564f4bc499407e4e5",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaExclusionOptions.d.ts": {
+        "version": "4ed2d8fb4c598719985b8fbef65f7de9c3f5ae6a233fc0fe20bd00193c490908",
+        "signature": "4ed2d8fb4c598719985b8fbef65f7de9c3f5ae6a233fc0fe20bd00193c490908",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchemaOptions.d.ts": {
+        "version": "53a86aae1d9aaee78c042d6ed6695f301663114f62b16b9d061fbd711ef69d36",
+        "signature": "53a86aae1d9aaee78c042d6ed6695f301663114f62b16b9d061fbd711ef69d36",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts": {
+        "version": "1e9dd4dc39eb80dacd5573944aa8b3f84854e8397ac3ec0a86feadd4e2ce40d4",
+        "signature": "1e9dd4dc39eb80dacd5573944aa8b3f84854e8397ac3ec0a86feadd4e2ce40d4",
+        "affectsGlobalScope": false
+      },
       "./node_modules/@nativescript-community/typeorm/browser/logger/LoggerOptions.d.ts": {
-        "version": "fffbc1e8ad6d8d696aace7335e90e5f154d05a1defafe3fded08b91bd53fcea2",
-        "signature": "fffbc1e8ad6d8d696aace7335e90e5f154d05a1defafe3fded08b91bd53fcea2",
+        "version": "c20fe75426bf9281b4b5ac93243ca7d93c55d9e9f5146b755028a2136302bef7",
+        "signature": "c20fe75426bf9281b4b5ac93243ca7d93c55d9e9f5146b755028a2136302bef7",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/types/DatabaseType.d.ts": {
@@ -1372,8 +1357,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts": {
-        "version": "9fa8e2892e6218ef6509eb2f7c97adab9518c07594acde96c697a6e3f63ad11b",
-        "signature": "9fa8e2892e6218ef6509eb2f7c97adab9518c07594acde96c697a6e3f63ad11b",
+        "version": "a49e3af85d547004bcd8535e19b328cd39f7164abcb4e10e52763e167740abbb",
+        "signature": "a49e3af85d547004bcd8535e19b328cd39f7164abcb4e10e52763e167740abbb",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCacheOptions.d.ts": {
@@ -1391,9 +1376,14 @@
         "signature": "2ccd6e2511abe69058e02186314e80ed85c39c8d69be7e655b44ca552d9e586b",
         "affectsGlobalScope": false
       },
+      "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts": {
+        "version": "9d1d33309b69e7a14fcaff4c9e948071a3de86492d6a45ab74a6b5106d093fee",
+        "signature": "9d1d33309b69e7a14fcaff4c9e948071a3de86492d6a45ab74a6b5106d093fee",
+        "affectsGlobalScope": false
+      },
       "./node_modules/@nativescript-community/typeorm/browser/driver/Driver.d.ts": {
-        "version": "c794abb14a54676e0eabe99ab29a3161f6a23760f1118ff5dca0bfaeb3e45e1d",
-        "signature": "c794abb14a54676e0eabe99ab29a3161f6a23760f1118ff5dca0bfaeb3e45e1d",
+        "version": "d9c67760cf98bd58418f9232eafeca63465e26309036ec372a2a4ed1e2b1be12",
+        "signature": "d9c67760cf98bd58418f9232eafeca63465e26309036ec372a2a4ed1e2b1be12",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/migration/MigrationInterface.d.ts": {
@@ -1432,13 +1422,13 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/postgres/PostgresConnectionOptions.d.ts": {
-        "version": "2896a42e57904683734a159687a27757f1128fe5b54f4626fbe90d9e54d71e37",
-        "signature": "2896a42e57904683734a159687a27757f1128fe5b54f4626fbe90d9e54d71e37",
+        "version": "6a44b6f04f21a80984cd0e1d10847df9da0d45519dc443933bee5d77c1359408",
+        "signature": "6a44b6f04f21a80984cd0e1d10847df9da0d45519dc443933bee5d77c1359408",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/sqlite/SqliteConnectionOptions.d.ts": {
-        "version": "21d60abbf2774f6d4550403a0fabad54d33378b4b282c1b5298c6e08006c84c1",
-        "signature": "21d60abbf2774f6d4550403a0fabad54d33378b4b282c1b5298c6e08006c84c1",
+        "version": "c1fa8be5a9ffa9bd54b74a682971f33dd99224e7238caf1ba07746bac2426592",
+        "signature": "c1fa8be5a9ffa9bd54b74a682971f33dd99224e7238caf1ba07746bac2426592",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/sqlserver/SqlServerConnectionCredentialsOptions.d.ts": {
@@ -1462,8 +1452,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/MongoConnectionOptions.d.ts": {
-        "version": "221a4d5e9096221fb9fe1a6b8f612a4029db45b372017832eaf2ae26e3ee849f",
-        "signature": "221a4d5e9096221fb9fe1a6b8f612a4029db45b372017832eaf2ae26e3ee849f",
+        "version": "503aca11c0619cd522e1a77979050c04d3ce9dd4d4d6ac6cd98b896776e53329",
+        "signature": "503aca11c0619cd522e1a77979050c04d3ce9dd4d4d6ac6cd98b896776e53329",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/cordova/CordovaConnectionOptions.d.ts": {
@@ -1542,8 +1532,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts": {
-        "version": "309676a9dfce8b3fa6542b84b30737837a8f88d6f458bf141698343b253f0da1",
-        "signature": "309676a9dfce8b3fa6542b84b30737837a8f88d6f458bf141698343b253f0da1",
+        "version": "6be41273ee5b875922797a963876abeae8a0809f1a2ba778fcd99ad5f3bd0131",
+        "signature": "6be41273ee5b875922797a963876abeae8a0809f1a2ba778fcd99ad5f3bd0131",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/connection/ConnectionManager.d.ts": {
@@ -1582,8 +1572,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/EntityRepositoryMetadataArgs.d.ts": {
-        "version": "dd6e78feb6ad8ffd7375d68546eebc55915a20f368f0034d9cde1c05820ed019",
-        "signature": "dd6e78feb6ad8ffd7375d68546eebc55915a20f368f0034d9cde1c05820ed019",
+        "version": "5aa7565991c306061181bd0148c458bcce3472d912e2af6a98a0a54904cd84fc",
+        "signature": "5aa7565991c306061181bd0148c458bcce3472d912e2af6a98a0a54904cd84fc",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/TransactionEntityMetadataArgs.d.ts": {
@@ -1782,8 +1772,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/decorator/relations/OneToMany.d.ts": {
-        "version": "631d092e0533ecd450b00657327dcad9e4acdf86b532e603873a4ff2c57d4c08",
-        "signature": "631d092e0533ecd450b00657327dcad9e4acdf86b532e603873a4ff2c57d4c08",
+        "version": "9f41961a10c1afdf0e655f0e913083dfceb7cd083108b21ba3b6b9d427e5a783",
+        "signature": "9f41961a10c1afdf0e655f0e913083dfceb7cd083108b21ba3b6b9d427e5a783",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/decorator/relations/OneToOne.d.ts": {
@@ -1897,13 +1887,13 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Any.d.ts": {
-        "version": "7a88dbbfaf7fa337a1540ea1b7cdd826d4213949ec01ed5507de357164c3baee",
-        "signature": "7a88dbbfaf7fa337a1540ea1b7cdd826d4213949ec01ed5507de357164c3baee",
+        "version": "ddaa88853f1ee35622267a9d95450cd00c80d6d920ff7acb438c5a6d265ba549",
+        "signature": "ddaa88853f1ee35622267a9d95450cd00c80d6d920ff7acb438c5a6d265ba549",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Between.d.ts": {
-        "version": "8ab64d0a41dbe291a00c152a1cfd15c6e10c25632570119659f5ee1707d0e067",
-        "signature": "8ab64d0a41dbe291a00c152a1cfd15c6e10c25632570119659f5ee1707d0e067",
+        "version": "f780879a2ca63dbb59b36f772bc28dccd2840f1377d8d632e8c978b99c26a45f",
+        "signature": "f780879a2ca63dbb59b36f772bc28dccd2840f1377d8d632e8c978b99c26a45f",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Equal.d.ts": {
@@ -1912,8 +1902,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/In.d.ts": {
-        "version": "b2241e9c697bcec55b33a462ab09b6eaf9a06e3891ae21c25d70270cf0565168",
-        "signature": "b2241e9c697bcec55b33a462ab09b6eaf9a06e3891ae21c25d70270cf0565168",
+        "version": "1f6b42497e897d0e703464f75d264e5b7efbc54e0060e48811630e8e34c4bf78",
+        "signature": "1f6b42497e897d0e703464f75d264e5b7efbc54e0060e48811630e8e34c4bf78",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/IsNull.d.ts": {
@@ -1929,6 +1919,11 @@
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/LessThanOrEqual.d.ts": {
         "version": "3c8bf00283ef468da8389119d3f5662c81106e302c8810f40ea86b1018df647e",
         "signature": "3c8bf00283ef468da8389119d3f5662c81106e302c8810f40ea86b1018df647e",
+        "affectsGlobalScope": false
+      },
+      "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/ILike.d.ts": {
+        "version": "67b248e4bac845c5139898b44cbd3e1213674bcc9831039701b5f0f957243a24",
+        "signature": "67b248e4bac845c5139898b44cbd3e1213674bcc9831039701b5f0f957243a24",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Like.d.ts": {
@@ -1952,38 +1947,38 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Raw.d.ts": {
-        "version": "11a312c0ed704668e5f7eb7870ecfca203d425a0c6d9b0eb546a103dd0c8eb09",
-        "signature": "11a312c0ed704668e5f7eb7870ecfca203d425a0c6d9b0eb546a103dd0c8eb09",
+        "version": "45bf5ca176cbdba570fdb372fd44343743a263f5fee80ce64876f9dcfc8eb374",
+        "signature": "45bf5ca176cbdba570fdb372fd44343743a263f5fee80ce64876f9dcfc8eb374",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOptionsUtils.d.ts": {
-        "version": "a0da3c23176a8791ea3a266258ee1a97a4825d607ebee4110d033d1eda8378fe",
-        "signature": "a0da3c23176a8791ea3a266258ee1a97a4825d607ebee4110d033d1eda8378fe",
+        "version": "408bf1d233f81244fc0f626a4d7de48fee4f7f579f42e90a5f20a4993e756a6f",
+        "signature": "408bf1d233f81244fc0f626a4d7de48fee4f7f579f42e90a5f20a4993e756a6f",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/logger/AdvancedConsoleLogger.d.ts": {
-        "version": "da1db7242d36869284da67553c0694c28b57a590ddcd5d431facaa1f99af406e",
-        "signature": "da1db7242d36869284da67553c0694c28b57a590ddcd5d431facaa1f99af406e",
+        "version": "9149c2cc9d0075acd3a792d68b9b3ea37f3a9440a195e140d8e705186ba31f0f",
+        "signature": "9149c2cc9d0075acd3a792d68b9b3ea37f3a9440a195e140d8e705186ba31f0f",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/logger/SimpleConsoleLogger.d.ts": {
-        "version": "7b6a213bd775a361bad0ecfc3f555e91b6e4f0cc5573216b1a01ee863e77c636",
-        "signature": "7b6a213bd775a361bad0ecfc3f555e91b6e4f0cc5573216b1a01ee863e77c636",
+        "version": "cc7ed2f02c648a5213daa6d3aad35d307b5e7b2ca6249b5e5cadbe3794371954",
+        "signature": "cc7ed2f02c648a5213daa6d3aad35d307b5e7b2ca6249b5e5cadbe3794371954",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/logger/FileLogger.d.ts": {
-        "version": "46937114fa847f545060ab0ba442ef037823577a888af85466088d5b2842810b",
-        "signature": "46937114fa847f545060ab0ba442ef037823577a888af85466088d5b2842810b",
+        "version": "47dd43cd3c71fe8aae614394785cae9f19b29696e3cd5ef5ee72d579558f9fd3",
+        "signature": "47dd43cd3c71fe8aae614394785cae9f19b29696e3cd5ef5ee72d579558f9fd3",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/repository/AbstractRepository.d.ts": {
-        "version": "c9d0d6a735806cf22b708550e89d5315e81367e675e6c89fefe831857bb885a2",
-        "signature": "c9d0d6a735806cf22b708550e89d5315e81367e675e6c89fefe831857bb885a2",
+        "version": "b75db76c1ac0d59dbe5ed5848e7a09cd452ca5dec918313becf7dacc420dbfa7",
+        "signature": "b75db76c1ac0d59dbe5ed5848e7a09cd452ca5dec918313becf7dacc420dbfa7",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/repository/BaseEntity.d.ts": {
-        "version": "f626de98fb8781df6e273a24fe56261791a4f6c12edead9890c768cb0bfa30df",
-        "signature": "f626de98fb8781df6e273a24fe56261791a4f6c12edead9890c768cb0bfa30df",
+        "version": "cdabd37d1c6b90d392ddfc3b1fe7a956262f5b0b9530ba47d53bb5a8a0eb976e",
+        "signature": "cdabd37d1c6b90d392ddfc3b1fe7a956262f5b0b9530ba47d53bb5a8a0eb976e",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/driver/sqlserver/MssqlParameter.d.ts": {
@@ -1992,8 +1987,8 @@
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/connection/ConnectionOptionsReader.d.ts": {
-        "version": "599247bc6d7918bf1f03eacec2e84956435b9c35b427e22d489663f95f4d4279",
-        "signature": "599247bc6d7918bf1f03eacec2e84956435b9c35b427e22d489663f95f4d4279",
+        "version": "f4ccbddbaaaef62bdb3e0e4455321957069fe84995aeac8d0c386a761741c4f6",
+        "signature": "f4ccbddbaaaef62bdb3e0e4455321957069fe84995aeac8d0c386a761741c4f6",
         "affectsGlobalScope": false
       },
       "./node_modules/@nativescript-community/typeorm/browser/migration/MigrationExecutor.d.ts": {
@@ -2006,14 +2001,9 @@
         "signature": "f5839b540a4dc9aedf088407f84786ed022f89f1e06bca967a88dc23fea1d46d",
         "affectsGlobalScope": false
       },
-      "./node_modules/@nativescript-community/typeorm/browser/util/PromiseUtils.d.ts": {
-        "version": "10f4c6f167d66d6f26c399e05dcfbaba2913d3d72249474359c9a99305097861",
-        "signature": "10f4c6f167d66d6f26c399e05dcfbaba2913d3d72249474359c9a99305097861",
-        "affectsGlobalScope": false
-      },
       "./node_modules/@nativescript-community/typeorm/browser/index.d.ts": {
-        "version": "59c55cb85d5940fd380c74b9a1495db1db749b957e7b423d465b961561fdcc60",
-        "signature": "59c55cb85d5940fd380c74b9a1495db1db749b957e7b423d465b961561fdcc60",
+        "version": "65916fb178938c9fb2c0588cf5447f5b5de992d50d0e308d6b2169a027fa9dd5",
+        "signature": "65916fb178938c9fb2c0588cf5447f5b5de992d50d0e308d6b2169a027fa9dd5",
         "affectsGlobalScope": false
       },
       "./node_modules/@akylas/nativescript-sqlite/typeorm/index.d.ts": {
@@ -2022,8 +2012,8 @@
         "affectsGlobalScope": false
       },
       "./app/main-view-model.ts": {
-        "version": "9bfbaaaf30b5627a07835e8b6265dc173c7f0b81a7d999f009fa4e66cede302d",
-        "signature": "e9953a525e3096d23a40538fdf68bbd61fbf797c3f7cc3c3934210d6f5cee3cc",
+        "version": "6c200fc3f210a6610ad910332ad00242548073e9288cb4cb502884a725d7c908",
+        "signature": "1e8be455d62d3838435c235eacc2c2aecab0cada6704ec9d8ee1a04a08616510",
         "affectsGlobalScope": false
       },
       "./app/main-page.ts": {
@@ -2790,351 +2780,6 @@
         "version": "48b52264fa193879a074197839dbb4796fa07e86350ff888e5361e06aa46df76",
         "signature": "48b52264fa193879a074197839dbb4796fa07e86350ff888e5361e06aa46df76",
         "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/globals.d.ts": {
-        "version": "1332704d6761c94b85753fc3cadc36109f53e5d92fad137ac3de18083febedf3",
-        "signature": "1332704d6761c94b85753fc3cadc36109f53e5d92fad137ac3de18083febedf3",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/@types/node/async_hooks.d.ts": {
-        "version": "c438b413e94ff76dfa20ae005f33a1c84f2480d1d66e0fd687501020d0de9b50",
-        "signature": "c438b413e94ff76dfa20ae005f33a1c84f2480d1d66e0fd687501020d0de9b50",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/buffer.d.ts": {
-        "version": "bc6a78961535181265845bf9b9e8a147ffd0ca275097ceb670a9b92afa825152",
-        "signature": "bc6a78961535181265845bf9b9e8a147ffd0ca275097ceb670a9b92afa825152",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/child_process.d.ts": {
-        "version": "987249e7b75023387c5fd9dc2f959ee777cb8989b7900f5a9eb4a67d290f2cba",
-        "signature": "987249e7b75023387c5fd9dc2f959ee777cb8989b7900f5a9eb4a67d290f2cba",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/cluster.d.ts": {
-        "version": "123ec69e4b3a686eb49afd94ebe3292a5c84a867ecbcb6bb84bdd720a12af803",
-        "signature": "123ec69e4b3a686eb49afd94ebe3292a5c84a867ecbcb6bb84bdd720a12af803",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/console.d.ts": {
-        "version": "eb5197aade83cb0e360ac407289c53a8009e8fdae7939892a0240d30444496b6",
-        "signature": "eb5197aade83cb0e360ac407289c53a8009e8fdae7939892a0240d30444496b6",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/@types/node/constants.d.ts": {
-        "version": "90c85ddbb8de82cd19198bda062065fc51b7407c0f206f2e399e65a52e979720",
-        "signature": "90c85ddbb8de82cd19198bda062065fc51b7407c0f206f2e399e65a52e979720",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/crypto.d.ts": {
-        "version": "c5ecc351d5eaa36dc682b4c398b57a9d37c108857b71a09464a06e0185831ac2",
-        "signature": "c5ecc351d5eaa36dc682b4c398b57a9d37c108857b71a09464a06e0185831ac2",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/dgram.d.ts": {
-        "version": "7e050b767ed10c7ffbc01f314defbf420bf0b5d54ce666e1c87507c035dfc191",
-        "signature": "7e050b767ed10c7ffbc01f314defbf420bf0b5d54ce666e1c87507c035dfc191",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/dns.d.ts": {
-        "version": "7db7569fbb3e2b01ba8751c761cdd3f0debd104170d5665b7dc20a11630df3a9",
-        "signature": "7db7569fbb3e2b01ba8751c761cdd3f0debd104170d5665b7dc20a11630df3a9",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/domain.d.ts": {
-        "version": "cde4d7f6274468180fa39847b183aec22626e8212ff885d535c53f4cd7c225fd",
-        "signature": "cde4d7f6274468180fa39847b183aec22626e8212ff885d535c53f4cd7c225fd",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/@types/node/events.d.ts": {
-        "version": "365e8358843a23944be84b810b1f774ea0223adfccc085f30fd7f4c13dc8a09f",
-        "signature": "365e8358843a23944be84b810b1f774ea0223adfccc085f30fd7f4c13dc8a09f",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/@types/node/fs.d.ts": {
-        "version": "f87f95c015900102a5c0edcdebb17596de1382510e6cc17ab79f375d3505bb12",
-        "signature": "f87f95c015900102a5c0edcdebb17596de1382510e6cc17ab79f375d3505bb12",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/fs/promises.d.ts": {
-        "version": "05b5679a897598ebe556ee93415b3af1f456e674ea82e4d7afcd716bfe43aa98",
-        "signature": "05b5679a897598ebe556ee93415b3af1f456e674ea82e4d7afcd716bfe43aa98",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/http.d.ts": {
-        "version": "35fe02b2c10616cc7ac3db9c15778df7ed9c99276889efdd9be31f342841cfcd",
-        "signature": "35fe02b2c10616cc7ac3db9c15778df7ed9c99276889efdd9be31f342841cfcd",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/http2.d.ts": {
-        "version": "1c3fe66943f587685aa4a42f664f794655da1767401d2f85910177dac78aa45d",
-        "signature": "1c3fe66943f587685aa4a42f664f794655da1767401d2f85910177dac78aa45d",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/https.d.ts": {
-        "version": "c969bf4c7cdfe4d5dd28aa09432f99d09ad1d8d8b839959646579521d0467d1a",
-        "signature": "c969bf4c7cdfe4d5dd28aa09432f99d09ad1d8d8b839959646579521d0467d1a",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/inspector.d.ts": {
-        "version": "6c3857edaeeaaf43812f527830ebeece9266b6e8eb5271ab6d2f0008306c9947",
-        "signature": "6c3857edaeeaaf43812f527830ebeece9266b6e8eb5271ab6d2f0008306c9947",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/module.d.ts": {
-        "version": "bc6a77e750f4d34584e46b1405b771fb69a224197dd6bafe5b0392a29a70b665",
-        "signature": "bc6a77e750f4d34584e46b1405b771fb69a224197dd6bafe5b0392a29a70b665",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/net.d.ts": {
-        "version": "8de97668870cfb20fc9d355d2ef379e897bdd8a98c889c7d8a6de40ee408ad52",
-        "signature": "8de97668870cfb20fc9d355d2ef379e897bdd8a98c889c7d8a6de40ee408ad52",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/os.d.ts": {
-        "version": "ed4ae81196cccc10f297d228bca8d02e31058e6d723a3c5bc4be5fb3c61c6a34",
-        "signature": "ed4ae81196cccc10f297d228bca8d02e31058e6d723a3c5bc4be5fb3c61c6a34",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/path.d.ts": {
-        "version": "84044697c8b3e08ef24e4b32cfe6440143d07e469a5e34bda0635276d32d9f35",
-        "signature": "84044697c8b3e08ef24e4b32cfe6440143d07e469a5e34bda0635276d32d9f35",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/perf_hooks.d.ts": {
-        "version": "4982d94cb6427263c8839d8d6324a8bbe129e931deb61a7380f8fad17ba2cfc0",
-        "signature": "4982d94cb6427263c8839d8d6324a8bbe129e931deb61a7380f8fad17ba2cfc0",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/process.d.ts": {
-        "version": "e64979f6084c279bf8cd58dbc9203567f68f1ed19a8ad91351f078f03323ddf6",
-        "signature": "e64979f6084c279bf8cd58dbc9203567f68f1ed19a8ad91351f078f03323ddf6",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/@types/node/punycode.d.ts": {
-        "version": "3f6a1fd73c9dc3bd7f4b79bc075297ca6527904df69b0f2c2c94e4c4c7d9a32c",
-        "signature": "3f6a1fd73c9dc3bd7f4b79bc075297ca6527904df69b0f2c2c94e4c4c7d9a32c",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/querystring.d.ts": {
-        "version": "884560fda6c3868f925f022adc3a1289fe6507bbb45adb10fa1bbcc73a941bb0",
-        "signature": "884560fda6c3868f925f022adc3a1289fe6507bbb45adb10fa1bbcc73a941bb0",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/readline.d.ts": {
-        "version": "6b2bb67b0942bcfce93e1d6fad5f70afd54940a2b13df7f311201fba54b2cbe9",
-        "signature": "6b2bb67b0942bcfce93e1d6fad5f70afd54940a2b13df7f311201fba54b2cbe9",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/repl.d.ts": {
-        "version": "acbed967a379b3e9f73237ba9473f8b337eeea14b7dc64d445430b5d695751da",
-        "signature": "acbed967a379b3e9f73237ba9473f8b337eeea14b7dc64d445430b5d695751da",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/stream.d.ts": {
-        "version": "272a46cc8f494677af587d17939e61e7db2b1925633e4da0c186ba17f6732521",
-        "signature": "272a46cc8f494677af587d17939e61e7db2b1925633e4da0c186ba17f6732521",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/string_decoder.d.ts": {
-        "version": "d67e08745494b000da9410c1ae2fdc9965fc6d593fe0f381a47491f75417d457",
-        "signature": "d67e08745494b000da9410c1ae2fdc9965fc6d593fe0f381a47491f75417d457",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/timers.d.ts": {
-        "version": "b40652bf8ce4a18133b31349086523b219724dca8df3448c1a0742528e7ad5b9",
-        "signature": "b40652bf8ce4a18133b31349086523b219724dca8df3448c1a0742528e7ad5b9",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/tls.d.ts": {
-        "version": "a0545ca910ec6b318b8e1d63813c980c3be44824cf217b6477a56fbe9c7927d5",
-        "signature": "a0545ca910ec6b318b8e1d63813c980c3be44824cf217b6477a56fbe9c7927d5",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/trace_events.d.ts": {
-        "version": "a77fdb357c78b70142b2fdbbfb72958d69e8f765fd2a3c69946c1018e89d4638",
-        "signature": "a77fdb357c78b70142b2fdbbfb72958d69e8f765fd2a3c69946c1018e89d4638",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/tty.d.ts": {
-        "version": "3c2ac350c3baa61fd2b1925844109e098f4376d0768a4643abc82754fd752748",
-        "signature": "3c2ac350c3baa61fd2b1925844109e098f4376d0768a4643abc82754fd752748",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/url.d.ts": {
-        "version": "80ffc1786a5dab91b4aa59a72720f02f25df8b7c76b593e04d5e381aec284ccb",
-        "signature": "80ffc1786a5dab91b4aa59a72720f02f25df8b7c76b593e04d5e381aec284ccb",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/util.d.ts": {
-        "version": "5ef157fbb39494a581bd24f21b60488fe248d452c479738b5e41b48720ea69b8",
-        "signature": "5ef157fbb39494a581bd24f21b60488fe248d452c479738b5e41b48720ea69b8",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/v8.d.ts": {
-        "version": "289be113bad7ee27ee7fa5b1e373c964c9789a5e9ed7db5ddcb631371120b953",
-        "signature": "289be113bad7ee27ee7fa5b1e373c964c9789a5e9ed7db5ddcb631371120b953",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/vm.d.ts": {
-        "version": "baf0b82ffc5d2616f44a6fb1f81e8d798545bebf0c30f5d8b003a1dba1acfb3f",
-        "signature": "baf0b82ffc5d2616f44a6fb1f81e8d798545bebf0c30f5d8b003a1dba1acfb3f",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/worker_threads.d.ts": {
-        "version": "c6a5b34f1e725019445754f1e733585f113e0dced75f137bd3c4af5853d3f6ab",
-        "signature": "c6a5b34f1e725019445754f1e733585f113e0dced75f137bd3c4af5853d3f6ab",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/zlib.d.ts": {
-        "version": "15fbe50526244954eb2f933546bca6cdcf0db16c9428d099b3b386c1db5799ab",
-        "signature": "15fbe50526244954eb2f933546bca6cdcf0db16c9428d099b3b386c1db5799ab",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/ts3.4/base.d.ts": {
-        "version": "d44028ae0127eb3e9fcfa5f55a8b81d64775ce15aca1020fe25c511bbb055834",
-        "signature": "d44028ae0127eb3e9fcfa5f55a8b81d64775ce15aca1020fe25c511bbb055834",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/globals.global.d.ts": {
-        "version": "2708349d5a11a5c2e5f3a0765259ebe7ee00cdcc8161cb9990cb4910328442a1",
-        "signature": "2708349d5a11a5c2e5f3a0765259ebe7ee00cdcc8161cb9990cb4910328442a1",
-        "affectsGlobalScope": true
-      },
-      "./node_modules/@types/node/wasi.d.ts": {
-        "version": "4e0a4d84b15692ea8669fe4f3d05a4f204567906b1347da7a58b75f45bae48d3",
-        "signature": "4e0a4d84b15692ea8669fe4f3d05a4f204567906b1347da7a58b75f45bae48d3",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/ts3.6/base.d.ts": {
-        "version": "ad1ae5ae98eceb9af99061e83e867b9897d267aebc8f3b938c9424deabadf4bb",
-        "signature": "ad1ae5ae98eceb9af99061e83e867b9897d267aebc8f3b938c9424deabadf4bb",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/assert.d.ts": {
-        "version": "d0c575d48d6dad75648017ff18762eb97f9398cc9486541b3070e79ce12719e6",
-        "signature": "d0c575d48d6dad75648017ff18762eb97f9398cc9486541b3070e79ce12719e6",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/base.d.ts": {
-        "version": "e61a21e9418f279bc480394a94d1581b2dee73747adcbdef999b6737e34d721b",
-        "signature": "e61a21e9418f279bc480394a94d1581b2dee73747adcbdef999b6737e34d721b",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/node/index.d.ts": {
-        "version": "5825520e2099309182c6e2a2b3061b060d42a098c58f67d1754880a7e2cce99a",
-        "signature": "5825520e2099309182c6e2a2b3061b060d42a098c58f67d1754880a7e2cce99a",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/minimatch/index.d.ts": {
-        "version": "1d1e6bd176eee5970968423d7e215bfd66828b6db8d54d17afec05a831322633",
-        "signature": "1d1e6bd176eee5970968423d7e215bfd66828b6db8d54d17afec05a831322633",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/glob/index.d.ts": {
-        "version": "393137c76bd922ba70a2f8bf1ade4f59a16171a02fb25918c168d48875b0cfb0",
-        "signature": "393137c76bd922ba70a2f8bf1ade4f59a16171a02fb25918c168d48875b0cfb0",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/json-schema/index.d.ts": {
-        "version": "b2be568d8ce95fcb26eebd04c035d94825655fdf689bf67d799f5ff8cbbb1024",
-        "signature": "b2be568d8ce95fcb26eebd04c035d94825655fdf689bf67d799f5ff8cbbb1024",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/parse-json/index.d.ts": {
-        "version": "2b8264b2fefd7367e0f20e2c04eed5d3038831fe00f5efbc110ff0131aab899b",
-        "signature": "2b8264b2fefd7367e0f20e2c04eed5d3038831fe00f5efbc110ff0131aab899b",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/source-list-map/index.d.ts": {
-        "version": "67fc055eb86a0632e2e072838f889ffe1754083cb13c8c80a06a7d895d877aae",
-        "signature": "67fc055eb86a0632e2e072838f889ffe1754083cb13c8c80a06a7d895d877aae",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/tapable/index.d.ts": {
-        "version": "d558a0fe921ebcc88d3212c2c42108abf9f0d694d67ebdeba37d7728c044f579",
-        "signature": "d558a0fe921ebcc88d3212c2c42108abf9f0d694d67ebdeba37d7728c044f579",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/source-map/source-map.d.ts": {
-        "version": "2887592574fcdfd087647c539dcb0fbe5af2521270dad4a37f9d17c16190d579",
-        "signature": "2887592574fcdfd087647c539dcb0fbe5af2521270dad4a37f9d17c16190d579",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/uglify-js/index.d.ts": {
-        "version": "0215efc2c3f40fd9ec91f19d277afc9efba41cee054fd0be4c92e75cb10cf2c0",
-        "signature": "0215efc2c3f40fd9ec91f19d277afc9efba41cee054fd0be4c92e75cb10cf2c0",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/anymatch/index.d.ts": {
-        "version": "4fb0b7d532aa6fb850b6cd2f1ee4f00802d877b5c66a51903bc1fb0624126349",
-        "signature": "4fb0b7d532aa6fb850b6cd2f1ee4f00802d877b5c66a51903bc1fb0624126349",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/Source.d.ts": {
-        "version": "8560a87b2e9f8e2c3808c8f6172c9b7eb6c9b08cb9f937db71c285ecf292c81d",
-        "signature": "8560a87b2e9f8e2c3808c8f6172c9b7eb6c9b08cb9f937db71c285ecf292c81d",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts": {
-        "version": "ffe3931ff864f28d80ae2f33bd11123ad3d7bad9896b910a1e61504cc093e1f5",
-        "signature": "ffe3931ff864f28d80ae2f33bd11123ad3d7bad9896b910a1e61504cc093e1f5",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts": {
-        "version": "083c1bd82f8dc3a1ed6fc9e8eaddf141f7c05df418eca386598821e045253af9",
-        "signature": "083c1bd82f8dc3a1ed6fc9e8eaddf141f7c05df418eca386598821e045253af9",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts": {
-        "version": "274ebe605bd7f71ce161f9f5328febc7d547a2929f803f04b44ec4a7d8729517",
-        "signature": "274ebe605bd7f71ce161f9f5328febc7d547a2929f803f04b44ec4a7d8729517",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts": {
-        "version": "6ca0207e70d985a24396583f55836b10dc181063ab6069733561bfde404d1bad",
-        "signature": "6ca0207e70d985a24396583f55836b10dc181063ab6069733561bfde404d1bad",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/RawSource.d.ts": {
-        "version": "5908142efeaab38ffdf43927ee0af681ae77e0d7672b956dfb8b6c705dbfe106",
-        "signature": "5908142efeaab38ffdf43927ee0af681ae77e0d7672b956dfb8b6c705dbfe106",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts": {
-        "version": "f772b188b943549b5c5eb803133314b8aa7689eced80eed0b70e2f30ca07ab9c",
-        "signature": "f772b188b943549b5c5eb803133314b8aa7689eced80eed0b70e2f30ca07ab9c",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts": {
-        "version": "0026b816ef05cfbf290e8585820eef0f13250438669107dfc44482bac007b14f",
-        "signature": "0026b816ef05cfbf290e8585820eef0f13250438669107dfc44482bac007b14f",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts": {
-        "version": "8ef5aad624890acfe0fa48230edce255f00934016d16acb8de0edac0ea5b21bb",
-        "signature": "8ef5aad624890acfe0fa48230edce255f00934016d16acb8de0edac0ea5b21bb",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/index.d.ts": {
-        "version": "608f7279e195a33959d62ac32f42ca201a225a4c820a872f9af8562120b2865a",
-        "signature": "608f7279e195a33959d62ac32f42ca201a225a4c820a872f9af8562120b2865a",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts": {
-        "version": "d84398556ba4595ee6be554671da142cfe964cbdebb2f0c517a10f76f2b016c0",
-        "signature": "d84398556ba4595ee6be554671da142cfe964cbdebb2f0c517a10f76f2b016c0",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack-sources/index.d.ts": {
-        "version": "004efa076dda36645bc670b0daaafb83a2d10ef60b6c6ed1cb39168d7e7fbfa8",
-        "signature": "004efa076dda36645bc670b0daaafb83a2d10ef60b6c6ed1cb39168d7e7fbfa8",
-        "affectsGlobalScope": false
-      },
-      "./node_modules/@types/webpack/index.d.ts": {
-        "version": "c0f715c52d382c77e752c83fb6a19d3dfec97d4bccdc78bae5f11abb7cb2ea21",
-        "signature": "c0f715c52d382c77e752c83fb6a19d3dfec97d4bccdc78bae5f11abb7cb2ea21",
-        "affectsGlobalScope": false
       }
     },
     "options": {
@@ -3198,10 +2843,13 @@
         "./node_modules/@nativescript/core/index.d.ts"
       ],
       "./node_modules/@akylas/nativescript-sqlite/sqlite.android.d.ts": [
-        "./node_modules/@akylas/nativescript-sqlite/sqlite.common.d.ts"
+        "./node_modules/@akylas/nativescript-sqlite/sqlitedatabase.android.d.ts"
       ],
       "./node_modules/@akylas/nativescript-sqlite/sqlite.d.ts": [
         "./node_modules/@akylas/nativescript-sqlite/sqlite.android.d.ts"
+      ],
+      "./node_modules/@akylas/nativescript-sqlite/sqlitedatabase.android.d.ts": [
+        "./node_modules/@akylas/nativescript-sqlite/sqlite.common.d.ts"
       ],
       "./node_modules/@akylas/nativescript-sqlite/typeorm/index.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts"
@@ -3209,6 +2857,10 @@
       "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCache.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCacheOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCache.d.ts",
@@ -3221,14 +2873,15 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCache.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/ConnectionOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/Driver.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/IsolationLevel.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/SqljsEntityManager.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/migration/Migration.d.ts",
@@ -3388,6 +3041,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/ColumnTypes.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/DataTypeDefaults.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/MappedColumnTypes.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/ColumnMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts",
@@ -3406,9 +3060,6 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/driver/better-sqlite3/BetterSqlite3ConnectionOptions.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts"
-      ],
-      "./node_modules/@nativescript-community/typeorm/browser/driver/cockroachdb/CockroachConnectionCredentialsOptions.d.ts": [
-        "./node_modules/@types/node/tls.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/driver/cockroachdb/CockroachConnectionOptions.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts",
@@ -3456,9 +3107,6 @@
         "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/oracle/OracleConnectionCredentialsOptions.d.ts"
       ],
-      "./node_modules/@nativescript-community/typeorm/browser/driver/postgres/PostgresConnectionCredentialsOptions.d.ts": [
-        "./node_modules/@types/node/tls.d.ts"
-      ],
       "./node_modules/@nativescript-community/typeorm/browser/driver/postgres/PostgresConnectionOptions.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/postgres/PostgresConnectionCredentialsOptions.d.ts"
@@ -3485,6 +3133,7 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/typings.d.ts",
@@ -3492,7 +3141,6 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindConditions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindManyOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOneOptions.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryPartialEntity.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/SelectQueryBuilder.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/result/DeleteResult.d.ts",
@@ -3508,8 +3156,8 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/MongoQueryRunner.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/typings.d.ts",
@@ -3568,8 +3216,8 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/JoinOptions.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts": [
-        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperatorType.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts"
+        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperatorType.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOptionsUtils.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindManyOptions.d.ts",
@@ -3584,6 +3232,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Equal.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/ILike.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/In.d.ts": [
@@ -3611,10 +3262,12 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Raw.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/index.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
@@ -3676,6 +3329,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/driver/sqlserver/MssqlParameter.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/ColumnTypes.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/DatabaseType.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/SqljsEntityManager.d.ts",
@@ -3695,6 +3349,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Any.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Between.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Equal.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/ILike.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/In.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/IsNull.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/LessThan.d.ts",
@@ -3707,6 +3362,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/logger/AdvancedConsoleLogger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/FileLogger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/logger/LoggerOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/SimpleConsoleLogger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata-args/MetadataArgsStorage.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
@@ -3746,7 +3402,6 @@
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/LoadEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/RemoveEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/util/PromiseUtils.d.ts",
         "./node_modules/reflect-metadata/index.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/logger/AdvancedConsoleLogger.d.ts": [
@@ -3755,6 +3410,7 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/logger/FileLogger.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/logger/LoggerOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts": [
@@ -3772,7 +3428,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/metadata/types/EventListenerTypes.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/EntityRepositoryMetadataArgs.d.ts": [
-        "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts"
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/InheritanceMetadataArgs.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/decorator/options/ColumnOptions.d.ts"
@@ -3957,10 +3613,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/WhereExpression.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/DeleteQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Brackets.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/WhereExpression.d.ts",
@@ -3968,9 +3623,8 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/InsertQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/ColumnMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryPartialEntity.d.ts",
@@ -3984,10 +3638,10 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryExpressionMap.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/ColumnMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Alias.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Brackets.d.ts",
@@ -4028,8 +3682,8 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/SelectQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/OrderByCondition.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/platform/PlatformTools.d.ts",
@@ -4042,10 +3696,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/SoftDeleteQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/OrderByCondition.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Brackets.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts",
@@ -4229,6 +3882,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/InsertEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/LoadEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/RemoveEvent.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionCommitEvent.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionRollbackEvent.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionStartEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/InsertEvent.d.ts": [
@@ -4247,6 +3903,21 @@
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionCommitEvent.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionRollbackEvent.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionStartEvent.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts": [
@@ -4976,263 +4647,6 @@
       ],
       "./node_modules/@nativescript/types-ios/lib/ios/runtime.d.ts": [
         "./node_modules/@nativescript/types-ios/lib/ios/interop.d.ts"
-      ],
-      "./node_modules/@types/glob/index.d.ts": [
-        "./node_modules/@types/minimatch/index.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/index.d.ts"
-      ],
-      "./node_modules/@types/node/base.d.ts": [
-        "./node_modules/@types/node/assert.d.ts",
-        "./node_modules/@types/node/ts3.6/base.d.ts"
-      ],
-      "./node_modules/@types/node/child_process.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/cluster.d.ts": [
-        "./node_modules/@types/node/child_process.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/net.d.ts"
-      ],
-      "./node_modules/@types/node/console.d.ts": [
-        "./node_modules/@types/node/util.d.ts"
-      ],
-      "./node_modules/@types/node/constants.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/os.d.ts"
-      ],
-      "./node_modules/@types/node/crypto.d.ts": [
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/dgram.d.ts": [
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/net.d.ts"
-      ],
-      "./node_modules/@types/node/domain.d.ts": [
-        "./node_modules/@types/node/events.d.ts"
-      ],
-      "./node_modules/@types/node/fs.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs/promises.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/fs/promises.d.ts": [
-        "./node_modules/@types/node/fs.d.ts"
-      ],
-      "./node_modules/@types/node/http.d.ts": [
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/http2.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/http.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/tls.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/https.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/http.d.ts",
-        "./node_modules/@types/node/tls.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/index.d.ts": [
-        "./node_modules/@types/node/base.d.ts"
-      ],
-      "./node_modules/@types/node/inspector.d.ts": [
-        "./node_modules/@types/node/events.d.ts"
-      ],
-      "./node_modules/@types/node/module.d.ts": [
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/net.d.ts": [
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/perf_hooks.d.ts": [
-        "./node_modules/@types/node/async_hooks.d.ts"
-      ],
-      "./node_modules/@types/node/process.d.ts": [
-        "./node_modules/@types/node/tty.d.ts"
-      ],
-      "./node_modules/@types/node/readline.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/repl.d.ts": [
-        "./node_modules/@types/node/readline.d.ts",
-        "./node_modules/@types/node/util.d.ts",
-        "./node_modules/@types/node/vm.d.ts"
-      ],
-      "./node_modules/@types/node/stream.d.ts": [
-        "./node_modules/@types/node/events.d.ts"
-      ],
-      "./node_modules/@types/node/tls.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/ts3.4/base.d.ts": [
-        "./node_modules/@types/node/async_hooks.d.ts",
-        "./node_modules/@types/node/buffer.d.ts",
-        "./node_modules/@types/node/child_process.d.ts",
-        "./node_modules/@types/node/cluster.d.ts",
-        "./node_modules/@types/node/console.d.ts",
-        "./node_modules/@types/node/constants.d.ts",
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/dgram.d.ts",
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/domain.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/fs/promises.d.ts",
-        "./node_modules/@types/node/globals.d.ts",
-        "./node_modules/@types/node/http.d.ts",
-        "./node_modules/@types/node/http2.d.ts",
-        "./node_modules/@types/node/https.d.ts",
-        "./node_modules/@types/node/inspector.d.ts",
-        "./node_modules/@types/node/module.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/os.d.ts",
-        "./node_modules/@types/node/path.d.ts",
-        "./node_modules/@types/node/perf_hooks.d.ts",
-        "./node_modules/@types/node/process.d.ts",
-        "./node_modules/@types/node/punycode.d.ts",
-        "./node_modules/@types/node/querystring.d.ts",
-        "./node_modules/@types/node/readline.d.ts",
-        "./node_modules/@types/node/repl.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/string_decoder.d.ts",
-        "./node_modules/@types/node/timers.d.ts",
-        "./node_modules/@types/node/tls.d.ts",
-        "./node_modules/@types/node/trace_events.d.ts",
-        "./node_modules/@types/node/tty.d.ts",
-        "./node_modules/@types/node/url.d.ts",
-        "./node_modules/@types/node/util.d.ts",
-        "./node_modules/@types/node/v8.d.ts",
-        "./node_modules/@types/node/vm.d.ts",
-        "./node_modules/@types/node/worker_threads.d.ts",
-        "./node_modules/@types/node/zlib.d.ts"
-      ],
-      "./node_modules/@types/node/ts3.6/base.d.ts": [
-        "./node_modules/@types/node/globals.global.d.ts",
-        "./node_modules/@types/node/ts3.4/base.d.ts",
-        "./node_modules/@types/node/wasi.d.ts"
-      ],
-      "./node_modules/@types/node/tty.d.ts": [
-        "./node_modules/@types/node/net.d.ts"
-      ],
-      "./node_modules/@types/node/url.d.ts": [
-        "./node_modules/@types/node/querystring.d.ts"
-      ],
-      "./node_modules/@types/node/v8.d.ts": [
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/worker_threads.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs/promises.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/url.d.ts",
-        "./node_modules/@types/node/vm.d.ts"
-      ],
-      "./node_modules/@types/node/zlib.d.ts": [
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/uglify-js/index.d.ts": [
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/index.d.ts": [
-        "./node_modules/@types/node/index.d.ts",
-        "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/RawSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts": [
-        "./node_modules/@types/source-list-map/index.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts": [
-        "./node_modules/@types/source-list-map/index.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/RawSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/Source.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/index.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/RawSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack/index.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/index.d.ts",
-        "./node_modules/@types/tapable/index.d.ts",
-        "./node_modules/@types/uglify-js/index.d.ts",
-        "./node_modules/@types/webpack-sources/index.d.ts",
-        "./node_modules/anymatch/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
       ],
       "./references.d.ts": [
         "./node_modules/@nativescript/types-android/lib/android.d.ts",
@@ -5250,10 +4664,13 @@
         "./node_modules/@nativescript/core/index.d.ts"
       ],
       "./node_modules/@akylas/nativescript-sqlite/sqlite.android.d.ts": [
-        "./node_modules/@akylas/nativescript-sqlite/sqlite.common.d.ts"
+        "./node_modules/@akylas/nativescript-sqlite/sqlitedatabase.android.d.ts"
       ],
       "./node_modules/@akylas/nativescript-sqlite/sqlite.d.ts": [
         "./node_modules/@akylas/nativescript-sqlite/sqlite.android.d.ts"
+      ],
+      "./node_modules/@akylas/nativescript-sqlite/sqlitedatabase.android.d.ts": [
+        "./node_modules/@akylas/nativescript-sqlite/sqlite.common.d.ts"
       ],
       "./node_modules/@akylas/nativescript-sqlite/typeorm/index.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts"
@@ -5261,6 +4678,10 @@
       "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCache.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCacheOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCache.d.ts",
@@ -5273,14 +4694,15 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCache.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/ConnectionOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/Driver.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/IsolationLevel.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/SqljsEntityManager.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/migration/Migration.d.ts",
@@ -5440,6 +4862,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/ColumnTypes.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/DataTypeDefaults.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/MappedColumnTypes.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/ColumnMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts",
@@ -5531,6 +4954,7 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/typings.d.ts",
@@ -5538,7 +4962,6 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindConditions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindManyOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOneOptions.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryPartialEntity.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/SelectQueryBuilder.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/result/DeleteResult.d.ts",
@@ -5554,8 +4977,8 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/MongoQueryRunner.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/mongodb/typings.d.ts",
@@ -5614,8 +5037,8 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/JoinOptions.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts": [
-        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperatorType.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts"
+        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperatorType.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOptionsUtils.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindManyOptions.d.ts",
@@ -5630,6 +5053,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Equal.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/ILike.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/In.d.ts": [
@@ -5657,10 +5083,12 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Raw.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/index.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
@@ -5722,6 +5150,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/driver/sqlserver/MssqlParameter.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/ColumnTypes.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/driver/types/DatabaseType.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/SqljsEntityManager.d.ts",
@@ -5741,6 +5170,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Any.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Between.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Equal.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/ILike.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/In.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/IsNull.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/LessThan.d.ts",
@@ -5753,6 +5183,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/logger/AdvancedConsoleLogger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/FileLogger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/logger/LoggerOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/logger/SimpleConsoleLogger.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata-args/MetadataArgsStorage.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
@@ -5792,7 +5223,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/LoadEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/RemoveEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/util/PromiseUtils.d.ts"
+        "./node_modules/reflect-metadata/index.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/logger/AdvancedConsoleLogger.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts",
@@ -5800,6 +5231,7 @@
       ],
       "./node_modules/@nativescript-community/typeorm/browser/logger/FileLogger.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/logger/LoggerOptions.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/logger/Logger.d.ts": [
@@ -5817,7 +5249,7 @@
         "./node_modules/@nativescript-community/typeorm/browser/metadata/types/EventListenerTypes.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/EntityRepositoryMetadataArgs.d.ts": [
-        "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts"
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/metadata-args/InheritanceMetadataArgs.d.ts": [
         "./node_modules/@nativescript-community/typeorm/browser/decorator/options/ColumnOptions.d.ts"
@@ -6002,10 +5434,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/WhereExpression.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/DeleteQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Brackets.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/WhereExpression.d.ts",
@@ -6013,9 +5444,8 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/InsertQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/ColumnMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryPartialEntity.d.ts",
@@ -6029,10 +5459,10 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryExpressionMap.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/index.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/find-options/FindOperator.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/ColumnMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Alias.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Brackets.d.ts",
@@ -6073,8 +5503,8 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/SelectQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/OrderByCondition.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/platform/PlatformTools.d.ts",
@@ -6087,10 +5517,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/query-builder/SoftDeleteQueryBuilder.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
-        "./node_modules/@nativescript-community/typeorm/browser/entity-schema/EntitySchema.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/find-options/OrderByCondition.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/Brackets.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-builder/QueryBuilder.d.ts",
@@ -6274,6 +5703,9 @@
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/InsertEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/LoadEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/RemoveEvent.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionCommitEvent.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionRollbackEvent.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionStartEvent.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/InsertEvent.d.ts": [
@@ -6292,6 +5724,21 @@
         "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/metadata/EntityMetadata.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionCommitEvent.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionRollbackEvent.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
+      ],
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionStartEvent.d.ts": [
+        "./node_modules/@nativescript-community/typeorm/browser/connection/Connection.d.ts",
+        "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
         "./node_modules/@nativescript-community/typeorm/browser/query-runner/QueryRunner.d.ts"
       ],
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts": [
@@ -7022,263 +6469,6 @@
       "./node_modules/@nativescript/types-ios/lib/ios/runtime.d.ts": [
         "./node_modules/@nativescript/types-ios/lib/ios/interop.d.ts"
       ],
-      "./node_modules/@types/glob/index.d.ts": [
-        "./node_modules/@types/minimatch/index.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/index.d.ts"
-      ],
-      "./node_modules/@types/node/base.d.ts": [
-        "./node_modules/@types/node/assert.d.ts",
-        "./node_modules/@types/node/ts3.6/base.d.ts"
-      ],
-      "./node_modules/@types/node/child_process.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/cluster.d.ts": [
-        "./node_modules/@types/node/child_process.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/net.d.ts"
-      ],
-      "./node_modules/@types/node/console.d.ts": [
-        "./node_modules/@types/node/util.d.ts"
-      ],
-      "./node_modules/@types/node/constants.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/os.d.ts"
-      ],
-      "./node_modules/@types/node/crypto.d.ts": [
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/dgram.d.ts": [
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/net.d.ts"
-      ],
-      "./node_modules/@types/node/domain.d.ts": [
-        "./node_modules/@types/node/events.d.ts"
-      ],
-      "./node_modules/@types/node/fs.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs/promises.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/fs/promises.d.ts": [
-        "./node_modules/@types/node/fs.d.ts"
-      ],
-      "./node_modules/@types/node/http.d.ts": [
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/http2.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/http.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/tls.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/https.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/http.d.ts",
-        "./node_modules/@types/node/tls.d.ts",
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/index.d.ts": [
-        "./node_modules/@types/node/base.d.ts"
-      ],
-      "./node_modules/@types/node/inspector.d.ts": [
-        "./node_modules/@types/node/events.d.ts"
-      ],
-      "./node_modules/@types/node/module.d.ts": [
-        "./node_modules/@types/node/url.d.ts"
-      ],
-      "./node_modules/@types/node/net.d.ts": [
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/perf_hooks.d.ts": [
-        "./node_modules/@types/node/async_hooks.d.ts"
-      ],
-      "./node_modules/@types/node/process.d.ts": [
-        "./node_modules/@types/node/tty.d.ts"
-      ],
-      "./node_modules/@types/node/readline.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/repl.d.ts": [
-        "./node_modules/@types/node/readline.d.ts",
-        "./node_modules/@types/node/util.d.ts",
-        "./node_modules/@types/node/vm.d.ts"
-      ],
-      "./node_modules/@types/node/stream.d.ts": [
-        "./node_modules/@types/node/events.d.ts"
-      ],
-      "./node_modules/@types/node/tls.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/ts3.4/base.d.ts": [
-        "./node_modules/@types/node/async_hooks.d.ts",
-        "./node_modules/@types/node/buffer.d.ts",
-        "./node_modules/@types/node/child_process.d.ts",
-        "./node_modules/@types/node/cluster.d.ts",
-        "./node_modules/@types/node/console.d.ts",
-        "./node_modules/@types/node/constants.d.ts",
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/dgram.d.ts",
-        "./node_modules/@types/node/dns.d.ts",
-        "./node_modules/@types/node/domain.d.ts",
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs.d.ts",
-        "./node_modules/@types/node/fs/promises.d.ts",
-        "./node_modules/@types/node/globals.d.ts",
-        "./node_modules/@types/node/http.d.ts",
-        "./node_modules/@types/node/http2.d.ts",
-        "./node_modules/@types/node/https.d.ts",
-        "./node_modules/@types/node/inspector.d.ts",
-        "./node_modules/@types/node/module.d.ts",
-        "./node_modules/@types/node/net.d.ts",
-        "./node_modules/@types/node/os.d.ts",
-        "./node_modules/@types/node/path.d.ts",
-        "./node_modules/@types/node/perf_hooks.d.ts",
-        "./node_modules/@types/node/process.d.ts",
-        "./node_modules/@types/node/punycode.d.ts",
-        "./node_modules/@types/node/querystring.d.ts",
-        "./node_modules/@types/node/readline.d.ts",
-        "./node_modules/@types/node/repl.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/string_decoder.d.ts",
-        "./node_modules/@types/node/timers.d.ts",
-        "./node_modules/@types/node/tls.d.ts",
-        "./node_modules/@types/node/trace_events.d.ts",
-        "./node_modules/@types/node/tty.d.ts",
-        "./node_modules/@types/node/url.d.ts",
-        "./node_modules/@types/node/util.d.ts",
-        "./node_modules/@types/node/v8.d.ts",
-        "./node_modules/@types/node/vm.d.ts",
-        "./node_modules/@types/node/worker_threads.d.ts",
-        "./node_modules/@types/node/zlib.d.ts"
-      ],
-      "./node_modules/@types/node/ts3.6/base.d.ts": [
-        "./node_modules/@types/node/globals.global.d.ts",
-        "./node_modules/@types/node/ts3.4/base.d.ts",
-        "./node_modules/@types/node/wasi.d.ts"
-      ],
-      "./node_modules/@types/node/tty.d.ts": [
-        "./node_modules/@types/node/net.d.ts"
-      ],
-      "./node_modules/@types/node/url.d.ts": [
-        "./node_modules/@types/node/querystring.d.ts"
-      ],
-      "./node_modules/@types/node/v8.d.ts": [
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/node/worker_threads.d.ts": [
-        "./node_modules/@types/node/events.d.ts",
-        "./node_modules/@types/node/fs/promises.d.ts",
-        "./node_modules/@types/node/stream.d.ts",
-        "./node_modules/@types/node/url.d.ts",
-        "./node_modules/@types/node/vm.d.ts"
-      ],
-      "./node_modules/@types/node/zlib.d.ts": [
-        "./node_modules/@types/node/stream.d.ts"
-      ],
-      "./node_modules/@types/uglify-js/index.d.ts": [
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/index.d.ts": [
-        "./node_modules/@types/node/index.d.ts",
-        "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/RawSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts": [
-        "./node_modules/@types/source-list-map/index.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts": [
-        "./node_modules/@types/source-list-map/index.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/RawSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/Source.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack-sources/lib/index.d.ts": [
-        "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/RawSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts",
-        "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-        "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
-      "./node_modules/@types/webpack/index.d.ts": [
-        "./node_modules/@types/node/crypto.d.ts",
-        "./node_modules/@types/node/index.d.ts",
-        "./node_modules/@types/tapable/index.d.ts",
-        "./node_modules/@types/uglify-js/index.d.ts",
-        "./node_modules/@types/webpack-sources/index.d.ts",
-        "./node_modules/anymatch/index.d.ts",
-        "./node_modules/source-map/source-map.d.ts"
-      ],
       "./references.d.ts": [
         "./node_modules/@nativescript/types-android/lib/android.d.ts",
         "./node_modules/@nativescript/types-ios/lib/ios.d.ts"
@@ -7288,13 +6478,35 @@
       "./app/app.ts",
       "./app/main-page.ts",
       "./app/main-view-model.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.dom.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.collection.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.core.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.generator.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.promise.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.proxy.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.reflect.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.symbol.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2016.array.include.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2016.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.intl.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.object.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.string.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts",
+      "./node_modules/.pnpm/typescript@3.9.7/node_modules/typescript/lib/lib.es5.d.ts",
       "./node_modules/@akylas/nativescript-sqlite/sqlite.android.d.ts",
       "./node_modules/@akylas/nativescript-sqlite/sqlite.common.d.ts",
       "./node_modules/@akylas/nativescript-sqlite/sqlite.d.ts",
+      "./node_modules/@akylas/nativescript-sqlite/sqlitedatabase.android.d.ts",
       "./node_modules/@akylas/nativescript-sqlite/typeorm/index.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCache.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/cache/QueryResultCacheOptions.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/common/DeepPartial.d.ts",
+      "./node_modules/@nativescript-community/typeorm/browser/common/EntityTarget.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/common/ObjectLiteral.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/common/ObjectType.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/connection/BaseConnectionOptions.d.ts",
@@ -7400,6 +6612,7 @@
       "./node_modules/@nativescript-community/typeorm/browser/driver/types/DatabaseType.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/driver/types/IsolationLevel.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/driver/types/MappedColumnTypes.d.ts",
+      "./node_modules/@nativescript-community/typeorm/browser/driver/types/ReplicationMode.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/EntityManager.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/MongoEntityManager.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/entity-manager/SqljsEntityManager.d.ts",
@@ -7423,6 +6636,7 @@
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Any.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Between.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/Equal.d.ts",
+      "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/ILike.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/In.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/IsNull.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/find-options/operator/LessThan.d.ts",
@@ -7543,8 +6757,10 @@
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/InsertEvent.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/LoadEvent.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/RemoveEvent.d.ts",
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionCommitEvent.d.ts",
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionRollbackEvent.d.ts",
+      "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/TransactionStartEvent.d.ts",
       "./node_modules/@nativescript-community/typeorm/browser/subscriber/event/UpdateEvent.d.ts",
-      "./node_modules/@nativescript-community/typeorm/browser/util/PromiseUtils.d.ts",
       "./node_modules/@nativescript/core/application-settings/index.d.ts",
       "./node_modules/@nativescript/core/application/application-interfaces.d.ts",
       "./node_modules/@nativescript/core/application/index.d.ts",
@@ -7812,105 +7028,8 @@
       "./node_modules/@nativescript/types-ios/lib/ios/objc-x86_64/objc!zlib.d.ts",
       "./node_modules/@nativescript/types-ios/lib/ios/runtime.d.ts",
       "./node_modules/@types/anymatch/index.d.ts",
-      "./node_modules/@types/glob/index.d.ts",
-      "./node_modules/@types/json-schema/index.d.ts",
-      "./node_modules/@types/minimatch/index.d.ts",
-      "./node_modules/@types/node/assert.d.ts",
-      "./node_modules/@types/node/async_hooks.d.ts",
-      "./node_modules/@types/node/base.d.ts",
-      "./node_modules/@types/node/buffer.d.ts",
-      "./node_modules/@types/node/child_process.d.ts",
-      "./node_modules/@types/node/cluster.d.ts",
-      "./node_modules/@types/node/console.d.ts",
-      "./node_modules/@types/node/constants.d.ts",
-      "./node_modules/@types/node/crypto.d.ts",
-      "./node_modules/@types/node/dgram.d.ts",
-      "./node_modules/@types/node/dns.d.ts",
-      "./node_modules/@types/node/domain.d.ts",
-      "./node_modules/@types/node/events.d.ts",
-      "./node_modules/@types/node/fs.d.ts",
-      "./node_modules/@types/node/fs/promises.d.ts",
-      "./node_modules/@types/node/globals.d.ts",
-      "./node_modules/@types/node/globals.global.d.ts",
-      "./node_modules/@types/node/http.d.ts",
-      "./node_modules/@types/node/http2.d.ts",
-      "./node_modules/@types/node/https.d.ts",
-      "./node_modules/@types/node/index.d.ts",
-      "./node_modules/@types/node/inspector.d.ts",
-      "./node_modules/@types/node/module.d.ts",
-      "./node_modules/@types/node/net.d.ts",
-      "./node_modules/@types/node/os.d.ts",
-      "./node_modules/@types/node/path.d.ts",
-      "./node_modules/@types/node/perf_hooks.d.ts",
-      "./node_modules/@types/node/process.d.ts",
-      "./node_modules/@types/node/punycode.d.ts",
-      "./node_modules/@types/node/querystring.d.ts",
-      "./node_modules/@types/node/readline.d.ts",
-      "./node_modules/@types/node/repl.d.ts",
-      "./node_modules/@types/node/stream.d.ts",
-      "./node_modules/@types/node/string_decoder.d.ts",
-      "./node_modules/@types/node/timers.d.ts",
-      "./node_modules/@types/node/tls.d.ts",
-      "./node_modules/@types/node/trace_events.d.ts",
-      "./node_modules/@types/node/ts3.4/base.d.ts",
-      "./node_modules/@types/node/ts3.6/base.d.ts",
-      "./node_modules/@types/node/tty.d.ts",
-      "./node_modules/@types/node/url.d.ts",
-      "./node_modules/@types/node/util.d.ts",
-      "./node_modules/@types/node/v8.d.ts",
-      "./node_modules/@types/node/vm.d.ts",
-      "./node_modules/@types/node/wasi.d.ts",
-      "./node_modules/@types/node/worker_threads.d.ts",
-      "./node_modules/@types/node/zlib.d.ts",
-      "./node_modules/@types/parse-json/index.d.ts",
-      "./node_modules/@types/source-list-map/index.d.ts",
-      "./node_modules/@types/tapable/index.d.ts",
-      "./node_modules/@types/uglify-js/index.d.ts",
-      "./node_modules/@types/webpack-sources/index.d.ts",
-      "./node_modules/@types/webpack-sources/lib/CachedSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/CompatSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/ConcatSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/OriginalSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/PrefixSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/RawSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/ReplaceSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/SizeOnlySource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/Source.d.ts",
-      "./node_modules/@types/webpack-sources/lib/SourceMapSource.d.ts",
-      "./node_modules/@types/webpack-sources/lib/index.d.ts",
-      "./node_modules/@types/webpack/index.d.ts",
-      "./node_modules/anymatch/index.d.ts",
       "./node_modules/reflect-metadata/index.d.ts",
-      "./node_modules/source-map/source-map.d.ts",
       "./node_modules/tslib/tslib.d.ts",
-      "./node_modules/typescript/lib/lib.dom.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.collection.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.core.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.generator.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.iterable.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.promise.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.proxy.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.reflect.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.symbol.d.ts",
-      "./node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts",
-      "./node_modules/typescript/lib/lib.es2016.array.include.d.ts",
-      "./node_modules/typescript/lib/lib.es2016.d.ts",
-      "./node_modules/typescript/lib/lib.es2017.d.ts",
-      "./node_modules/typescript/lib/lib.es2017.intl.d.ts",
-      "./node_modules/typescript/lib/lib.es2017.object.d.ts",
-      "./node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts",
-      "./node_modules/typescript/lib/lib.es2017.string.d.ts",
-      "./node_modules/typescript/lib/lib.es2017.typedarrays.d.ts",
-      "./node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts",
-      "./node_modules/typescript/lib/lib.es2018.asynciterable.d.ts",
-      "./node_modules/typescript/lib/lib.es2018.d.ts",
-      "./node_modules/typescript/lib/lib.es2018.intl.d.ts",
-      "./node_modules/typescript/lib/lib.es2018.promise.d.ts",
-      "./node_modules/typescript/lib/lib.es2018.regexp.d.ts",
-      "./node_modules/typescript/lib/lib.es2020.bigint.d.ts",
-      "./node_modules/typescript/lib/lib.es5.d.ts",
-      "./node_modules/typescript/lib/lib.esnext.intl.d.ts",
       "./references.d.ts"
     ]
   },

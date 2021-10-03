@@ -1,9 +1,9 @@
 import { Observable } from '@nativescript/core/data/observable';
-import { SQLiteDatabase, deleteDatabase, openOrCreate } from '@akylas/nativescript-sqlite';
+import { SQLiteDatabase, deleteDatabase, openOrCreate } from '@nativescript-community/sqlite';
 import { knownFolders, path } from '@nativescript/core/file-system';
 import { ImageSource } from '@nativescript/core';
 import { BaseEntity, Column, Connection, Entity, PrimaryGeneratedColumn, createConnection } from '@nativescript-community/typeorm/browser';
-import { installMixins } from '@akylas/nativescript-sqlite/typeorm';
+import { installMixins } from '@nativescript-community/sqlite/typeorm';
 
 interface DataExample {
     id: number;

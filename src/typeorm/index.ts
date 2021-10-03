@@ -16,7 +16,7 @@ export function installMixins() {
         const { type } = connection.options;
         switch (type) {
             case 'nativescript' as any:
-            case '@akylas/nativescript-sqlite' as any:
+            case '@nativescript-community/sqlite' as any:
                 return new NativescriptDriver(connection);
             default:
                 return oldFunc.call(this, connection);
