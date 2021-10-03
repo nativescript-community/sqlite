@@ -1,12 +1,12 @@
 # Nativescript: Akylas Sqlite
 
-[![npm](https://img.shields.io/npm/v/@akylas/nativescript-sqlite.svg)](https://www.npmjs.com/package/@akylas/nativescript-sqlite)
-[![npm](https://img.shields.io/npm/dt/@akylas/nativescript-sqlite.svg?label=npm%20downloads)](https://www.npmjs.com/package/@akylas/nativescript-sqlite)
+[![npm](https://img.shields.io/npm/v/@nativescript-community/sqlite.svg)](https://www.npmjs.com/package/@nativescript-community/sqlite)
+[![npm](https://img.shields.io/npm/dt/@nativescript-community/sqlite.svg?label=npm%20downloads)](https://www.npmjs.com/package/@nativescript-community/sqlite)
 
 ## Installation
 
 ```
-ns plugin add @akylas/nativescript-sqlite
+ns plugin add @nativescript-community/sqlite
 ```
 
 ## Usage
