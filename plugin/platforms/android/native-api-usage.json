@@ -1,0 +1,5 @@
+{
+    "uses": [
+        "android.database:Cursor*", "android.database.sqlite:SQLiteDatabase*"
+    ]
+}
