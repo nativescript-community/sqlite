@@ -14,7 +14,7 @@ ns plugin add @nativescript-community/sqlite
 You should take care of wrapping sqlite calls to your preferred async option (promises, observables, async/await). And catch any exceptions thrown.
 
 ```typescript
-import { openOrCreate, deleteDatabase } from "nativescript-akylas-sqlite";
+import { openOrCreate, deleteDatabase } from "@nativescript-community/sqlite";
 
 const sqlite = openOrCreate("path/to/db");
 sqlite.execute("CREATE TABLE names (id INT, name TEXT)");
