@@ -1,4 +1,5 @@
 import {
+    SQLiteDatabase as ISQLiteDatabase,
     SqliteParam,
     SqliteParams,
     SqliteRow,
@@ -454,7 +455,7 @@ async function transactionRaw<T = any>(
     }
 }
 
-export class SQLiteDatabase {
+export class SQLiteDatabase implements ISQLiteDatabase {
     db: FMDatabase;
     transformBlobs: boolean;
     constructor(public filePath: string, options?: {
@@ -465,7 +466,7 @@ export class SQLiteDatabase {
         this.transformBlobs = !options || options.transformBlobs !== false;
     }
     isOpen = false;
-    async open() {
+     open() {
         if (!this.db) {
             this.db = FMDatabase.databaseWithPath(getRealPath(this.filePath));
         }
@@ -474,19 +475,19 @@ export class SQLiteDatabase {
         }
         return this.isOpen;
     }
-    async close() {
+     close() {
         if (!this.isOpen) return;
         this.db.close();
         // sqlite3_close_v2(db);
         this.db = null;
         this.isOpen = false;
     }
-    async setVersion(version: number) {
+     setVersion(version: number) {
         this.db.userVersion = version + 0;
         // const query = "PRAGMA user_version=" + (version + 0).toString();
         // execRaw(this.db, query);
     }
-    async getVersion() {
+     getVersion() {
         // const query = "PRAGMA user_version";
         // const result = this.getArray(query);
         // return result && (result[0] as number);

@@ -1,4 +1,4 @@
-import { SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
+import { SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError, SQLiteDatabase as ISQLiteDatabase } from './sqlite.common';
 
 import { Application } from '@nativescript/core';
 import { SQLiteDatabaseBase } from './sqlitedatabase.android';
@@ -24,8 +24,8 @@ function createDb(dbName: string, flags) {
     }
 }
 
-export class SQLiteDatabase extends SQLiteDatabaseBase {
-    async open() {
+export class SQLiteDatabase extends SQLiteDatabaseBase implements ISQLiteDatabase {
+    open() {
         if (!this.db) {
             this.db = createDb(this.filePath, this.flags);
             if (this.threading && !this.worker) {

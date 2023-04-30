@@ -193,11 +193,7 @@ export class SQLiteDatabaseBase {
         nativeData,
         messageData,
         timeout = 0
-    ): Promise<{
-            id: number;
-            nativeDatas?: { [k: string]: any };
-            [k: string]: any;
-        }> {
+    ): Promise<any> {
         return new Promise((resolve, reject) => {
             let id = Date.now().valueOf();
             if (id <= this.lastId ) {
@@ -240,7 +236,7 @@ export class SQLiteDatabaseBase {
         return this.db && this.db.isOpen();
     }
 
-    async close() {
+     close() {
         if (!this.isOpen) return;
         if (this.worker) {
             this.worker.postMessage({
@@ -255,7 +251,7 @@ export class SQLiteDatabaseBase {
     async setVersion(version: number) {
         this.db.setVersion(version);
     }
-    async getVersion() {
+     getVersion() {
         return this.db.getVersion();
     }
     async execute(query: string, params?: SqliteParams) {

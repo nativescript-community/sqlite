@@ -11,13 +11,13 @@ export type Db = any;
 export type SqliteUpgrade = (db: Db) => void;
 
 export interface SQLiteDatabase {
-    getVersion(): Promise<number>;
+    getVersion();
 
-    setVersion(version: number): Promise<void>;
+    setVersion(version: number);
 
     isOpen: boolean;
 
-    close(): Promise<void>;
+    close();
 
     select(query: string, params?: SqliteParams): Promise<SqliteRow[]>;
 
@@ -36,7 +36,7 @@ export interface SQLiteDatabase {
         params: SqliteParams,
         callback: (error: Error, result: SqliteRow) => void,
         complete: (error: Error, count: number) => void
-    ): Promise<void>;
+    ): Promise<number>;
 }
 
 export function isNothing(x: any) {
