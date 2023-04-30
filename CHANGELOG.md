@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.4.2](https://github.com/nativescript-community/sqlite/compare/v3.4.1...v3.4.2) (2023-04-30)
+
+
+### Bug Fixes
+
+* **android:** native-api-usage ([8ae5291](https://github.com/nativescript-community/sqlite/commit/8ae52917baed61dec106d9f328f57a8791c79f87))
+
+
+
+
+
 ## [3.4.1](https://github.com/nativescript-community/sqlite/compare/v3.4.0...v3.4.1) (2022-02-01)
 
 
