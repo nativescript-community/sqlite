@@ -7,7 +7,7 @@ import * as NSSqlite from '../sqlite';
 export class NativeSQLite extends nanoSQLMemoryIndex {
     plugin: InanoSQLPlugin = {
         name: 'Akylas NativeScript SQLite Adapter',
-        version: 2.37,
+        version: 2.37
     };
 
     nSQL: InanoSQLInstance;
@@ -20,7 +20,7 @@ export class NativeSQLite extends nanoSQLMemoryIndex {
         [tableName: string]: InanoSQLTable;
     };
 
-    constructor(private filePath: string, private options?: {flags?: number; threading?: boolean}) {
+    constructor(private filePath: string, private options?: { flags?: number; threading?: boolean }) {
         super(false, true);
         this._ai = {};
         this._query = this._query.bind(this);
@@ -46,14 +46,7 @@ export class NativeSQLite extends nanoSQLMemoryIndex {
         this._sqlite.createTable(tableName, tableData, this._ai, complete, error);
     }
 
-    async _query(
-        allowWrite: boolean,
-        sql: string,
-        args: any[],
-        onRow: (row: any, i: number) => void,
-        complete: () => void,
-        error: (err: any) => void
-    ) {
+    async _query(allowWrite: boolean, sql: string, args: any[], onRow: (row: any, i: number) => void, complete: () => void, error: (err: any) => void) {
         if (allowWrite) {
             try {
                 await this._db.execute(sql, args);
@@ -98,17 +91,7 @@ export class NativeSQLite extends nanoSQLMemoryIndex {
     }
 
     write(table: string, pk: any, row: { [key: string]: any }, complete: (pk: any) => void, error: (err: any) => void) {
-        this._sqlite.write(
-            this._tables[table].pkType,
-            this._tables[table].pkCol,
-            table,
-            pk,
-            row,
-            this._tables[table].ai,
-            this._ai,
-            complete,
-            error
-        );
+        this._sqlite.write(this._tables[table].pkType, this._tables[table].pkCol, table, pk, row, this._tables[table].ai, this._ai, complete, error);
     }
 
     read(table: string, pk: any, complete: (row: { [key: string]: any } | undefined) => void, error: (err: any) => void) {

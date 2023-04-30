@@ -16,7 +16,7 @@ import { SQLiteDatabaseBase } from './sqlitedatabase';
 // }
 // const worker = new DBWorker();
 const fakeDatabase = new SQLiteDatabaseBase(null);
-context.onmessage = (async (event: { data }) => {
+context.onmessage = (async (event:   { data }) => {
     const data = event.data;
     switch (data.type) {
         case 'terminate':
@@ -33,22 +33,19 @@ context.onmessage = (async (event: { data }) => {
             fakeDatabase.threading = false;
             if (data.dbOptions) {
                 Object.assign(fakeDatabase, data.dbOptions);
-
             }
             try {
-                const result =await (fakeDatabase[call] as Function).apply(fakeDatabase, args);
+                const result = await (fakeDatabase[call] as Function).apply(fakeDatabase, args);
                 // console.log('Worker.onmessage done ', id, call, !!result);
-                (global as any).postMessage(
-                    {
-                        id,
-                        result,
-                    }
-                );
+                (global as any).postMessage({
+                    id,
+                    result
+                });
             } catch (err) {
                 (global as any).postMessage(
                     Object.assign(data, {
                         id,
-                        error: err.toString(),
+                        error: err.toString()
                     })
                 );
                 // console.log('error in worker', err.toString());

@@ -1,8 +1,7 @@
-import { SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError, SQLiteDatabase as ISQLiteDatabase } from './sqlite.common';
+import { SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 
 import { Application } from '@nativescript/core';
 import { SQLiteDatabaseBase } from './sqlitedatabase.android';
-
 
 function createDb(dbName: string, flags) {
     if (dbName === ':memory:') {
@@ -13,10 +12,7 @@ function createDb(dbName: string, flags) {
         return android.database.sqlite.SQLiteDatabase.openDatabase(
             dbName,
             null,
-            flags !== undefined
-                ? flags
-                : android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY |
-                      android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS
+            flags !== undefined ? flags : android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS
         );
     } else {
         const activity: android.app.Activity = Application.android.foregroundActivity || Application.android.startActivity;
@@ -37,15 +33,17 @@ export class SQLiteDatabase extends SQLiteDatabaseBase implements ISQLiteDatabas
     }
 }
 
-export const openOrCreate = (filePath: string, options?: {
-    threading?: boolean;
-    transformBlobs?: boolean;
-    flags?: number;
-}): SQLiteDatabase => {
+export const openOrCreate = (
+    filePath: string,
+    options?: {
+        threading?: boolean;
+        transformBlobs?: boolean;
+        flags?: number;
+    }
+): SQLiteDatabase => {
     const obj = new SQLiteDatabase(filePath, options);
     obj.open();
     return obj;
 };
 
-export const deleteDatabase = (filePath: string) =>
-    android.database.sqlite.SQLiteDatabase.deleteDatabase(new java.io.File(filePath));
+export const deleteDatabase = (filePath: string) => android.database.sqlite.SQLiteDatabase.deleteDatabase(new java.io.File(filePath));

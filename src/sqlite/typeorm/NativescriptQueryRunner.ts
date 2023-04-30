@@ -6,7 +6,6 @@ import { Broadcaster } from '@nativescript-community/typeorm/browser/subscriber/
 import { NativescriptDriver } from './NativescriptDriver';
 import * as NSQlite from '../sqlite';
 
-
 /**
  * Runs queries on a single sqlite database connection.
  */

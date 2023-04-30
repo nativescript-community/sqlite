@@ -1,40 +1,9 @@
 {
+    "extends": "./tools/tsconfig",
     "compilerOptions": {
-        "target": "es2017",
-        "module": "esnext",
-        "moduleResolution": "node",
-        "declaration": true,
-        "removeComments": true,
-        "noLib": false,
-        "emitDecoratorMetadata": false,
-        "experimentalDecorators": true,
-        "lib": ["es6", "dom"],
-        "sourceMap": true,
-        "pretty": true,
-        "allowUnreachableCode": false,
-        "allowUnusedLabels": false,
-        "noEmitHelpers": true,
-        "noEmitOnError": false,
-        "noImplicitAny": false,
-        "noImplicitReturns": true,
-        "noImplicitUseStrict": true,
-        "noFallthroughCasesInSwitch": true,
-        "baseUrl": ".",
-        "outDir": "./plugin",
-        "rootDir": "src",
         "paths": {
-            "tns-core-modules": ["./node_modules/@nativescript/core"],
-            "tns-core-modules/*": ["./node_modules/@nativescript/core/*"],
-            "*": ["node_modules/*"]
-        },
-        "plugins": [
-            { "transform": "./node_modules/@nativescript/webpack/transformers/ns-transform-native-classes", "type": "raw" }
-        ]
-    },
-    "include": ["src/**/*", "./references.d.ts"],
-    "exclude": ["node_modules", "platforms", "src/scripts"],
-    "compileOnSave": false,
-    "angularCompilerOptions": {
-        "skipTemplateCodegen": true
+            "@nativescript-community/sqlite": ["src/sqlite"],
+            "@nativescript-community/sqlite/*": ["src/sqlite/*"]
+        }
     }
 }

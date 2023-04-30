@@ -31,12 +31,7 @@ export interface SQLiteDatabase {
 
     transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T>;
 
-    each(
-        query: string,
-        params: SqliteParams,
-        callback: (error: Error, result: SqliteRow) => void,
-        complete: (error: Error, count: number) => void
-    ): Promise<number>;
+    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow) => void, complete: (error: Error, count: number) => void): Promise<number>;
 }
 
 export function isNothing(x: any) {
@@ -72,7 +67,6 @@ export function paramToString(p: SqliteParam) {
         } else if (Array.isArray(p)) {
             return arrayToNativeByteArray(p);
         }
-
     } else {
         if (p instanceof NSData) {
             return p;
