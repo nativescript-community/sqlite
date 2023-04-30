@@ -1,20 +1,21 @@
-# Nativescript: Akylas Sqlite
+{{ load:../../tools/readme/edit-warning.md }}
+{{ template:title }}
+{{ template:badges }}
+{{ template:description }}
 
-[![npm](https://img.shields.io/npm/v/@nativescript-community/sqlite.svg)](https://www.npmjs.com/package/@nativescript-community/sqlite)
-[![npm](https://img.shields.io/npm/dt/@nativescript-community/sqlite.svg?label=npm%20downloads)](https://www.npmjs.com/package/@nativescript-community/sqlite)
+{{ template:toc }}
 
 ## Installation
+Run the following command from the root of your project:
 
-```
-ns plugin add @nativescript-community/sqlite
-```
+`ns plugin add {{ pkg.name }}`
 
 ## Usage
 
 You should take care of wrapping sqlite calls to your preferred async option (promises, observables, async/await). And catch any exceptions thrown.
 
 ```typescript
-import { openOrCreate, deleteDatabase } from "nativescript-akylas-sqlite";
+import { openOrCreate, deleteDatabase } from "@nativescript-community/sqlite";
 
 const sqlite = openOrCreate("path/to/db");
 sqlite.execute("CREATE TABLE names (id INT, name TEXT)");
