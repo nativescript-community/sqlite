@@ -2,6 +2,7 @@
     "uses": [
         "android.database:Cursor",
         "android.database.sqlite:SQLiteClosable",
-        "android.database.sqlite:SQLiteDatabase"
+        "android.database.sqlite:SQLiteDatabase",
+        "android.database.sqlite:SQLiteDatabase.CursorFactory"
     ]
 }
