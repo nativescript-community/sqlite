@@ -29,3 +29,9 @@ sqlite.transaction(cancelTransaction => {
     );
 });
 ```
+
+## Platforms sqlite versions
+
+*  [Android](https://stackoverflow.com/a/4377116)
+*  [iOS](https://github.com/yapstudios/YapDatabase/wiki/SQLite-version-(bundled-with-OS))
+
