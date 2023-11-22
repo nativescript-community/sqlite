@@ -1,12 +1,8 @@
-import { Connection } from '@nativescript-community/typeorm/browser/connection/Connection';
-import { AbstractSqliteDriver } from '@nativescript-community/typeorm/browser/driver/sqlite-abstract/AbstractSqliteDriver';
-import { ColumnType } from '@nativescript-community/typeorm/browser/driver/types/ColumnTypes';
-import { DriverOptionNotSetError } from '@nativescript-community/typeorm/browser/error/DriverOptionNotSetError';
-import { DriverPackageNotInstalledError } from '@nativescript-community/typeorm/browser/error/DriverPackageNotInstalledError';
-import { QueryRunner } from '@nativescript-community/typeorm/browser/query-runner/QueryRunner';
+import { ColumnType, DataSource, DriverOptionNotSetError, DriverPackageNotInstalledError, QueryRunner } from 'typeorm/browser';
+import { AbstractSqliteDriver } from 'typeorm/browser/driver/sqlite-abstract/AbstractSqliteDriver';
 import * as NSQlite from '../sqlite';
-import { NativescriptConnectionOptions } from './index';
 import { NativescriptQueryRunner } from './NativescriptQueryRunner';
+import { NativescriptConnectionOptions } from './index';
 /**
  * Organizes communication with sqlite DBMS within Nativescript.
  */
@@ -27,7 +23,7 @@ export class NativescriptDriver extends AbstractSqliteDriver {
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
-    constructor(connection: Connection) {
+    constructor(connection: DataSource) {
         super(connection);
         this.connection = connection;
         this.options = connection.options as NativescriptConnectionOptions;

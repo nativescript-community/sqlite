@@ -146,7 +146,7 @@ const transactionRaw = async <T = any>(db: Db, action: (cancel?: () => void) => 
     }
 };
 
-const messagePromises: { [key: string]: { resolve: Function; reject: Function; timeoutTimer: NodeJS.Timer }[] } = {};
+const messagePromises: { [key: string]: { resolve: Function; reject: Function; timeoutTimer: ReturnType<typeof setTimeout> }[] } = {};
 
 export class SQLiteDatabaseBase {
     db: android.database.sqlite.SQLiteDatabase;
