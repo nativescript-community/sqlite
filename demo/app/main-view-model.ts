@@ -2,7 +2,7 @@ import { Observable } from '@nativescript/core/data/observable';
 import { SQLiteDatabase, deleteDatabase, openOrCreate } from '@nativescript-community/sqlite';
 import { knownFolders, path } from '@nativescript/core/file-system';
 import { ImageSource } from '@nativescript/core';
-import { BaseEntity, Column, Connection, Entity, PrimaryGeneratedColumn, createConnection } from '@nativescript-community/typeorm/browser';
+import { BaseEntity, Column, Connection, Entity, PrimaryGeneratedColumn, createConnection } from 'typeorm/browser';
 import { installMixins } from '@nativescript-community/sqlite/typeorm';
 
 interface DataExample {

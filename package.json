@@ -54,7 +54,7 @@
         "@nano-sql/core": "^2.3.7",
         "@nativescript-community/plugin-seed-tools": "file:tools",
         "@nativescript-community/template-snippet": "file:demo-snippets",
-        "@nativescript-community/typeorm": "0.2.28-1"
+        "typeorm": "0.3.17"
     },
     "bootstrapper": "nativescript-plugin-seed",
     "commitlint": {

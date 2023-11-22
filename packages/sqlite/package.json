@@ -38,7 +38,7 @@
     "repository": "nativescript-community/sqlite",
     "peerDependencies": {
         "@nano-sql/core": "^2.3.7",
-        "@nativescript-community/typeorm": "0.2.28-1"
+        "typeorm": "^0.3.17"
     },
     "dependencies": {
         "@nativescript/hook": "~2.0.0"
