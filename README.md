@@ -42,6 +42,7 @@
 
 * [Installation](#installation)
 * [Usage](#usage)
+* [Platforms sqlite versions](#platforms-sqlite-versions)
 
 
 [](#installation)
@@ -79,6 +80,18 @@ sqlite.transaction(cancelTransaction => {
     );
 });
 ```
+
+
+[](#platforms-sqlite-versions)
+
+
+[](#platforms-sqlite-versions)
+
+## Platforms sqlite versions
+
+*  [Android](https://stackoverflow.com/a/4377116)
+*  [iOS](https://github.com/yapstudios/YapDatabase/wiki/SQLite-version-(bundled-with-OS))
+
 
 
 [](#demos-and-development)
