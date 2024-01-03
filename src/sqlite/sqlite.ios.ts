@@ -411,7 +411,7 @@ async function transactionRaw<T = any>(db: FMDatabase, action: (cancel?: () => v
         if (isFirstTransaction) {
             execRaw(db, 'ROLLBACK TRANSACTION');
         }
-        throwError(`transaction: ${e}`);
+        throwError(e);
         return null;
     }
 }
@@ -478,12 +478,21 @@ export class SQLiteDatabase implements ISQLiteDatabase {
     _isInTransaction = false;
     async transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T> {
         let res;
-        if (!this._isInTransaction) {
-            this._isInTransaction = true;
-            res = transactionRaw(this.db, action, true);
-            this._isInTransaction = false;
-        } else {
-            res = transactionRaw(this.db, action, false);
+        let shouldFinishTransaction = false;
+        try {
+            if (!this._isInTransaction) {
+                this._isInTransaction = shouldFinishTransaction = true;
+                res = await transactionRaw(this.db, action, true);
+            }
+            else {
+                res = await transactionRaw(this.db, action, false);
+            }
+        } catch(error) {
+            throw error;
+        } finally {
+            if (shouldFinishTransaction) {
+                this._isInTransaction = false;
+            }
         }
         return res;
     }
