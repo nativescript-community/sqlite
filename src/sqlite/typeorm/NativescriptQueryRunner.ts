@@ -1,15 +1,13 @@
-import { ObjectLiteral } from '@nativescript-community/typeorm/browser/common/ObjectLiteral';
-import { QueryRunnerAlreadyReleasedError } from '@nativescript-community/typeorm/browser/error/QueryRunnerAlreadyReleasedError';
-import { QueryFailedError } from '@nativescript-community/typeorm/browser/error/QueryFailedError';
-import { AbstractSqliteQueryRunner } from '@nativescript-community/typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner';
-import { Broadcaster } from '@nativescript-community/typeorm/browser/subscriber/Broadcaster';
+import { ObjectLiteral, QueryFailedError, QueryResult, QueryRunner, QueryRunnerAlreadyReleasedError } from 'typeorm/browser';
+import { AbstractSqliteQueryRunner } from 'typeorm/browser/driver/sqlite-abstract/AbstractSqliteQueryRunner';
+import { Broadcaster } from 'typeorm/browser/subscriber/Broadcaster';
 import { NativescriptDriver } from './NativescriptDriver';
 import * as NSQlite from '../sqlite';
 
 /**
  * Runs queries on a single sqlite database connection.
  */
-export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
+export class NativescriptQueryRunner extends AbstractSqliteQueryRunner implements QueryRunner {
     /**
      * Database driver used by connection.
      */
@@ -26,13 +24,15 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
     /**
      * Executes a given SQL query.
      */
-    async query(query: string, parameters?: any[]) {
+    async query(query: string, parameters?: any[], useStructuredResult?: boolean): Promise<any> {
         if (this.isReleased) {
             throw new QueryRunnerAlreadyReleasedError();
         }
+
         const connection = this.driver.connection;
         const isInsertQuery = query.startsWith('INSERT INTO') || query.startsWith('UPDATE');
         connection.logger.logQuery(query, parameters, this);
+
         try {
             const db: NSQlite.SQLiteDatabase = await this.connect();
             const queryStartTime = +new Date();
@@ -46,7 +46,12 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
             if (maxQueryExecutionTime && queryExecutionTime > maxQueryExecutionTime) {
                 connection.logger.logQuerySlow(queryExecutionTime, query, parameters, this);
             }
-            return result;
+
+            if (useStructuredResult) {
+                return { records: result, raw: result } as QueryResult;
+            } else {
+                return result;
+            }
         } catch (err) {
             connection.logger.logQueryError(err, query, parameters, this);
             throw new QueryFailedError(query, parameters, err);

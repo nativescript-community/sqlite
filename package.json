@@ -13,7 +13,7 @@
         "clean.demo": "rimraf demo/hooks demo/node_modules demo/platforms",
         "clean": "rimraf 'packages/**/*.d.ts' 'packages/**/*.js' 'packages/**/*.js.map' 'packages/**/*.metada' 'packages/**/angular/ng-package.json'",
         "plugin.watch": "pnpm run tsc -- -w",
-        "publish": "npm run clean ; npm run build.all ; npm run readme ; npm run doc ; npm run commit_readme_doc_changes ; lerna publish",
+        "publish": "npm run setup && npm run clean && npm run build.all && npm run readme && npm run doc && npm run commit_readme_doc_changes && lerna publish",
         "test.android": "pnpm run build && cd ./demo && tns build android && tns test android --justlaunch",
         "test.ios": "pnpm run build && cd ./demo && tns build ios && tns test ios --justlaunch",
         "test.android.verbose": "pnpm run build  && cd ./demo && tns build android && tns test android",
@@ -25,7 +25,7 @@
         "demo.vue.clean": "cd ./demo-vue && ns clean",
         "demo.vue.ios": "cd ./demo-vue && ns run ios --no-hmr --env.watchNodeModules",
         "doc": "node tools/builddoc.mjs",
-        "commit_readme_doc_changes": "git add docs *.md ; git commit -m \"readme/doc\"",
+        "commit_readme_doc_changes": "git add docs/** *.md ; git commit -m \"readme/doc\" ; echo \"commit readme doc done\"",
         "postinstall": "npm run setup",
         "readme": "lerna run readme && node ./tools/readme.js",
         "start": "./node_modules/.bin/ntl -A -s 15 -o",
@@ -54,7 +54,7 @@
         "@nano-sql/core": "^2.3.7",
         "@nativescript-community/plugin-seed-tools": "file:tools",
         "@nativescript-community/template-snippet": "file:demo-snippets",
-        "@nativescript-community/typeorm": "0.2.28-1"
+        "typeorm": "0.3.17"
     },
     "bootstrapper": "nativescript-plugin-seed",
     "commitlint": {
@@ -74,11 +74,7 @@
     },
     "workspaces": [
         "packages/*",
-        "demo-vue",
-        "demo-ng",
-        "demo-svelte",
-        "demo-react",
-        "demo-snippets"
+        "demo*"
     ],
     "engines": {
         "npm": "please use yarn or pnpm",
