@@ -1,4 +1,5 @@
 {
+  "private": true,
   "dependencies": {
     "@nativescript-community/sqlite": "*",
     "@nativescript/core": "8.1.3",

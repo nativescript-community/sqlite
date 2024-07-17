@@ -1,5 +1,4 @@
 {
-    "version": "1.3.0",
     "description": "SQLite for Nativescript",
     "scripts": {
         "setup": "npm run submodules && ts-patch install",
