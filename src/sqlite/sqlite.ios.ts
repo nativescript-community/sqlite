@@ -419,14 +419,22 @@ async function transactionRaw<T = any>(db: FMDatabase, action: (cancel?: () => v
 export class SQLiteDatabase implements ISQLiteDatabase {
     db: FMDatabase;
     transformBlobs: boolean;
+    filePath: string;
     constructor(
-        public filePath: string,
+        filePathOrDb: string | FMDatabase,
         options?: {
             threading?: boolean;
             transformBlobs?: boolean;
             readOnly?: boolean;
         }
     ) {
+        if (filePathOrDb instanceof FMDatabase) {
+            this.db = filePathOrDb;
+            this.filePath = filePathOrDb.databaseURL.absoluteString;
+            this.isOpen = this.db.isOpen;
+        } else {
+            this.filePath = filePathOrDb;
+        }
         this.transformBlobs = !options || options.transformBlobs !== false;
     }
     isOpen = false;
@@ -434,6 +442,7 @@ export class SQLiteDatabase implements ISQLiteDatabase {
         if (!this.db) {
             this.db = FMDatabase.databaseWithPath(getRealPath(this.filePath));
         }
+        this.isOpen = this.db.isOpen;
         if (!this.isOpen) {
             this.isOpen = this.db.open();
         }
@@ -483,11 +492,10 @@ export class SQLiteDatabase implements ISQLiteDatabase {
             if (!this._isInTransaction) {
                 this._isInTransaction = shouldFinishTransaction = true;
                 res = await transactionRaw(this.db, action, true);
-            }
-            else {
+            } else {
                 res = await transactionRaw(this.db, action, false);
             }
-        } catch(error) {
+        } catch (error) {
             throw error;
         } finally {
             if (shouldFinishTransaction) {
@@ -508,6 +516,19 @@ export function openOrCreate(
     }
 ): SQLiteDatabase {
     const obj = new SQLiteDatabase(getRealPath(filePath), options);
+    obj.open();
+    return obj;
+}
+
+export function wrapDb(
+    db: FMDatabase,
+    options?: {
+        readOnly?: boolean;
+        transformBlobs?: boolean;
+        threading?: boolean;
+    }
+): SQLiteDatabase {
+    const obj = new SQLiteDatabase(db, options);
     obj.open();
     return obj;
 }

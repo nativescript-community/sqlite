@@ -21,6 +21,7 @@ function createDb(dbName: string, flags) {
 }
 
 export class SQLiteDatabase extends SQLiteDatabaseBase implements ISQLiteDatabase {
+
     open() {
         if (!this.db) {
             this.db = createDb(this.filePath, this.flags);
@@ -31,6 +32,19 @@ export class SQLiteDatabase extends SQLiteDatabaseBase implements ISQLiteDatabas
         }
         return this.isOpen;
     }
+}
+
+export function wrapDb(
+    db: android.database.sqlite.SQLiteDatabase,
+    options?: {
+        readOnly?: boolean;
+        transformBlobs?: boolean;
+        threading?: boolean;
+    }
+): SQLiteDatabase {
+    const obj = new SQLiteDatabase(db, options);
+    obj.open();
+    return obj;
 }
 
 export const openOrCreate = (

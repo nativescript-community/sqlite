@@ -149,11 +149,12 @@ const transactionRaw = async <T = any>(db: Db, action: (cancel?: () => void) => 
 const messagePromises: { [key: string]: { resolve: Function; reject: Function; timeoutTimer: ReturnType<typeof setTimeout> }[] } = {};
 
 export class SQLiteDatabaseBase {
+    filePath: string;
     db: android.database.sqlite.SQLiteDatabase;
     flags;
     transformBlobs: boolean;
     constructor(
-        public filePath: string,
+        filePathOrDb: string | android.database.sqlite.SQLiteDatabase,
         options?: {
             threading?: boolean;
             readOnly?: boolean;
@@ -161,6 +162,12 @@ export class SQLiteDatabaseBase {
             transformBlobs?: boolean;
         }
     ) {
+        if (filePathOrDb instanceof android.database.sqlite.SQLiteDatabase) {
+            this.db = filePathOrDb;
+            this.filePath = filePathOrDb.getPath();
+        } else {
+            this.filePath = filePathOrDb;
+        }
         this.threading = options && options.threading === true;
         this.flags = options?.flags;
         this.transformBlobs = !options || options.transformBlobs !== false;
