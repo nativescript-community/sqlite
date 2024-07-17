@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@nativescript-community/sqlite": "file:../plugin",
+    "@nativescript-community/sqlite": "*",
     "@nativescript/core": "8.1.3",
     "nativescript-theme-core": "^2.0.24",
     "typeorm": "0.3.17"
