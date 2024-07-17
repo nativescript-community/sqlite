@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.1](https://github.com/nativescript-community/sqlite/compare/v3.5.0...v3.5.1) (2024-07-17)
+
+**Note:** Version bump only for package @nativescript-community/sqlite
+
 # [3.5.0](https://github.com/nativescript-community/sqlite/compare/v3.4.2...v3.5.0) (2024-01-03)
 
 ### Features

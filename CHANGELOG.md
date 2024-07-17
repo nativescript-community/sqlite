@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.1](https://github.com/nativescript-community/sqlite/compare/v3.5.0...v3.5.1) (2024-07-17)
+
+### Features
+
+* new `wrapDb` method to use existing native database ([b0ea41d](https://github.com/nativescript-community/sqlite/commit/b0ea41da36b024c636d10fce16f57eba0934ef9c))
+
 # [3.5.0](https://github.com/nativescript-community/sqlite/compare/v3.4.2...v3.5.0) (2024-01-03)
 
 ### Bug Fixes
