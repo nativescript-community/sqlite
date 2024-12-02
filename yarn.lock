@@ -1631,10 +1631,10 @@ __metadata:
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=339072&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=37d971&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/sqlite": "npm:*"
-  checksum: cc90f6d85f8081770027c5de674c3037671124c378b38a4f13474a7217d387ed103660963cdf6219bd1611b8b0fb87e409b0706a6fafc7257e7d3f3849711040
+  checksum: 26e788c01a05b850ff8348cb278fab1b919727b9751a323cc205f863c6ec7201ca8e5e4f333f10eefd2216fa976a818a9e39d68de205af425f372e967975b646
   languageName: node
   linkType: hard
 
