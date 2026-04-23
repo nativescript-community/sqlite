@@ -425,11 +425,7 @@ export class SQLiteDatabase implements ISQLiteDatabase {
     filePath: string;
     constructor(
         filePathOrDb: string | FMDatabase,
-        options?: {
-            threading?: boolean;
-            transformBlobs?: boolean;
-            readOnly?: boolean;
-        }
+        options?: DatabaseOptions
     ) {
         if (filePathOrDb instanceof FMDatabase) {
             this.db = filePathOrDb;
