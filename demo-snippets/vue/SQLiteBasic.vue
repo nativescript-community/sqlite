@@ -31,13 +31,12 @@ import Vue from 'nativescript-vue';
 import { knownFolders, path } from '@nativescript/core';
 import { openOrCreate, deleteDatabase } from '@nativescript-community/sqlite';
 
-let db = null;
-
 const DB_PATH = path.join(knownFolders.documents().path, 'demo.sqlite');
 
 export default Vue.extend({
     data() {
         return {
+            db: null as any,
             statusMessage: 'Tap a button to begin.',
             results: [] as string[]
         };
@@ -50,16 +49,16 @@ export default Vue.extend({
 
         async onCreateDb() {
             try {
-                db = openOrCreate(DB_PATH);
-                await db.execute(`
+                this.db = openOrCreate(DB_PATH);
+                await this.db.execute(`
                     CREATE TABLE IF NOT EXISTS people (
                         id   INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT    NOT NULL,
                         age  INTEGER NOT NULL
                     )
                 `);
-                await db.setVersion(1);
-                this.statusMessage = `DB opened (version ${db.getVersion()})`;
+                await this.db.setVersion(1);
+                this.statusMessage = `DB opened (version ${this.db.getVersion()})`;
                 this.log('✔ DB created / opened');
                 this.log('✔ Table "people" ready');
             } catch (e) {
@@ -69,7 +68,7 @@ export default Vue.extend({
         },
 
         async onInsert() {
-            if (!db) {
+            if (!this.db) {
                 this.statusMessage = 'Create the DB first.';
                 return;
             }
@@ -81,9 +80,9 @@ export default Vue.extend({
                     ['Dave', 28]
                 ];
 
-                await db.transaction(async () => {
+                await this.db.transaction(async () => {
                     for (const [name, age] of records) {
-                        await db.execute(
+                        await this.db.execute(
                             'INSERT INTO people (name, age) VALUES (?, ?)',
                             [name, age]
                         );
@@ -99,20 +98,20 @@ export default Vue.extend({
         },
 
         async onSearch() {
-            if (!db) {
+            if (!this.db) {
                 this.statusMessage = 'Create the DB first.';
                 return;
             }
             try {
                 // Select all rows
-                const all = await db.select('SELECT * FROM people ORDER BY age ASC');
+                const all = await this.db.select('SELECT * FROM people ORDER BY age ASC');
                 this.log(`✔ All rows (${all.length}):`);
                 for (const row of all) {
                     this.log(`   id=${row.id}  name=${row.name}  age=${row.age}`);
                 }
 
                 // Parameterised search – age >= 29
-                const older = await db.select(
+                const older = await this.db.select(
                     'SELECT name, age FROM people WHERE age >= ?',
                     [29]
                 );
@@ -129,14 +128,14 @@ export default Vue.extend({
         },
 
         async onDelete() {
-            if (!db) {
+            if (!this.db) {
                 this.statusMessage = 'Create the DB first.';
                 return;
             }
             try {
                 // Delete rows with age < 30
-                await db.execute('DELETE FROM people WHERE age < ?', [30]);
-                const remaining = await db.select('SELECT * FROM people');
+                await this.db.execute('DELETE FROM people WHERE age < ?', [30]);
+                const remaining = await this.db.select('SELECT * FROM people');
                 this.statusMessage = `Deleted age < 30; ${remaining.length} rows remain`;
                 this.log(`✔ Deleted records where age < 30`);
                 this.log(`✔ Remaining: ${remaining.map(r => r['name']).join(', ') || '(none)'}`);
@@ -148,9 +147,9 @@ export default Vue.extend({
 
         async onCleanup() {
             try {
-                if (db) {
-                    db.close();
-                    db = null;
+                if (this.db) {
+                    this.db.close();
+                    this.db = null;
                 }
                 const deleted = deleteDatabase(DB_PATH);
                 this.statusMessage = `DB closed & deleted: ${deleted}`;

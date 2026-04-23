@@ -30,7 +30,8 @@ import { openOrCreate, deleteDatabase } from '@nativescript-community/sqlite';
 
 const DB_PATH = path.join(knownFolders.documents().path, 'blob_demo.sqlite');
 
-// Build a Uint8Array filled with zeros of the given byte length.
+// Build a zero-filled Uint8Array of the given byte length.
+// Using zeros keeps memory usage predictable for this demo.
 function makeLargeBuffer(byteLength: number): Uint8Array {
     return new Uint8Array(byteLength);
 }
