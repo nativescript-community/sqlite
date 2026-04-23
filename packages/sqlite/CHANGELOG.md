@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.8](https://github.com/nativescript-community/sqlite/compare/v3.5.7...v3.5.8) (2026-04-23)
+
+### Bug Fixes
+
+* **android:** native api usage fix ([0ca595f](https://github.com/nativescript-community/sqlite/commit/0ca595f1ed1629670f19cc177e4adc5dd2b250d3))
+
 ## [3.5.7](https://github.com/nativescript-community/sqlite/compare/v3.5.6...v3.5.7) (2026-04-23)
 
 **Note:** Version bump only for package @nativescript-community/sqlite
