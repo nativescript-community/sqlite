@@ -2,6 +2,12 @@ export type SqliteParam = null | number | string | ArrayBuffer | any;
 
 export type SqliteParams = SqliteParam | SqliteParam[];
 
+export interface SqliteRequestOptions {
+    transformBlobs?: boolean;
+    cursorWindowSize?: number;
+    cursorWindowName?: string;
+}
+
 export interface SqliteRow {
     [name: string]: SqliteParam;
 }
@@ -19,19 +25,19 @@ export interface SQLiteDatabase {
 
     close();
 
-    select(query: string, params?: SqliteParams): Promise<SqliteRow[]>;
+    select(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteRow[]>;
 
-    selectArray(query: string, params?: SqliteParams): Promise<SqliteParam[][]>;
+    selectArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteParam[][]>;
 
-    get(query: string, params?: SqliteParams): Promise<SqliteRow>;
+    get(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteRow>;
 
-    getArray(query: string, params?: SqliteParams): Promise<SqliteParam[]>;
+    getArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteParam[]>;
 
     execute(query: string, params?: SqliteParams): Promise<void>;
 
     transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T>;
 
-    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow) => void, complete: (error: Error, count: number) => void): Promise<number>;
+    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow) => void, complete: (error: Error, count: number) => void, options?: SqliteRequestOptions): Promise<number>;
 }
 
 export function isNothing(x: any) {
