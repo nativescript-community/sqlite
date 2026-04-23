@@ -83,7 +83,9 @@ export default Vue.extend({
                 this.log('⏳ Attempting to SELECT the large blob…');
 
                 try {
-                    const rows = await db.select('SELECT * FROM blobs WHERE id = ?', [1]);
+                    const rows = await db.select('SELECT * FROM blobs WHERE id = ?', [1], {
+                        cursorWindowSize:4 * 1024 * 1024
+                    });
                     // If we reach here the platform did NOT throw (e.g. iOS).
                     this.log(`ℹ Platform did not throw — got ${rows.length} row(s)`);
                     this.log('  (SQLiteBlobTooBigException is Android-specific)');
