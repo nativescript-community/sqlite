@@ -1,4 +1,4 @@
-import { SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
+import { SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRequestOptions, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 
 const iosProperty = <T extends any>(_self, property: T): T => {
     if (typeof property === 'function') {
@@ -111,7 +111,7 @@ const getNewCursorStatement = (statement: interop.Reference<any>): CursorStateme
 //     return cursorSt.count;
 // };
 
-function getResultsAsObject(cursorSt: FMResultSet, transformBlobs?: boolean): SqliteRow {
+function getResultsAsObject(cursorSt: FMResultSet, transformBlobs: boolean): SqliteRow {
     // const count = cursorSt.columnCount;
     // if (!count) {
     //     return null;
@@ -130,7 +130,7 @@ function getResultsAsObject(cursorSt: FMResultSet, transformBlobs?: boolean): Sq
     return data;
 }
 
-function getResultsAsArray(cursorSt: FMResultSet, transformBlobs?: boolean): SqliteParam[] {
+function getResultsAsArray(cursorSt: FMResultSet, transformBlobs: boolean): SqliteParam[] {
     const data = [];
     const dict = cursorSt.resultDictionary;
     dict.enumerateKeysAndObjectsUsingBlock((key: any, value: any) => {
@@ -203,7 +203,7 @@ function getRealPath(dbname: string, create = false) {
 //     return db.value;
 // }
 
-// function prepareStatement(db: FMDatabase, query: string) {
+// function prepareStatement(db: SQLiteDatabase, query: string) {
 //     const statement = new interop.Reference<any>();
 //     const result = sqlite3_prepare_v2(db, query, -1, statement, null);
 //     if (result) {
@@ -249,7 +249,7 @@ function getRealPath(dbname: string, create = false) {
 //     }
 // }
 
-function getRaw(db: FMDatabase, query: string, params: SqliteParams, asObject: boolean, transformBlobs?: boolean): SqliteRow | SqliteParam[] {
+function getRaw(db: SQLiteDatabase, query: string, params: SqliteParams, asObject: boolean, options?: SqliteRequestOptions): SqliteRow | SqliteParam[] {
     // const statement = prepareStatement(db, query);
     // const cursorSt = getNewCursorStatement(statement);
     // bind(params, statement);
@@ -263,8 +263,9 @@ function getRaw(db: FMDatabase, query: string, params: SqliteParams, asObject: b
     // finalize(statement);
     // return data;
 
-    const s = db.executeQueryWithArgumentsInArray(query, paramsToStringArray(params));
+    const s = db.db.executeQueryWithArgumentsInArray(query, paramsToStringArray(params));
     if (s) {
+        const transformBlobs = options?.transformBlobs ?? db.transformBlobs
         return asObject ? getResultsAsObject(s, transformBlobs) : getResultsAsArray(s, transformBlobs);
         // while (s.next()) {
         //     //retrieve values for each record
@@ -274,18 +275,18 @@ function getRaw(db: FMDatabase, query: string, params: SqliteParams, asObject: b
         //     }
         // }
     } else {
-        throw db.lastError();
+        throw db.db.lastError();
     }
 }
 
 function eachRaw(
-    db: FMDatabase,
+    db: SQLiteDatabase,
     query: string,
     params: SqliteParams,
     asObject: boolean,
     callback: (error: Error, result: SqliteRow | SqliteParam[]) => void,
     complete: (error: Error, count: number) => void,
-    transformBlobs?: boolean
+   options?: SqliteRequestOptions
 ) {
     // const statement = prepareStatement(db, query);
     // const cursorSt = getNewCursorStatement(statement);
@@ -296,8 +297,9 @@ function eachRaw(
     return Promise.resolve()
         .then(() => {
             let count = 0;
-            const s = db.executeQueryWithArgumentsInArray(query, paramsToStringArray(params));
+            const s = db.db.executeQueryWithArgumentsInArray(query, paramsToStringArray(params));
             if (s) {
+                const transformBlobs = options?.transformBlobs ?? db.transformBlobs
                 while (s.next()) {
                     //retrieve values for each record
                     const row = getResults(s, transformBlobs);
@@ -307,7 +309,7 @@ function eachRaw(
                     }
                 }
             } else {
-                throw db.lastError();
+                throw db.db.lastError();
             }
 
             // while (true) {
@@ -339,14 +341,15 @@ function eachRaw(
 
     // return rows;
 }
-function selectRaw(db: FMDatabase, query: string, params: SqliteParams, asObject: boolean, transformBlobs?: boolean): SqliteRow[] | SqliteParam[][] {
+function selectRaw(db: SQLiteDatabase, query: string, params: SqliteParams, asObject: boolean, options?: SqliteRequestOptions): SqliteRow[] | SqliteParam[][] {
     // const statement = prepareStatement(db, query);
     // const cursorSt = getNewCursorStatement(statement);
     // bind(params, statement);
     let rows = [];
     const getResults = asObject ? getResultsAsObject : getResultsAsArray;
-    const s = db.executeQueryWithArgumentsInArray(query, paramsToStringArray(params));
+    const s = db.db.executeQueryWithArgumentsInArray(query, paramsToStringArray(params));
     if (s) {
+        const transformBlobs = options?.transformBlobs ?? db.transformBlobs
         while (s.next()) {
             //retrieve values for each record
             const row = getResults(s, transformBlobs);
@@ -355,7 +358,7 @@ function selectRaw(db: FMDatabase, query: string, params: SqliteParams, asObject
             }
         }
     } else {
-        throw db.lastError();
+        throw db.db.lastError();
     }
     // while (true) {
     //     const result = step(statement);
@@ -372,12 +375,12 @@ function selectRaw(db: FMDatabase, query: string, params: SqliteParams, asObject
     return rows;
 }
 
-function execRaw(db: FMDatabase, query: string, params?: SqliteParams) {
+function execRaw(db: SQLiteDatabase, query: string, params?: SqliteParams) {
     // const statement = prepareStatement(db, query);
     // bind(params, statement);
     // step(statement);
     // finalize(statement);
-    const s = db.executeUpdateWithArgumentsInArray(query, paramsToStringArray(params));
+    const s = db.db.executeUpdateWithArgumentsInArray(query, paramsToStringArray(params));
     if (!s) {
         // while (s.next()) {
         //     //retrieve values for each record
@@ -387,11 +390,11 @@ function execRaw(db: FMDatabase, query: string, params?: SqliteParams) {
         //     }
         // }
         // } else {
-        throw db.lastError();
+        throw db.db.lastError();
     }
 }
 
-async function transactionRaw<T = any>(db: FMDatabase, action: (cancel?: () => void) => Promise<T>, isFirstTransaction: boolean) {
+async function transactionRaw<T = any>(db: SQLiteDatabase, action: (cancel?: () => void) => Promise<T>, isFirstTransaction: boolean) {
     try {
         if (isFirstTransaction) {
             execRaw(db, 'BEGIN EXCLUSIVE TRANSACTION');
@@ -467,22 +470,22 @@ export class SQLiteDatabase implements ISQLiteDatabase {
         return this.db.userVersion;
     }
     async execute(query: string, params?: SqliteParams) {
-        return execRaw(this.db, query, params);
+        return execRaw(this, query, params);
     }
-    async get(query: string, params?: SqliteParams, transformBlobs?: boolean) {
-        return getRaw(this.db, query, params, true, transformBlobs ?? this.transformBlobs) || null;
+    async get(query: string, params?: SqliteParams, options?: SqliteRequestOptions) {
+        return getRaw(this, query, params, true, options) || null;
     }
-    async getArray(query: string, params?: SqliteParams, transformBlobs?: boolean) {
-        return (getRaw(this.db, query, params, false, transformBlobs ?? this.transformBlobs) || null) as SqliteParam[];
+    async getArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions) {
+        return (getRaw(this, query, params, false, options) || null) as SqliteParam[];
     }
-    async select(query: string, params?: SqliteParams, transformBlobs?: boolean) {
-        return selectRaw(this.db, query, params, true, transformBlobs ?? this.transformBlobs) as SqliteRow[];
+    async select(query: string, params?: SqliteParams, options?: SqliteRequestOptions) {
+        return selectRaw(this, query, params, true, options) as SqliteRow[];
     }
-    async each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow) => void, complete: (error: Error, count: number) => void, transformBlobs?: boolean) {
-        return eachRaw(this.db, query, params, true, callback as (error: Error, result: any) => void, complete, transformBlobs ?? this.transformBlobs);
+    async each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow) => void, complete: (error: Error, count: number) => void, options?: SqliteRequestOptions) {
+        return eachRaw(this, query, params, true, callback as (error: Error, result: any) => void, complete, options);
     }
-    async selectArray(query: string, params?: SqliteParams, transformBlobs?: boolean) {
-        return selectRaw(this.db, query, params, false, transformBlobs ?? this.transformBlobs) as SqliteParam[][];
+    async selectArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions) {
+        return selectRaw(this, query, params, false, options) as SqliteParam[][];
     }
     _isInTransaction = false;
     async transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T> {
@@ -491,9 +494,9 @@ export class SQLiteDatabase implements ISQLiteDatabase {
         try {
             if (!this._isInTransaction) {
                 this._isInTransaction = shouldFinishTransaction = true;
-                res = await transactionRaw(this.db, action, true);
+                res = await transactionRaw(this, action, true);
             } else {
-                res = await transactionRaw(this.db, action, false);
+                res = await transactionRaw(this, action, false);
             }
         } catch (error) {
             throw error;
@@ -511,7 +514,7 @@ export function openOrCreate(
     flags?: number,
     options?: {
         readOnly?: boolean;
-        transformBlobs?: boolean;
+       options?: SqliteRequestOptions;
         threading?: boolean;
     }
 ): SQLiteDatabase {
@@ -524,7 +527,7 @@ export function wrapDb(
     db: FMDatabase,
     options?: {
         readOnly?: boolean;
-        transformBlobs?: boolean;
+       options?: SqliteRequestOptions;
         threading?: boolean;
     }
 ): SQLiteDatabase {
