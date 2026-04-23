@@ -10,7 +10,7 @@
         "demo.ios": "pnpm i && pnpm run tsc && cd demo && tns run ios",
         "demo.android": "pnpm i && pnpm run tsc && cd demo && tns run android",
         "clean.demo": "rimraf demo/hooks demo/node_modules demo/platforms",
-        "clean": "rimraf 'packages/**/*.d.ts' 'packages/**/*.js' 'packages/**/*.js.map' 'packages/**/*.metada' 'packages/**/angular/ng-package.json'",
+        "clean": "rimraf -g 'packages/**/*.d.ts' 'packages/**/*.tsbuildinfo' 'packages/**/*.js' 'packages/**/*.mjs' 'packages/**/*.js.map' 'packages/**/*.mjs.map' 'packages/**/*.metada' 'packages/**/angular/ng-package.json'",
         "plugin.watch": "pnpm run tsc -- -w",
         "publish": "npm run setup && npm run clean && npm run build.all && npm run readme && npm run doc && npm run commit_readme_doc_changes && lerna publish",
         "test.android": "pnpm run build && cd ./demo && tns build android && tns test android --justlaunch",
@@ -19,7 +19,7 @@
         "test.ios.verbose": "pnpm run build  && cd ./demo && tns build ios && tns test ios",
         "commitmsg": "commitlint -e $GIT_PARAMS",
         "build.all": "npm run build",
-        "fullclean": "npm run clean && rimraf 'packages/**/node_modules' 'demo-*/hooks' 'demo-*/node_modules' 'package-lock.json' 'pnpm-lock.yaml' 'node_modules'",
+        "fullclean": "npm run clean && rimraf -g 'packages/**/node_modules' 'demo-*/hooks' 'demo-*/node_modules' 'package-lock.json' 'pnpm-lock.yaml' 'node_modules'",
         "demo.vue.android": "cd ./demo-vue && ns run android --no-hmr --env.watchNodeModules",
         "demo.vue.clean": "cd ./demo-vue && ns clean",
         "demo.vue.ios": "cd ./demo-vue && ns run ios --no-hmr --env.watchNodeModules",
@@ -29,7 +29,7 @@
         "readme": "lerna run readme && node ./tools/readme.js",
         "start": "./node_modules/.bin/ntl -A -s 15 -o",
         "submodules": "git submodule update --init",
-        "sync": "node ./tools/sync.js",
+        "sync": "node ./tools/sync.mjs",
         "update": "node ./tools/update.js"
     },
     "keywords": [
