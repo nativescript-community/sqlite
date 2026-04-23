@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.7](https://github.com/nativescript-community/sqlite/compare/v3.5.6...v3.5.7) (2026-04-23)
+
+### Bug Fixes
+
+* open db options fix ([cdd4e6c](https://github.com/nativescript-community/sqlite/commit/cdd4e6cc3e0b556b21509a80bdf8b0c80f85ff29))
+
 ## [3.5.6](https://github.com/nativescript-community/sqlite/compare/v3.5.1...v3.5.6) (2026-04-23)
 
 ### Bug Fixes
