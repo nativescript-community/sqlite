@@ -8,6 +8,12 @@ export interface SqliteRequestOptions {
     cursorWindowName?: string;
 }
 
+export type DatabaseOptions = {
+    threading?: boolean;
+    readOnly?: boolean;
+    flags?: number;
+} & SqliteRequestOptions
+
 export interface SqliteRow {
     [name: string]: SqliteParam;
 }

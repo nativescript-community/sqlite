@@ -1,4 +1,4 @@
-import { SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRequestOptions, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
+import { DatabaseOptions, SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRequestOptions, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 
 const iosProperty = <T extends any>(_self, property: T): T => {
     if (typeof property === 'function') {
@@ -511,12 +511,7 @@ export class SQLiteDatabase implements ISQLiteDatabase {
 
 export function openOrCreate(
     filePath: string,
-    flags?: number,
-    options?: {
-        readOnly?: boolean;
-       options?: SqliteRequestOptions;
-        threading?: boolean;
-    }
+    options?: DatabaseOptions
 ): SQLiteDatabase {
     const obj = new SQLiteDatabase(getRealPath(filePath), options);
     obj.open();
@@ -525,11 +520,7 @@ export function openOrCreate(
 
 export function wrapDb(
     db: FMDatabase,
-    options?: {
-        readOnly?: boolean;
-       options?: SqliteRequestOptions;
-        threading?: boolean;
-    }
+    options?: DatabaseOptions
 ): SQLiteDatabase {
     const obj = new SQLiteDatabase(db, options);
     obj.open();

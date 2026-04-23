@@ -1,4 +1,4 @@
-import { SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
+import { DatabaseOptions, SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 
 import { Application } from '@nativescript/core';
 import { SQLiteDatabaseBase } from './sqlitedatabase.android';
@@ -36,11 +36,7 @@ export class SQLiteDatabase extends SQLiteDatabaseBase implements ISQLiteDatabas
 
 export function wrapDb(
     db: android.database.sqlite.SQLiteDatabase,
-    options?: {
-        readOnly?: boolean;
-        transformBlobs?: boolean;
-        threading?: boolean;
-    }
+    options?: DatabaseOptions
 ): SQLiteDatabase {
     const obj = new SQLiteDatabase(db, options);
     obj.open();
@@ -49,11 +45,7 @@ export function wrapDb(
 
 export const openOrCreate = (
     filePath: string,
-    options?: {
-        threading?: boolean;
-        transformBlobs?: boolean;
-        flags?: number;
-    }
+    options?: DatabaseOptions
 ): SQLiteDatabase => {
     const obj = new SQLiteDatabase(filePath, options);
     obj.open();

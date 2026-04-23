@@ -1,4 +1,4 @@
-import { SqliteParam, SqliteParams, SqliteRequestOptions, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
+import { DatabaseOptions, SqliteParam, SqliteParams, SqliteRequestOptions, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 import { SDK_VERSION } from '@nativescript/core/utils';
 
 type Db = android.database.sqlite.SQLiteDatabase;
@@ -174,12 +174,7 @@ export class SQLiteDatabaseBase {
     transformBlobs: boolean;
     constructor(
         filePathOrDb: string | android.database.sqlite.SQLiteDatabase,
-        options?: {
-            threading?: boolean;
-            readOnly?: boolean;
-            flags?: number;
-            transformBlobs?: boolean;
-        }
+        options?: DatabaseOptions
     ) {
         if (filePathOrDb instanceof android.database.sqlite.SQLiteDatabase) {
             this.db = filePathOrDb;
@@ -190,6 +185,8 @@ export class SQLiteDatabaseBase {
         this.threading = options && options.threading === true;
         this.flags = options?.flags;
         this.transformBlobs = !options || options.transformBlobs !== false;
+        this.cursorWindowSize = options?.cursorWindowSize;
+        this.cursorWindowName = options?.cursorWindowName;
     }
     _isInTransaction = false;
     threading = false;
