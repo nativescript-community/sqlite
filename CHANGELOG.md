@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.6](https://github.com/nativescript-community/sqlite/compare/v3.5.1...v3.5.6) (2026-04-23)
+
+### Bug Fixes
+
+* add support for `cursorWindowSize` on db and requests to prevent SQLiteBlobTooBigException on android ([b64f1b7](https://github.com/nativescript-community/sqlite/commit/b64f1b78c3123fda75fc0da5ba84b6cf62349139))
+
 ## [3.5.1](https://github.com/nativescript-community/sqlite/compare/v3.5.0...v3.5.1) (2024-07-17)
 
 ### Features
