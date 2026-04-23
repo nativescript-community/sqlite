@@ -1,6 +1,11 @@
 {
     "uses": [
+        "java.lang:reflect.Field",
+        "java.lang:Class",
+        "java.lang.reflect:AccessibleObject",
         "android.database:Cursor",
+        "android.database:CursorWindow",
+        "android.database:AbstractWindowedCursor",
         "android.database.sqlite:SQLiteClosable",
         "android.database.sqlite:SQLiteDatabase",
         "android.database.sqlite:SQLiteDatabase.CursorFactory"

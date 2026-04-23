@@ -102,8 +102,10 @@ const rawSql =
                 cursorWindow = new android.database.CursorWindow(cursorName, cursorWindowSize);
             } else {
                 cursorWindow = new android.database.CursorWindow(cursorName);
+                const field = android.database.CursorWindow.class.getDeclaredField("sCursorWindowSize");
+                field.setAccessible(true);
+                field.set(null, cursorWindowSize); 
             }
-            console.log('rawSql', 'cursorWindow', cursorWindowSize, cursorWindow);
             (cursor as android.database.AbstractWindowedCursor).setWindow(cursorWindow);
         }
         try {
