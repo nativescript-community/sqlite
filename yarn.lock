@@ -2148,10 +2148,10 @@ __metadata:
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=339072&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=417f31&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/sqlite": "npm:*"
-  checksum: 10/cc90f6d85f8081770027c5de674c3037671124c378b38a4f13474a7217d387ed103660963cdf6219bd1611b8b0fb87e409b0706a6fafc7257e7d3f3849711040
+  checksum: 10/3a52f4d966c55a7d37a6ec5cbc5877f99cfdc27124db423a2d7e2ca7d58cae144c6e334c6e0343597565bc26477a086a4a30956605d2316429516962b8c235da
   languageName: node
   linkType: hard
 
