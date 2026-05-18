@@ -92,19 +92,19 @@ const rawSql =
     (db: SQLiteDatabaseBase, options?: SqliteRequestOptions) =>
     (sql: string, params?: SqliteParams) => {
         const parameters = paramsToStringArray(params) as string[];
-        const transformBlobs = options?.transformBlobs ?? db.transformBlobs
-        const cursorWindowSize = options?.cursorWindowSize ?? db.cursorWindowSize
+        const transformBlobs = options?.transformBlobs ?? db.transformBlobs;
+        const cursorWindowSize = options?.cursorWindowSize ?? db.cursorWindowSize;
         const cursor = db.db.rawQuery(sql, parameters);
         if (cursorWindowSize !== undefined) {
-            const cursorName =  db.cursorWindowName ?? "window"
+            const cursorName = db.cursorWindowName ?? 'window';
             let cursorWindow: android.database.CursorWindow;
-            if (SDK_VERSION >= 28 ) {
+            if (SDK_VERSION >= 28) {
                 cursorWindow = new android.database.CursorWindow(cursorName, cursorWindowSize);
             } else {
                 cursorWindow = new android.database.CursorWindow(cursorName);
-                const field = android.database.CursorWindow.class.getDeclaredField("sCursorWindowSize");
+                const field = android.database.CursorWindow.class.getDeclaredField('sCursorWindowSize');
                 field.setAccessible(true);
-                field.set(null, cursorWindowSize); 
+                field.set(null, java.lang.Integer.valueOf(cursorWindowSize));
             }
             (cursor as android.database.AbstractWindowedCursor).setWindow(cursorWindow);
         }
@@ -122,7 +122,7 @@ const eachRaw =
     <T>(onCursor: FromCursor<T>) =>
     (db: SQLiteDatabaseBase, options?: SqliteRequestOptions) =>
     (sql: string, params: SqliteParams, callback: (error: Error, result: T) => void, complete: (error: Error, count: number) => void) => {
-        const transformBlobs = options?.transformBlobs ?? db.transformBlobs
+        const transformBlobs = options?.transformBlobs ?? db.transformBlobs;
         const parameters = paramsToStringArray(params);
         const cursor = db.db.rawQuery(sql, parameters as string[]);
         return Promise.resolve()
@@ -172,10 +172,7 @@ export class SQLiteDatabaseBase {
     db: android.database.sqlite.SQLiteDatabase;
     flags;
     transformBlobs: boolean;
-    constructor(
-        filePathOrDb: string | android.database.sqlite.SQLiteDatabase,
-        options?: DatabaseOptions
-    ) {
+    constructor(filePathOrDb: string | android.database.sqlite.SQLiteDatabase, options?: DatabaseOptions) {
         if (filePathOrDb instanceof android.database.sqlite.SQLiteDatabase) {
             this.db = filePathOrDb;
             this.filePath = filePathOrDb.getPath();
