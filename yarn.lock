@@ -2148,10 +2148,10 @@ __metadata:
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=417f31&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=730830&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/sqlite": "npm:*"
-  checksum: 10/3a52f4d966c55a7d37a6ec5cbc5877f99cfdc27124db423a2d7e2ca7d58cae144c6e334c6e0343597565bc26477a086a4a30956605d2316429516962b8c235da
+  checksum: 10/1e3c4c8de97e2455dd5f51e4da780fdd9eae8e2a0c3dd323654fa13de823625d1c3384ea5e494c4596ceaacc7b22d32a919dcebd1b94bafdf33cd27c34c18c52
   languageName: node
   linkType: hard
 
@@ -5043,11 +5043,11 @@ __metadata:
   linkType: hard
 
 "brace-expansion@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "brace-expansion@npm:5.0.5"
+  version: 5.0.6
+  resolution: "brace-expansion@npm:5.0.6"
   dependencies:
     balanced-match: "npm:^4.0.2"
-  checksum: 10/f259b2ddf04489da9512ad637ba6b4ef2d77abd4445d20f7f1714585f153435200a53fa6a2e4a5ee974df14ddad4cd16421f6f803e96e8b452bd48598878d0ee
+  checksum: 10/a7acf120fefa79e9d7c9c92898114f57c07596a3920197f3c5917e6a628b04220a5f7f9618c30bdd973a6576a32113b99f9c3f1c8245ccc399dd2a9a718d81d8
   languageName: node
   linkType: hard
 
