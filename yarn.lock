@@ -2148,10 +2148,10 @@ __metadata:
 
 "@nativescript-community/template-snippet@file:demo-snippets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.1
-  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=417f31&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@nativescript-community/template-snippet@file:demo-snippets#demo-snippets::hash=730830&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@nativescript-community/sqlite": "npm:*"
-  checksum: 10/3a52f4d966c55a7d37a6ec5cbc5877f99cfdc27124db423a2d7e2ca7d58cae144c6e334c6e0343597565bc26477a086a4a30956605d2316429516962b8c235da
+  checksum: 10/1e3c4c8de97e2455dd5f51e4da780fdd9eae8e2a0c3dd323654fa13de823625d1c3384ea5e494c4596ceaacc7b22d32a919dcebd1b94bafdf33cd27c34c18c52
   languageName: node
   linkType: hard
 
@@ -15728,9 +15728,9 @@ __metadata:
   linkType: hard
 
 "undici@npm:^6.25.0":
-  version: 6.25.0
-  resolution: "undici@npm:6.25.0"
-  checksum: 10/a475e45da3e1d1073283bb70531666f09a432eabff2b857bd7063d469a1ee1486192ff61dc0dadbb526673ce1120fee14d66a59b6b17d1e0bd3a4d5f0a52d0a6
+  version: 6.27.0
+  resolution: "undici@npm:6.27.0"
+  checksum: 10/30c18cdb235edf4dd36f8aa3ace1ffaf44060289a7d62ad44c33180d2d74a224015d25574812f62ce9c625b5beb1b0b766495b650fedf356aca11eed7ce2c816
   languageName: node
   linkType: hard
 
