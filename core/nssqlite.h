@@ -87,6 +87,11 @@ NSSQLITE_API void nssqlite_db_release(NSDb* db);
  * (the callback will NOT be called). */
 
 #define NS_EXEC_SCRIPT 1u /* sqlite3_exec: many statements, no parameters, no rows */
+/* Experimental (benchmark): result data is a UTF-8 JSON document {"c":[names],"r":[[values]...]} instead of a
+ * rows block. Blobs are base64 strings, INT64 and REAL are JSON numbers. No chunking. */
+#define NS_EXEC_JSON 2u
+/* Experimental (benchmark): rows block v2 with an ASCII string heap (see nssqlite_wire.h). */
+#define NS_EXEC_STRHEAP 4u
 
 /* Run one statement. sql is UTF-8. params is a params block (nssqlite_wire.h) or NULL.
  * chunk_rows > 0 streams rows: the callback is called with done = 0 for every chunk of

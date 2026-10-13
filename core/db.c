@@ -246,13 +246,14 @@ static int bind_params(NSDb* db, sqlite3_stmt* st, const uint8_t* params, size_t
     return 0;
 }
 
-static void block_begin(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p) {
+static void block_begin(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p, int heap) {
     int ncols = p->column_count(st);
-    nssqlite_buf_u32(b, NS_ROWS_MAGIC);
+    nssqlite_buf_u32(b, heap ? NS_ROWS_MAGIC2 : NS_ROWS_MAGIC);
     nssqlite_buf_u32(b, (uint32_t)ncols);
     nssqlite_buf_u32(b, 0); /* nrows, patched */
     nssqlite_buf_i64(b, 0); /* changes, patched */
     nssqlite_buf_i64(b, 0); /* last insert rowid, patched */
+    if (heap) nssqlite_buf_u32(b, 0); /* heap offset, patched */
     for (int i = 0; i < ncols; i++) {
         const char* n = p->column_name(st, i);
         nssqlite_buf_u32(b, n ? (uint32_t)strlen(n) : 0);
@@ -260,15 +261,34 @@ static void block_begin(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p) {
     }
 }
 
-static void block_end(NSBuf* b, uint32_t nrows, int64_t changes, int64_t rowid) {
+/* heap != NULL: v2 block, the heap bytes are appended and their offset patched into the header. */
+static void block_end(NSBuf* b, uint32_t nrows, int64_t changes, int64_t rowid, NSBuf* heap) {
     nssqlite_buf_patch_u32(b, 8, nrows);
     if (!b->oom && b->len >= 28) {
         memcpy(b->data + 12, &changes, 8);
         memcpy(b->data + 20, &rowid, 8);
     }
+    if (heap) {
+        nssqlite_buf_patch_u32(b, 28, (uint32_t)b->len);
+        nssqlite_buf_bytes(b, heap->data, heap->len);
+        heap->len = 0;
+    }
 }
 
-static void encode_row(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p, int ncols) {
+static int is_ascii(const unsigned char* s, size_t n) {
+    size_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        uint64_t w;
+        memcpy(&w, s + i, 8);
+        if (w & 0x8080808080808080ull) return 0;
+    }
+    for (; i < n; i++) {
+        if (s[i] & 0x80) return 0;
+    }
+    return 1;
+}
+
+static void encode_row(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p, int ncols, NSBuf* heap) {
     for (int c = 0; c < ncols; c++) {
         switch (p->column_type(st, c)) {
             case SQLITE_INTEGER: nssqlite_buf_value_int(b, p->column_int64(st, c)); break;
@@ -276,7 +296,14 @@ static void encode_row(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p, int ncol
             case SQLITE_TEXT: {
                 const unsigned char* t = p->column_text(st, c);
                 int n = p->column_bytes(st, c);
-                nssqlite_buf_value_text(b, (const char*)t, t ? (size_t)n : 0);
+                if (heap && t && n > 0 && is_ascii(t, (size_t)n)) {
+                    nssqlite_buf_u8(b, NS_T_TEXT_REF);
+                    nssqlite_buf_u32(b, (uint32_t)heap->len);
+                    nssqlite_buf_u32(b, (uint32_t)n);
+                    nssqlite_buf_bytes(heap, t, (size_t)n);
+                } else {
+                    nssqlite_buf_value_text(b, (const char*)t, t ? (size_t)n : 0);
+                }
                 break;
             }
             case SQLITE_BLOB: {
@@ -290,11 +317,94 @@ static void encode_row(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p, int ncol
     }
 }
 
+static void json_str(NSBuf* b, const unsigned char* s, size_t n) {
+    static const char hex[] = "0123456789abcdef";
+    nssqlite_buf_u8(b, '"');
+    size_t start = 0;
+    for (size_t i = 0; i < n; i++) {
+        unsigned char c = s[i];
+        if (c >= 0x20 && c != '"' && c != '\\') continue;
+        nssqlite_buf_bytes(b, s + start, i - start);
+        start = i + 1;
+        if (c == '"' || c == '\\') {
+            nssqlite_buf_u8(b, '\\');
+            nssqlite_buf_u8(b, c);
+        } else {
+            const char esc[6] = {'\\', 'u', '0', '0', hex[c >> 4], hex[c & 15]};
+            nssqlite_buf_bytes(b, esc, 6);
+        }
+    }
+    nssqlite_buf_bytes(b, s + start, n - start);
+    nssqlite_buf_u8(b, '"');
+}
+
+static void json_begin(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p) {
+    int ncols = p->column_count(st);
+    nssqlite_buf_bytes(b, "{\"c\":[", 6);
+    for (int i = 0; i < ncols; i++) {
+        const char* n = p->column_name(st, i);
+        if (i) nssqlite_buf_u8(b, ',');
+        json_str(b, (const unsigned char*)(n ? n : ""), n ? strlen(n) : 0);
+    }
+    nssqlite_buf_bytes(b, "],\"r\":[", 7);
+}
+
+static void json_row(NSBuf* b, sqlite3_stmt* st, NSSqliteProvider* p, int ncols, int first) {
+    static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    char num[40];
+    if (!first) nssqlite_buf_u8(b, ',');
+    nssqlite_buf_u8(b, '[');
+    for (int c = 0; c < ncols; c++) {
+        if (c) nssqlite_buf_u8(b, ',');
+        switch (p->column_type(st, c)) {
+            case SQLITE_INTEGER: {
+                int n = snprintf(num, sizeof(num), "%lld", (long long)p->column_int64(st, c));
+                nssqlite_buf_bytes(b, num, (size_t)n);
+                break;
+            }
+            case SQLITE_FLOAT: {
+                double d = p->column_double(st, c);
+                if (d != d || d - d != 0) {
+                    nssqlite_buf_bytes(b, "null", 4);
+                } else {
+                    int n = snprintf(num, sizeof(num), "%.17g", d);
+                    nssqlite_buf_bytes(b, num, (size_t)n);
+                }
+                break;
+            }
+            case SQLITE_TEXT: {
+                const unsigned char* t = p->column_text(st, c);
+                json_str(b, t, t ? (size_t)p->column_bytes(st, c) : 0);
+                break;
+            }
+            case SQLITE_BLOB: {
+                const unsigned char* t = (const unsigned char*)p->column_blob(st, c);
+                size_t n = t ? (size_t)p->column_bytes(st, c) : 0;
+                nssqlite_buf_u8(b, '"');
+                for (size_t i = 0; i < n; i += 3) {
+                    uint32_t v = (uint32_t)t[i] << 16 | (i + 1 < n ? (uint32_t)t[i + 1] << 8 : 0) | (i + 2 < n ? t[i + 2] : 0);
+                    char q[4] = {b64[v >> 18], b64[(v >> 12) & 63], i + 1 < n ? b64[(v >> 6) & 63] : '=', i + 2 < n ? b64[v & 63] : '='};
+                    nssqlite_buf_bytes(b, q, 4);
+                }
+                nssqlite_buf_u8(b, '"');
+                break;
+            }
+            default: nssqlite_buf_bytes(b, "null", 4); break;
+        }
+    }
+    nssqlite_buf_u8(b, ']');
+}
+
 /* Runs one statement. Appends the rows block to out. When req != NULL and chunk_rows > 0, full
  * chunks are delivered through req->cb with done = 0 and out is reset after each. Returns the
  * sqlite status (0 on success) and fills message on failure. */
 static int run_stmt(NSDb* db, const uint8_t* sql, size_t sql_len, const uint8_t* params, size_t params_len, Req* chunk_req, uint32_t chunk_rows,
-                    NSBuf* out, int64_t* changes, int64_t* rowid, char** message) {
+                    uint32_t xflags, NSBuf* out, int64_t* changes, int64_t* rowid, char** message) {
+    int json = (xflags & NS_EXEC_JSON) != 0;
+    NSBuf heapbuf;
+    NSBuf* heap = NULL;
+    nssqlite_buf_init(&heapbuf);
+    if (!json && (xflags & NS_EXEC_STRHEAP)) heap = &heapbuf;
     NSSqliteProvider* p = &db->eng->p;
     int status = 0;
     sqlite3_stmt* st = stmt_get(db, sql, sql_len, &status, message);
@@ -305,24 +415,34 @@ static int run_stmt(NSDb* db, const uint8_t* sql, size_t sql_len, const uint8_t*
     }
     int ncols = p->column_count(st);
     uint32_t nrows = 0;
-    block_begin(out, st, p);
+    if (json) {
+        chunk_req = NULL;
+        json_begin(out, st, p);
+    } else {
+        block_begin(out, st, p, heap != NULL);
+    }
     for (;;) {
         int rc = p->step(st);
         if (rc == SQLITE_ROW) {
-            encode_row(out, st, p, ncols);
+            if (json) {
+                json_row(out, st, p, ncols, nrows == 0);
+            } else {
+                encode_row(out, st, p, ncols, heap);
+            }
             nrows++;
             if (chunk_req && chunk_rows && nrows >= chunk_rows) {
-                block_end(out, nrows, 0, 0);
+                block_end(out, nrows, 0, 0, heap);
                 size_t len;
                 uint8_t* data = nssqlite_buf_take(out, &len);
                 if (!data) {
+                    nssqlite_buf_free(&heapbuf);
                     p->reset(st);
                     *message = dup_cstr("out of memory");
                     return NS_ERR_NOMEM;
                 }
                 deliver(chunk_req, 0, 0, data, len, NULL, 0, 0);
                 nrows = 0;
-                block_begin(out, st, p);
+                block_begin(out, st, p, heap != NULL);
             }
         } else if (rc == SQLITE_DONE) {
             break;
@@ -330,12 +450,18 @@ static int run_stmt(NSDb* db, const uint8_t* sql, size_t sql_len, const uint8_t*
             status = p->extended_errcode(db->h);
             *message = dup_cstr(p->errmsg(db->h));
             p->reset(st);
+            nssqlite_buf_free(&heapbuf);
             return status;
         }
     }
     *changes = p->changes(db->h);
     *rowid = p->last_insert_rowid(db->h);
-    block_end(out, nrows, *changes, *rowid);
+    if (json) {
+        nssqlite_buf_bytes(out, "]}", 2);
+    } else {
+        block_end(out, nrows, *changes, *rowid, heap);
+    }
+    nssqlite_buf_free(&heapbuf);
     p->reset(st);
     return 0;
 }
@@ -396,7 +522,7 @@ static void do_exec(NSDb* db, Req* r) {
     NSBuf out;
     nssqlite_buf_init(&out);
     int64_t changes = 0, rowid = 0;
-    int status = run_stmt(db, r->sql, r->sql_len, r->params, r->params_len, r, r->chunk_rows, &out, &changes, &rowid, &message);
+    int status = run_stmt(db, r->sql, r->sql_len, r->params, r->params_len, r, r->chunk_rows, r->flags, &out, &changes, &rowid, &message);
     if (status) {
         nssqlite_buf_free(&out);
         deliver(r, status, 1, NULL, 0, message, 0, 0);
@@ -449,7 +575,7 @@ static void do_batch(NSDb* db, Req* r) {
         sql_copy[sql_len] = 0;
         NSBuf block;
         nssqlite_buf_init(&block);
-        status = run_stmt(db, sql_copy, sql_len, params, params_len, NULL, 0, &block, &last_changes, &last_rowid, &message);
+        status = run_stmt(db, sql_copy, sql_len, params, params_len, NULL, 0, 0, &block, &last_changes, &last_rowid, &message);
         free(sql_copy);
         if (!status) {
             nssqlite_buf_u32(&out, (uint32_t)block.len);

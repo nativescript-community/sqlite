@@ -153,6 +153,12 @@ int nssqlite_reader_value(NSReader* r, NSValue* out) {
         case NS_T_BLOB:
             if (nssqlite_reader_u32(r, &out->len)) return -1;
             return nssqlite_reader_bytes(r, out->len, &out->ptr);
+        case NS_T_TEXT_REF: { /* resolved against the heap by nssqlite_rows_next */
+            uint32_t off;
+            if (nssqlite_reader_u32(r, &off) || nssqlite_reader_u32(r, &out->len)) return -1;
+            out->i = off;
+            return 0;
+        }
         default:
             return -1;
     }
@@ -165,12 +171,21 @@ int nssqlite_rows_init(NSRows* rows, const uint8_t* data, size_t len) {
     nssqlite_reader_init(&rows->r, data, len);
     uint32_t magic;
     const uint8_t* p;
-    if (nssqlite_reader_u32(&rows->r, &magic) || magic != NS_ROWS_MAGIC) return -1;
+    if (nssqlite_reader_u32(&rows->r, &magic) || (magic != NS_ROWS_MAGIC && magic != NS_ROWS_MAGIC2)) return -1;
     if (nssqlite_reader_u32(&rows->r, &rows->ncols) || nssqlite_reader_u32(&rows->r, &rows->nrows)) return -1;
     if (nssqlite_reader_bytes(&rows->r, 8, &p)) return -1;
     memcpy(&rows->changes, p, 8);
     if (nssqlite_reader_bytes(&rows->r, 8, &p)) return -1;
     memcpy(&rows->last_insert_rowid, p, 8);
+    if (magic == NS_ROWS_MAGIC2) {
+        uint32_t heap_off;
+        if (nssqlite_reader_u32(&rows->r, &heap_off)) return -1;
+        size_t total = (size_t)(rows->r.end - data);
+        if (heap_off > total || heap_off < (size_t)(rows->r.p - data)) return -1;
+        rows->heap = data + heap_off;
+        rows->heap_len = total - heap_off;
+        rows->r.end = rows->heap; /* cells must not run into the heap */
+    }
     rows->names = rows->r.p;
     for (uint32_t i = 0; i < rows->ncols; i++) {
         uint32_t n;
@@ -199,6 +214,13 @@ int nssqlite_rows_next(NSRows* rows, NSValue* out) {
     if (rows->next_row >= rows->nrows) return 0;
     for (uint32_t c = 0; c < rows->ncols; c++) {
         if (nssqlite_reader_value(&rows->r, &out[c])) return -1;
+        if (out[c].type == NS_T_TEXT_REF) {
+            if (!rows->heap || (uint64_t)out[c].i + out[c].len > rows->heap_len) return -1;
+            out[c].ptr = rows->heap + out[c].i;
+            out[c].i = 0;
+            out[c].type = NS_T_TEXT;
+            out[c].ascii = 1;
+        }
     }
     rows->next_row++;
     return 1;

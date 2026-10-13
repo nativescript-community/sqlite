@@ -12,6 +12,7 @@ napi_create_int32
 napi_create_int64
 napi_create_object
 napi_create_reference
+napi_create_string_latin1
 napi_create_string_utf8
 napi_create_threadsafe_function
 napi_create_typedarray

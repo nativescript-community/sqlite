@@ -1,11 +1,9 @@
 import { EventData, Page } from '@nativescript/core'
 import { HelloWorldModel } from './main-view-model'
-import { runBridgeTests } from './bridge-test'
-import { runWorkerTest } from './napi-test'
+import { runBench } from './bench'
 
 export function navigatingTo(args: EventData) {
   const page = <Page>args.object
   page.bindingContext = new HelloWorldModel()
-  runBridgeTests()
-  runWorkerTest()
+  setTimeout(() => runBench(), 500)
 }

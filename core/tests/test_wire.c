@@ -117,10 +117,59 @@ static void test_buf_take(void) {
     nssqlite_free(d);
 }
 
+/* rows block v2: ASCII strings live in a heap and are referenced, other strings stay inline */
+static void test_rows_v2(void) {
+    NSBuf b;
+    nssqlite_buf_init(&b);
+    nssqlite_buf_u32(&b, NS_ROWS_MAGIC2);
+    nssqlite_buf_u32(&b, 2);          /* ncols */
+    nssqlite_buf_u32(&b, 2);          /* nrows */
+    nssqlite_buf_i64(&b, 0);
+    nssqlite_buf_i64(&b, 0);
+    size_t heap_off_at = b.len;
+    nssqlite_buf_u32(&b, 0);
+    nssqlite_buf_u32(&b, 1); nssqlite_buf_bytes(&b, "a", 1);
+    nssqlite_buf_u32(&b, 1); nssqlite_buf_bytes(&b, "b", 1);
+    /* row 0: heap ref (0, 5) and inline non-ASCII; row 1: heap ref (5, 3) and null */
+    nssqlite_buf_u8(&b, NS_T_TEXT_REF); nssqlite_buf_u32(&b, 0); nssqlite_buf_u32(&b, 5);
+    nssqlite_buf_value_text(&b, "\xc3\xa9", 2);
+    nssqlite_buf_u8(&b, NS_T_TEXT_REF); nssqlite_buf_u32(&b, 5);
+    size_t ref2_len_at = b.len;
+    nssqlite_buf_u32(&b, 3);
+    nssqlite_buf_value_null(&b);
+    nssqlite_buf_patch_u32(&b, heap_off_at, (uint32_t)b.len);
+    nssqlite_buf_bytes(&b, "helloabc", 8);
+
+    NSRows rows;
+    NSValue v[2];
+    CHECK(nssqlite_rows_init(&rows, b.data, b.len) == 0);
+    CHECK_EQ(nssqlite_rows_next(&rows, v), 1);
+    CHECK(v[0].type == NS_T_TEXT && v[0].ascii && v[0].len == 5 && memcmp(v[0].ptr, "hello", 5) == 0);
+    CHECK(v[1].type == NS_T_TEXT && !v[1].ascii && v[1].len == 2);
+    CHECK_EQ(nssqlite_rows_next(&rows, v), 1);
+    CHECK(v[0].len == 3 && memcmp(v[0].ptr, "abc", 3) == 0);
+    CHECK_EQ(v[1].type, NS_T_NULL);
+    CHECK_EQ(nssqlite_rows_next(&rows, v), 0);
+
+    /* a reference that points outside of the heap is rejected */
+    uint8_t* copy = (uint8_t*)malloc(b.len);
+    memcpy(copy, b.data, b.len);
+    NSRows bad;
+    CHECK(nssqlite_rows_init(&bad, copy, b.len) == 0);
+    uint32_t big = 100;
+    memcpy(copy + ref2_len_at, &big, 4); /* len of the 2nd ref */
+    CHECK(nssqlite_rows_init(&bad, copy, b.len) == 0);
+    CHECK_EQ(nssqlite_rows_next(&bad, v), 1);
+    CHECK(nssqlite_rows_next(&bad, v) < 0);
+    free(copy);
+    nssqlite_buf_free(&b);
+}
+
 int main(void) {
     test_roundtrip();
     test_bad_input();
     test_truncated_rows();
     test_buf_take();
+    test_rows_v2();
     return finish("wire");
 }

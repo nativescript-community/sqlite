@@ -2,7 +2,9 @@
 // Generates napi_dyn.h / napi_dyn.c from napi_symbols.txt: the Node-API functions the binding uses are
 // looked up at runtime (dlsym) instead of linked, so the binding loads on every runtime and is simply
 // inactive where napi_* does not exist (NativeScript <= 8). Update napi_symbols.txt with:
-//   cc -Iinclude -I../../core -c nssqlite_napi.c -o /tmp/x.o && nm -u /tmp/x.o | grep napi_ | sed 's/^ *_//' | sort
+//   every napi_* function called by nssqlite_napi.c must be listed, one per line, sorted (a missing entry fails to
+//   compile: the call would reference a real napi_* symbol and the iOS/Android link would break on NS 8).
+//   Candidates: grep -o '\bnapi_[a-z0-9_]*(' nssqlite_napi.c | tr -d '(' | sort -u   (ignore napi_dyn_load)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

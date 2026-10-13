@@ -20,6 +20,7 @@
 #undef napi_create_int64
 #undef napi_create_object
 #undef napi_create_reference
+#undef napi_create_string_latin1
 #undef napi_create_string_utf8
 #undef napi_create_threadsafe_function
 #undef napi_create_typedarray
@@ -94,6 +95,8 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_create_object) missing++;
     *(void**)&g_napi.p_napi_create_reference = lookup(extra, "napi_create_reference");
     if (!g_napi.p_napi_create_reference) missing++;
+    *(void**)&g_napi.p_napi_create_string_latin1 = lookup(extra, "napi_create_string_latin1");
+    if (!g_napi.p_napi_create_string_latin1) missing++;
     *(void**)&g_napi.p_napi_create_string_utf8 = lookup(extra, "napi_create_string_utf8");
     if (!g_napi.p_napi_create_string_utf8) missing++;
     *(void**)&g_napi.p_napi_create_threadsafe_function = lookup(extra, "napi_create_threadsafe_function");

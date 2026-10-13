@@ -12,6 +12,11 @@
  * params block  := count:u32 value{count}
  * rows block    := magic:u32 'NSR1' ncols:u32 nrows:u32 changes:i64 last_insert_rowid:i64
  *                  (len:u32 utf8){ncols}  value{ncols * nrows}      (row major)
+ * rows block v2 := magic:u32 'NSR2' ncols:u32 nrows:u32 changes:i64 last_insert_rowid:i64 heap_offset:u32
+ *                  (len:u32 utf8){ncols}  value{ncols * nrows}  heap:bytes   (requested with NS_EXEC_STRHEAP)
+ *   adds value TEXT_REF (6): offset:u32 len:u32 = an all-ASCII string stored in the heap that starts at
+ *   heap_offset (byte offsets equal UTF-16 offsets, so a reader can decode the heap once and slice it).
+ *   Strings with non-ASCII bytes stay inline (TEXT).
  * batch request := n:u32 ( sql_len:u32 sql  params_len:u32 params block ){n}
  * batch result  := n:u32 ( block_len:u32 rows block ){n}            (n = statements completed)
  */
@@ -27,9 +32,10 @@
 extern "C" {
 #endif
 
-#define NS_ROWS_MAGIC 0x3152534Eu /* "NSR1" little endian */
+#define NS_ROWS_MAGIC 0x3152534Eu  /* "NSR1" little endian */
+#define NS_ROWS_MAGIC2 0x3252534Eu /* "NSR2": rows block with an ASCII string heap */
 
-enum { NS_T_NULL = 0, NS_T_INT32 = 1, NS_T_INT64 = 2, NS_T_DOUBLE = 3, NS_T_TEXT = 4, NS_T_BLOB = 5 };
+enum { NS_T_NULL = 0, NS_T_INT32 = 1, NS_T_INT64 = 2, NS_T_DOUBLE = 3, NS_T_TEXT = 4, NS_T_BLOB = 5, NS_T_TEXT_REF = 6 };
 
 typedef struct NSValue {
     uint8_t type;
@@ -37,6 +43,7 @@ typedef struct NSValue {
     double d;               /* DOUBLE */
     const uint8_t* ptr;     /* TEXT, BLOB: points into the source buffer */
     uint32_t len;
+    uint8_t ascii;          /* TEXT read from the string heap: known to be 7-bit ASCII */
 } NSValue;
 
 /* ---- writer ---- */
@@ -84,6 +91,8 @@ typedef struct NSRows {
     int64_t changes;
     int64_t last_insert_rowid;
     const uint8_t* names; /* start of the column names */
+    const uint8_t* heap;  /* v2: string heap, NULL for v1 */
+    size_t heap_len;
 } NSRows;
 
 NSSQLITE_API int nssqlite_rows_init(NSRows* rows, const uint8_t* data, size_t len);

@@ -474,7 +474,8 @@ static int cell_to_js(napi_env env, const NSValue* v, uint32_t flags, napi_value
         case NS_T_INT32: return napi_create_int32(env, (int32_t)v->i, out);
         case NS_T_INT64: return (flags & DECODE_BIGINT) ? napi_create_bigint_int64(env, v->i, out) : napi_create_int64(env, v->i, out);
         case NS_T_DOUBLE: return napi_create_double(env, v->d, out);
-        case NS_T_TEXT: return napi_create_string_utf8(env, (const char*)v->ptr, v->len, out);
+        case NS_T_TEXT:
+            return v->ascii ? napi_create_string_latin1(env, (const char*)v->ptr, v->len, out) : napi_create_string_utf8(env, (const char*)v->ptr, v->len, out);
         case NS_T_BLOB: {
             void* p;
             napi_value ab;
