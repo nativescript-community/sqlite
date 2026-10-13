@@ -301,4 +301,5 @@ The bridges are split from the core and every binding is its own package (all `3
 
 The default SQLite (androidx `include.gradle`, `defaultEngine`, `defaultOptions: { wal: true }` on Android) is its own package, `sqlite-default-engine`; `sqlite` is now just core + napi + bridge + default engine
 with a re-export. Core + napi + default engine gives androidx without any bridge (proven on the Android emulator: SQLite 3.50.1, WAL, `getSync`, "bridge not installed" error; the umbrella still passes API 13/13 per binding, ORM 8/8, engines 28/28).
+Lean combo also proven on the iOS simulator (system SQLite 3.51.0, `delete` journal, `getSync`, "bridge not installed" error: 3/3).
 The app imports `sqlite-default-engine` once (side effect); the core's "No SQLite engine chosen" error names it.
