@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/sqlite-framework",
+        "outDir": "./",
+        "baseUrl": ".",
+        "paths": {
+            "@nativescript-community/sqlite-core": ["../sqlite-core/sqlite"]
+        }
+    },
+    "include": ["../../src/sqlite-framework/**/*", "../../references.d.ts", "../../tools/references.d.ts", "../../src/references.d.ts"]
+}

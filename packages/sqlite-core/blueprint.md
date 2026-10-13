@@ -20,6 +20,7 @@ Run the following command from the root of your project:
 This package opens a database only once an engine is chosen, with `configure({ engine })` (all databases) or `openOrCreate(file, { engine })` (one database). Without one it throws "No SQLite engine chosen".
 
 * **Android**: add a library that exports the `sqlite3_*` C API to your app and name it as `engine`: `libsqlcipher.so` (`net.zetetic:sqlcipher-android`), `libsqliteJni.so` (androidx `sqlite-bundled`), your own build in `jniLibs`...
+* **Android, no SQLite library at all**: [`@nativescript-community/sqlite-android-framework`](../sqlite-android-framework) uses the platform's `android.database.sqlite` as the engine (prototype).
 * **iOS**: `engine: null` is the SQLite of the process: the system one, unless your app links another (a CocoaPods `SQLCipher`, or your own dynamic framework: it is found first). Explicit choices: `'/usr/lib/libsqlite3.dylib'` (system), `'@rpath/MySqlite.framework/MySqlite'` (an embedded framework).
 * **iOS, SQLite linked statically** (a `.a`, static pod): symbols of static libraries are not reliably visible to `dlsym`, so the plugin cannot look them up. Build `native/provider/NSSqliteStaticProvider.m` into the same library (it registers the SQLite under a name at startup) and use `engine: '@static'`.
 

@@ -260,3 +260,19 @@ Findings:
 - **Proven** (`npm pack` of both, only `sqlite` in the app's dependencies): the CLI picks up the transitive core plugin (platform libs, java) and the gradle dependency from the default package; API 12/12 per binding, ORM 8/8, engine tests on Android (28/28) and iOS (default engine = system SQLite). Bare: an app with only `sqlite-core` + SQLCipher: no engine throws the explicit error, androidx is not in the APK (opening `libsqliteJni.so` fails), `configure({engine})` works (`app/bare-test.ts`, Android and iOS).
 - **iOS static SQLite**: `dlsym` cannot be relied on for the symbols of a static library (not exported, not even linked unless referenced). Fix: `nssqlite_register_provider(name, table)` in the core, called at startup by `native/provider/NSSqliteStaticProvider.m`, which sits in the same static library as the SQLite and references `sqlite3_*` directly (so the linker pulls the right object in). The app uses `engine: '@static'`. Host test added; device test: static custom build next to the system SQLite, FTS5/JSON, compiled-in extension, both in parallel (10/10, napi and bridge). Note: in that debug build the default engine (`null`) also found the static symbols through `dlsym`; not guaranteed (release / dead-strip), hence the registry.
 - Not done: publishing metadata (versions, changelog for the new package), static provider for release builds with `-dead_strip`, CocoaPods static pod example, NativeScript 8 run of the split packages.
+
+## Platform SQLite on Android: sqlite-android-framework (2026-10-13, prototype)
+
+`packages/sqlite-android-framework` (`@nativescript-community/sqlite-android-framework`, peer of core, ~25 KB per ABI, no change to the C core).
+Design: `libnssqlite_framework.so` (`binding/android-framework/shim.c`) exports the ~35 `sqlite3_*` functions the core resolves with `dlsym`, implemented on
+`com.akylas.sqlite.framework.FrameworkEngine` (Java, `android.database.sqlite` only, no dependency). Per statement one JNI call: Java runs it and returns
+blocks of rows in the core's own wire format, which the shim parses with the core reader and serves to `column_*` from memory (no per-cell JNI, no global refs).
+Params go the other way as a params block. The JS entry (`useFrameworkEngine`) only loads the library (`JNI_OnLoad` needs `System.loadLibrary`) and calls `configure({ engine })`.
+Framework quirks handled: typed binds through `CursorFactory` + `SQLiteQuery`; DML through `SQLiteStatement.executeUpdateDelete` (changes) plus a rowid query for INSERT;
+`BEGIN/COMMIT/ROLLBACK` mapped to `beginTransaction*` / `endTransaction` (the framework's session is per thread, which fits the one worker per database;
+`ROLLBACK TO` is left as a plain statement); `PRAGMA journal_mode=WAL` calls `enableWriteAheadLogging`; `NO_LOCALIZED_COLLATORS` avoids the `android_metadata` table;
+errors parsed from `(code N ...)` in the framework messages give the real SQLite codes (19 / 2067 for UNIQUE); statement tail / parameter count by a small scanner.
+Result: 11/11 device checks with both bindings (types, int64, big blobs/text, results, error codes, atomic batch, transactions with inner savepoint, `each` 20000 rows, scripts with triggers, WAL, reopen, read-only, parallel databases, RETURNING) on API-level emulator with SQLite 3.50.4.
+Speed vs androidx through the same core (emulator, warm): select 20000x3 ~14 vs ~3 ms, 1000 awaited point lookups ~55 vs ~40, 5000 inserts in a tx ~80 vs ~20, `batch` 5000 ~60 vs ~7 ms.
+Limits: no extensions / SQLCipher, version and options set by the OS, fixed busy timeout, rows over the 2 MB cursor window fail, first read counts all rows.
+Not done: older Android versions (the emulator has a recent SQLite), physical devices, TypeORM on this engine, avoiding the rowid query, `loadFrameworkEngine` in workers (library is loaded once per process, config is per realm).
