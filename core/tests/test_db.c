@@ -438,7 +438,7 @@ static void test_open_failure(void) {
     CHECK(waiter_last(&wo)->status > 0);
     CHECK(waiter_last(&wo)->message != NULL);
     CHECK(waiter_wait(&wq));
-    CHECK_EQ(waiter_last(&wq)->status, NS_ERR_CLOSED);
+    CHECK_EQ(waiter_last(&wq)->status, 14 /* SQLITE_CANTOPEN: the error of the open */);
     waiter_init(&wc);
     CHECK_EQ(nssqlite_close(db, on_result, &wc), 0);
     CHECK(waiter_wait(&wc));
@@ -485,6 +485,19 @@ static void test_open_options(void) {
     db = open_db(E, path, &o);
     CHECK_EQ(scalar_int(db, 0, "PRAGMA user_version"), 7);
     CHECK(run_ok(db, "CREATE TABLE nope(a)") != 0);
+    close_db(db);
+    rm_db(path);
+
+    /* wal is ignored for read-only connections (switching the journal mode needs a write) */
+    memset(&o, 0, sizeof(o));
+    db = open_db(E, path, &o);
+    CHECK_EQ(run_ok(db, "CREATE TABLE plain(a)"), 0);
+    close_db(db);
+    memset(&o, 0, sizeof(o));
+    o.flags = 0x1;
+    o.wal = 1;
+    db = open_db(E, path, &o);
+    CHECK_EQ(scalar_int(db, 0, "SELECT count(*) FROM plain"), 0);
     close_db(db);
     rm_db(path);
 

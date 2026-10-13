@@ -9,6 +9,7 @@
 #define SQLITE_OK 0
 #define SQLITE_ROW 100
 #define SQLITE_DONE 101
+#define SQLITE_OPEN_READONLY 0x00000001
 #define SQLITE_OPEN_READWRITE 0x00000002
 #define SQLITE_OPEN_CREATE 0x00000004
 #define SQLITE_INTEGER 1
@@ -407,7 +408,7 @@ static void do_open(NSDb* db, Req* r) {
     int status = 0;
     /* init_sql first: with SQLCipher `PRAGMA key` has to be the first statement on the connection */
     if (db->init_sql) status = exec_simple(db, db->init_sql, &msg);
-    if (!status && db->opts.wal && strcmp(db->path, ":memory:") != 0) status = exec_simple(db, "PRAGMA journal_mode=WAL", &msg);
+    if (!status && db->opts.wal && !(flags & SQLITE_OPEN_READONLY) && strcmp(db->path, ":memory:") != 0) status = exec_simple(db, "PRAGMA journal_mode=WAL", &msg);
     if (status) {
         db->open_status = status;
         db->open_message = dup_cstr(msg);
@@ -570,7 +571,8 @@ static void handle(NSDb* db, Req* r) {
         return;
     }
     if (!db->h) {
-        deliver_error(r, NS_ERR_CLOSED, db->open_message ? db->open_message : "database is not open");
+        /* a database that failed to open answers with the SQLite error of the open (SQLCipher: wrong key = 26) */
+        deliver_error(r, db->open_status ? db->open_status : NS_ERR_CLOSED, db->open_message ? db->open_message : "database is not open");
         return;
     }
     if (r->tx && db->tx_status && r->type != REQ_TX_END) {

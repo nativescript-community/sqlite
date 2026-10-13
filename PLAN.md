@@ -276,3 +276,11 @@ Result: 11/11 device checks with both bindings (types, int64, big blobs/text, re
 Speed vs androidx through the same core (emulator, warm): select 20000x3 ~14 vs ~3 ms, 1000 awaited point lookups ~55 vs ~40, 5000 inserts in a tx ~80 vs ~20, `batch` 5000 ~60 vs ~7 ms.
 Limits: no extensions / SQLCipher, version and options set by the OS, fixed busy timeout, rows over the 2 MB cursor window fail, first read counts all rows.
 Not done: older Android versions (the emulator has a recent SQLite), physical devices, TypeORM on this engine, avoiding the rowid query, `loadFrameworkEngine` in workers (library is loaded once per process, config is per realm).
+
+## WAL by default on Android (2026-10-13)
+
+Phone measurement: 500 awaited one-statement writes 2600 ms with androidx's default journal (DELETE), 38 ms in WAL (3.5.9, on the Android framework's TRUNCATE default: 824 ms).
+`@nativescript-community/sqlite` now configures `defaultOptions: { wal: true }` on Android (new `configure({ defaultOptions })` in core: options a database starts from, the
+ones given to `openOrCreate` win, `{ wal: false }` opts out). `sqlite-core` itself defaults to nothing. Core: `wal` is ignored for read-only connections (switching the journal
+mode needs a write); a database that failed to open now answers later requests with the SQLite error of the open instead of `-1` (SQLCipher wrong key + `wal` now reports code 26 on the first request).
+Device suites on Android emulator and iOS simulator: API 13/13 per binding (new check: default WAL on Android, `delete` on iOS, `wal: false`, read-only, `:memory:`), ORM 8/8, engines 28/28 (Android).

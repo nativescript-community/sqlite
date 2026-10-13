@@ -33,7 +33,7 @@ function getBackend() {
 export function openOrCreate(filePath: string, options: DatabaseOptions = {}): SQLiteDatabase {
     const b = getBackend();
     const engine = config.engine !== undefined ? config.engine : config.defaultEngine;
-    return new Database(b, resolveDatabasePath(filePath), options, engine !== undefined ? [engine] : undefined);
+    return new Database(b, resolveDatabasePath(filePath), config.defaultOptions ? { ...config.defaultOptions, ...options } : options, engine !== undefined ? [engine] : undefined);
 }
 
 /** Like `openOrCreate`, resolves once the database is open and rejects with the open error. */

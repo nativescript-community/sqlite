@@ -52,6 +52,11 @@ export interface GlobalConfig {
      * (@nativescript-community/sqlite sets androidx sqlite-bundled on Android, the SQLite of the process on iOS).
      */
     defaultEngine?: string | null;
+    /**
+     * Options every database starts from; the options given to `openOrCreate` win (`{ wal: false }` undoes a default
+     * `wal: true`). For provider packages: @nativescript-community/sqlite sets `{ wal: true }` on Android.
+     */
+    defaultOptions?: DatabaseOptions;
     /** force a binding: 'napi' (NativeScript >= 9.1) or 'bridge' (JNI / Objective-C). Default: napi when available. */
     backend?: 'auto' | 'napi' | 'bridge';
 }

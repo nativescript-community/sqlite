@@ -122,6 +122,30 @@ async function suite(backend: Backends) {
         await g.close();
         eq(deleteDatabase(name), true);
     });
+    await check(backend + ' journal mode default: WAL on Android, SQLite default on iOS; options win', async () => {
+        const name = 'api-test-journal-' + backend + '.db';
+        deleteDatabase(name);
+        const mode = async (options?: any) => {
+            const d = openOrCreate(name, options);
+            const m = (await d.getArray('PRAGMA journal_mode'))[0];
+            await d.close();
+            return m;
+        };
+        eq(await mode(), __ANDROID__ ? 'wal' : 'delete', 'default');
+        deleteDatabase(name);
+        eq(await mode({ wal: false }), 'delete', 'wal: false');
+        deleteDatabase(name);
+        const d = openOrCreate(name);
+        await d.execute('CREATE TABLE t(a)');
+        await d.close();
+        const ro = openOrCreate(name, { readOnly: true });
+        eq((await ro.getArray('SELECT count(*) FROM t'))[0], 0, 'read-only with the default');
+        await ro.close();
+        const mem = openOrCreate(':memory:');
+        eq((await mem.getArray('PRAGMA journal_mode'))[0], 'memory');
+        await mem.close();
+        deleteDatabase(name);
+    });
     await check(backend + ' open failure', async () => {
         const bad = openOrCreate('/nonexistent-dir-xyz/a/b.db', { flags: 0x2 }); // no CREATE: the folder cannot be created either
         await rejects(bad.ready, (e) => e instanceof SqliteError, 'ready');

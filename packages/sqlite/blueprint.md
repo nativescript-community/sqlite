@@ -23,6 +23,8 @@ await db.execute('CREATE TABLE names (id INTEGER PRIMARY KEY, name TEXT)');
 const rows = await db.select('SELECT * FROM names');
 ```
 
+**Android databases open in WAL mode by default** (`wal: true`): with SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). It adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). Opt out per database with `{ wal: false }`, or for all with `configure({ defaultOptions: { wal: false } })`. In-memory and read-only databases ignore it. iOS keeps SQLite's default.
+
 Everything from `sqlite-core` is re-exported, and so are its `/typeorm` and `/nanosql` entries. The default is only a default: `configure({ engine })` or the `engine` option still pick another SQLite.
 
 ### Do not want the default SQLite?

@@ -128,7 +128,7 @@ await db.close();
 
 * Parameters: `null`/`undefined`, numbers, booleans, bigint, strings, `Date` (ISO string), `ArrayBuffer`/typed arrays (blob).
 * Results: integers beyond 2^53 are numbers unless you ask for `{ int64: 'auto' | 'bigint' }`; blobs are `Uint8Array` (`{ transformBlobs: false }` for `ArrayBuffer`).
-* Options of `openOrCreate`: `readOnly`, `flags`, `engine`, `busyTimeout`, `wal`, `initSql` (e.g. `PRAGMA key = ...`).
+* Options of `openOrCreate`: `readOnly`, `flags`, `engine`, `busyTimeout`, `wal` (write-ahead logging, ignored for `:memory:` and read-only), `initSql` (runs first, e.g. `PRAGMA key = ...`). `configure({ defaultOptions })` sets options every database starts from.
 * Tiny statements in a loop: `executeSync`, `selectSync`, `getSync`... block the calling thread until the database answers and skip the event loop round trip (NativeScript 9.1+). Fast for small statements, never use them for big ones.
 * Extensions: `db.loadExtension(path)` when the SQLite library allows it, or link a static extension into your own library.
 * A database opens in the background: `await db.ready` (or `openOrCreateAsync`) to wait for it and get the open error.

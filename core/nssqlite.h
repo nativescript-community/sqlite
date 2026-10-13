@@ -79,7 +79,7 @@ NSSQLITE_API void nssqlite_free(void* p);
 typedef struct NSOpenOptions {
     int flags;               /* sqlite3_open_v2 flags, 0 = READWRITE | CREATE */
     int busy_timeout_ms;     /* 0 = default (5000), < 0 = none */
-    int wal;                 /* 1 = PRAGMA journal_mode=WAL after open (and after init_sql) */
+    int wal;                 /* 1 = PRAGMA journal_mode=WAL after open (and after init_sql); ignored for :memory: and read-only */
     const char* init_sql;    /* executed right after open, before `wal`: PRAGMA key for SQLCipher. May be NULL. */
 } NSOpenOptions;
 
