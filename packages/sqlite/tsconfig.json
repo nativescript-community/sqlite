@@ -6,6 +6,7 @@
         "baseUrl": ".",
         "paths": {
             "@nativescript-community/sqlite-core": ["../sqlite-core/sqlite"],
+            "@nativescript-community/sqlite-default-engine": ["../sqlite-default-engine/index"],
             "@nativescript-community/sqlite-core/*": ["../sqlite-core/*"]
         }
     },

@@ -77,3 +77,4 @@ native/.build/
 /packages/sqlite-bridge/platforms/android/jniLibs/
 /packages/sqlite-napi/platforms/ios/*.xcframework
 /packages/sqlite-bridge/platforms/ios/*.xcframework
+!/packages/sqlite-default-engine/platforms

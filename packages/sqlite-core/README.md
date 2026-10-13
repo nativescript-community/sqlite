@@ -61,7 +61,8 @@ The plugin is several small packages, so an app only carries what it uses:
 | **`@nativescript-community/sqlite-core`** (this one) | the TypeScript API and the C core. No SQLite, no binding, no dependency | 28 KB / 32 KB |
 | [`sqlite-napi`](../sqlite-napi) | the **Node-API** binding, for NativeScript 9.1+ (needs `sqlite-core`) | 23 KB / 29 KB |
 | [`sqlite-bridge`](../sqlite-bridge) | the **JNI** and **Objective-C** bridges, for any NativeScript version and required by NativeScript 8 (needs `sqlite-core`) | 10 KB / 17 KB |
-| [`sqlite`](../sqlite) | all of the above **plus a default SQLite** (androidx sqlite-bundled on Android, the SQLite of the process on iOS) and WAL on Android | + the androidx library |
+| [`sqlite-default-engine`](../sqlite-default-engine) | the **default SQLite**: androidx sqlite-bundled on Android (gradle dependency, WAL by default), the SQLite of the process on iOS. Import it once | + the androidx library |
+| [`sqlite`](../sqlite) | everything: core + napi + bridge + default engine | all of the above |
 | [`sqlite-android-framework`](../sqlite-android-framework) | the SQLite of Android itself (`android.database.sqlite`) as an engine, no SQLite library in the app (prototype) | 24 KB |
 
 What to install:
@@ -69,8 +70,9 @@ What to install:
 | you want | install |
 |---|---|
 | it to just work on every NativeScript version | `@nativescript-community/sqlite` |
+| NativeScript 9.1+ only, the default SQLite (androidx), **no bridges** | `sqlite-core` + `sqlite-napi` + `sqlite-default-engine` |
 | NativeScript 9.1+ only, your own SQLite (SQLCipher, a custom build) | `sqlite-core` + `sqlite-napi` |
-| NativeScript 8 (or 8 and 9), your own SQLite | `sqlite-core` + `sqlite-bridge` (+ `sqlite-napi` to use Node-API on 9.1+) |
+| NativeScript 8 (or 8 and 9) | `sqlite-core` + `sqlite-bridge` (+ `sqlite-napi` to use Node-API on 9.1+) + `sqlite-default-engine` or your own SQLite |
 | no SQLite library in the Android app | `sqlite-core` + a binding + `sqlite-android-framework` |
 
 Without a binding installed, opening a database throws an error saying which package to add.

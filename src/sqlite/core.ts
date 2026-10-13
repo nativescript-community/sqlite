@@ -86,8 +86,8 @@ export function loadEngine(backend: Backend, candidates: Array<string | null>): 
     if (candidates.length === 0) {
         throw new Error(
             'No SQLite engine chosen. This package ships no SQLite: set one with configure({ engine }) or the `engine` option ' +
-                "(e.g. 'libsqlcipher.so' on Android, null for the SQLite linked into the app on iOS), or use @nativescript-community/sqlite, " +
-                'which adds the default one.'
+                "(e.g. 'libsqlcipher.so' on Android, null for the SQLite linked into the app on iOS), or import @nativescript-community/sqlite-default-engine " +
+                '(androidx sqlite-bundled on Android, the SQLite of the process on iOS), or use @nativescript-community/sqlite which includes it.'
         );
     }
     throw new Error(
