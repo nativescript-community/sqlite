@@ -35,7 +35,7 @@ core/                 C11. nssqlite.h (~25 functions, opaque handles, completion
   statements          typed bind (int64/double/text/blob/null), step loop, statement cache
   encoder             rows -> one compact buffer (header, column names once, tagged cells)
   transactions        pinned connection, batch (atomic), savepoints
-  tests/              host tests (gtest + ASan), run on macOS CI
+  tests/              host tests: plain C harness (no framework), run under ASan+UBSan and TSan
 binding/napi/         one C file. napi_threadsafe_function -> JS thread, external ArrayBuffer
 binding/android/      Java + JNI (bridge backend)
 binding/ios/          Objective-C (bridge backend)
