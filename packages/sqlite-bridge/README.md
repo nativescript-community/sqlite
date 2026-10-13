@@ -40,6 +40,7 @@
 * [What it is](#what-it-is)
 * [Installation](#installation)
 * [Usage](#usage)
+	* [One platform with Node-API, the other with the bridge](#one-platform-with-node-api-the-other-with-the-bridge)
 * [Using the bridges directly](#using-the-bridges-directly)
 
 
@@ -77,6 +78,20 @@ configure({ backend: 'bridge' }); // throws a clear error when this package is m
 const db = openOrCreate('app.db', { engine: 'libsqlcipher.so' });
 await db.select('SELECT * FROM t');
 ```
+
+### One platform with Node-API, the other with the bridge
+
+A package is installed for both platforms, so an app whose Android runtime has Node-API but whose iOS runtime is NativeScript 8 would carry the JNI bridge on Android for nothing. Install `@nativescript-community/sqlite` (or core + napi + bridge) and leave the JNI library out of the Android build in `App_Resources/Android/app.gradle`:
+
+```gradle
+android {
+    packagingOptions {
+        exclude '**/libnssqlite_jni.so' // sqlite-bridge on Android: Node-API is used, the JNI library is never loaded
+    }
+}
+```
+
+(The few lines of `NativeSqlite.java` stay in the dex, unused.) On iOS the bridge is kept. If both runtimes have Node-API, simply do not install `sqlite-bridge`. Checked on the Android emulator with NativeScript 9.1: the APK holds `libnssqlite_core.so`, `libnssqlite_napi.so` and the SQLite library only, and the whole test suite passes with `backend: 'napi'`.
 
 
 [](#using-the-bridges-directly)

@@ -297,6 +297,12 @@ The bridges are split from the core and every binding is its own package (all `3
 - Proven: umbrella on NativeScript 9.1 Android emulator (API 13/13 per binding, ORM 8/8, engines 28/28) and iOS simulator (13/13, 8/8, 2/2); NativeScript 8.9.2 Android (umbrella, `auto` falls back to the bridge, 13/13 per mode); lean apps: core + napi only (Android, iOS) and core + bridge only (Android) with SQLCipher, checking the error naming the missing package and that the APK has no JNI library or `NativeSqlite` class. NativeScript 8.9 needed the SDK level pinned in `before-plugins.gradle` (`compileSdk = 35`, an int) with the local CLI, unrelated to the split.
 - Not done: iOS lean app with the bridge only, NativeScript 8 on iOS with the split, the sqlite-android-framework on the split (builds, not rerun), publishing metadata for the two new packages.
 
+## One platform with Node-API, the other with the bridge (2026-10-13)
+
+Packages are per runtime-binding, not per platform: an app with a Node-API Android runtime and a NativeScript 8 iOS runtime installs `sqlite` and drops the Android JNI library
+with `packagingOptions { exclude '**/libnssqlite_jni.so' }` in `app.gradle` (verified on the emulator: the APK holds core, napi and the SQLite library only, API 13/13, ORM 8/8,
+engines 14/14 with `backend: 'napi'`). Splitting `sqlite-bridge` in an Android and an iOS package would remove the need for the snippet; not done.
+
 ## sqlite-default-engine (2026-10-13)
 
 The default SQLite (androidx `include.gradle`, `defaultEngine`, `defaultOptions: { wal: true }` on Android) is its own package, `sqlite-default-engine`; `sqlite` is now just core + napi + bridge + default engine

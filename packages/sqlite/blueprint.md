@@ -107,6 +107,10 @@ await dataSource.initialize();
 
 The webpack changes TypeORM's browser build needs are listed in the [core documentation](../sqlite-core#typeorm).
 
+### Node-API on Android, NativeScript 8 on iOS (or the reverse)
+
+You get both bindings on both platforms. Leave the one you do not need out of that platform's build, for example the JNI library on Android: see *One platform with Node-API, the other with the bridge* in the [`sqlite-bridge`](../sqlite-bridge) documentation.
+
 ### Do not want the default SQLite?
 
 Depend on [`@nativescript-community/sqlite-core`](../sqlite-core) and the binding you need instead of this package: no SQLite and no gradle dependency come with them, so there is nothing to override or patch out when you use SQLCipher or your own build. Only need NativeScript 9.1+ with the default SQLite? `sqlite-core` + `sqlite-napi` + `sqlite-default-engine` is the same without the JNI / Objective-C bridges. See *Which packages* in the core documentation.

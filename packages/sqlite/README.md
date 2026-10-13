@@ -44,6 +44,7 @@
 	* [Extensions](#extensions)
 	* [Another SQLite for some or all databases](#another-sqlite-for-some-or-all-databases)
 	* [TypeORM](#typeorm)
+	* [Node-API on Android, NativeScript 8 on iOS (or the reverse)](#node-api-on-android-nativescript-8-on-ios-or-the-reverse)
 	* [Do not want the default SQLite?](#do-not-want-the-default-sqlite)
 
 
@@ -153,6 +154,10 @@ await dataSource.initialize();
 ```
 
 The webpack changes TypeORM's browser build needs are listed in the [core documentation](../sqlite-core#typeorm).
+
+### Node-API on Android, NativeScript 8 on iOS (or the reverse)
+
+You get both bindings on both platforms. Leave the one you do not need out of that platform's build, for example the JNI library on Android: see *One platform with Node-API, the other with the bridge* in the [`sqlite-bridge`](../sqlite-bridge) documentation.
 
 ### Do not want the default SQLite?
 
