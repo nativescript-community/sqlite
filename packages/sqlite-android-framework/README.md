@@ -38,6 +38,7 @@
 ## Table of Contents
 
 * [Installation](#installation)
+	* [Using it](#using-it)
 	* [Prototype: what to know](#prototype-what-to-know)
 
 
@@ -60,9 +61,25 @@ const db = openOrCreate('my.db');
 
 The app carries **no SQLite library** (this package is ~25 KB per ABI): the SQLite of the platform is used, with the native threads, the batching and the whole API of sqlite-core on top. The Android part is a small shim exposing the `sqlite3_*` functions the core needs on top of `android.database.sqlite`, so nothing in the core is specific to it. Works with both bindings (Node-API and JNI).
 
+### Using it
+
+Everything of [`sqlite-core`](../sqlite-core) works on top: promises on native threads, `batch`, `transaction`, `each`, `*Sync` (NativeScript 9.1+, they work but are not faster here, the Java round trip per statement dominates), TypeORM, both bindings.
+
+```typescript
+import { openOrCreate } from '@nativescript-community/sqlite-core';
+import { FRAMEWORK_ENGINE, loadFrameworkEngine } from '@nativescript-community/sqlite-android-framework';
+
+loadFrameworkEngine(); // once: loads the native shim
+const a = openOrCreate('app.db', { engine: FRAMEWORK_ENGINE, wal: true });
+const b = openOrCreate('other.db', { engine: 'libsqliteJni.so' }); // another SQLite in the same app is fine
+const rows = await a.select('SELECT sqlite_version() AS v, count(*) AS n FROM sqlite_master');
+```
+
+**Extensions are not available** (the framework does not allow loading them): `a.canLoadExtensions()` is false and `a.loadExtension(...)` rejects with a `SqliteError`. For extensions, SQLCipher or a fixed SQLite version use the androidx engine of [`@nativescript-community/sqlite`](../sqlite) or your own, see the core documentation.
+
 ### Prototype: what to know
 
-* **The platform decides** the SQLite version (Android 7 ships a 3.9, Android 14 a 3.4x, the OEM may differ) and its options: check `db.getSqliteVersion()`. No extensions (`canLoadExtensions()` is false), no SQLCipher, a fixed busy timeout (`busyTimeout` is ignored).
+* **The platform decides** the SQLite version (older Android versions ship much older SQLites, OEMs differ) and its options: check `db.getSqliteVersion()` at run time. No extensions (`canLoadExtensions()` is false), no SQLCipher, a fixed busy timeout (`busyTimeout` is ignored).
 * One statement per call, as with the other engines; `executeScript` and `batch` split statements with a small scanner (strings, comments, `CREATE TRIGGER ... END` are handled).
 * Transactions use the framework's session (`BEGIN` is `IMMEDIATE`, or `EXCLUSIVE` when asked; `DEFERRED` is run as `IMMEDIATE`).
 * A row bigger than the framework's cursor window (2 MB) cannot be read.
