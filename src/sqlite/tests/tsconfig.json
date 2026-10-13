@@ -6,10 +6,26 @@
         "strict": false,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "lib": ["es2022", "dom"],
-        "types": ["node"],
+        "lib": [
+            "es2022",
+            "dom"
+        ],
+        "types": [
+            "node"
+        ],
         "rootDir": "..",
         "sourceMap": true
     },
-    "include": ["./*.ts", "../codec.ts", "../core.ts", "../database.ts", "../backend.ts", "../backend.napi.ts", "../sqlite.common.ts"]
+    "include": [
+        "./*.ts",
+        "../codec.ts",
+        "../core.ts",
+        "../database.ts",
+        "../backend.ts",
+        "../backend.napi.ts",
+        "../sqlite.common.ts"
+    ],
+    "exclude": [
+        "./typeorm.test.ts"
+    ]
 }

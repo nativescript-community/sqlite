@@ -1,0 +1,13 @@
+[PERF] old insert 500 rows, one awaited execute each, autocommit {"ms":140.3,"min":134.4}
+[PERF] old insert 5000 rows in a transaction, awaited one by one {"ms":13.7,"min":13.2}
+[PERF] old insert 5000 rows in a transaction, all started at once {"ms":18,"min":16.3}
+[PERF] old select 20000 rows x 3 (int, short text, real) {"ms":718.5,"min":649.5,"info":20000}
+[PERF] old select 5000 rows x 12 (mixed, nulls) {"ms":79.4,"min":57.4,"info":5000}
+[PERF] old select 5000 rows x 3 (200 char text) {"ms":49.9,"min":33.3,"info":5000}
+[PERF] old select 1000 rows with 2 KB blobs {"ms":4.9,"min":4.7,"info":1000}
+[PERF] old 500 small selects (100 rows), one after the other {"ms":192.3,"min":177.7}
+[PERF] old 1000 get by primary key, one after the other {"ms":20.5,"min":20.3}
+[PERF] old 1000 get by primary key, all started at once {"ms":20.8,"min":20.7,"info":1000}
+[PERF] old each over 20000 rows {"ms":68.9,"min":65.8,"info":20000}
+[PERF] old jank during 20 selects of 2000 rows {"maxGapMs":273.8,"totalMs":273.8}
+[PERF] done

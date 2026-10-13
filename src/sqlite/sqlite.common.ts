@@ -101,6 +101,18 @@ export interface SQLiteQueryApi {
         options?: SqliteRequestOptions
     ): Promise<number>;
     batch(statements: Array<BatchStatement | string | [string, SqliteParams?]>, options?: BatchOptions): Promise<BatchResult[]>;
+
+    /**
+     * Blocking variants: they wait for the database thread on the calling thread, which saves the event loop round
+     * trip of the asynchronous calls (a few tens of microseconds on iOS, ~0.4 ms on Android) and blocks the thread for
+     * the duration of the statement. For small, fast statements in a loop; use the asynchronous methods for anything
+     * that can take long. Only available with the Node-API binding (NativeScript >= 9.1).
+     */
+    executeSync(query: string, params?: SqliteParams): ExecResult;
+    selectSync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): SqliteRow[];
+    selectArraySync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): any[][];
+    getSync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): SqliteRow | null;
+    getArraySync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): any[] | null;
 }
 
 export interface SQLiteTransaction extends SQLiteQueryApi {

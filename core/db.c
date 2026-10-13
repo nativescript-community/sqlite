@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "internal.h"
 
@@ -50,6 +51,7 @@ typedef struct CachedStmt {
 struct NSDb {
     NSEngine* eng;
     atomic_int refs;
+    atomic_int queued; /* requests in the queue: lets the worker spin without taking the lock */
     pthread_mutex_t mu;
     pthread_cond_t cv;
     Req *head, *tail;
@@ -606,9 +608,39 @@ static Req* pick(NSDb* db) {
     return NULL;
 }
 
+/* Waking a sleeping thread costs 50-300 us (more on a virtualised or idle CPU): after a request the worker keeps
+ * polling for a short while, so a caller that sends its next request right away (a loop of awaited statements)
+ * does not pay for a wake-up. The spin is bounded and only follows activity. */
+#define WORKER_SPIN_NS 60000
+
+static int64_t now_ns(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (int64_t)ts.tv_sec * 1000000000LL + ts.tv_nsec;
+}
+
+static void cpu_relax(void) {
+#if defined(__aarch64__) || defined(__arm__)
+    __asm__ __volatile__("yield");
+#elif defined(__x86_64__) || defined(__i386__)
+    __asm__ __volatile__("pause");
+#endif
+}
+
+static void spin_for_work(NSDb* db) {
+    int64_t end = now_ns() + WORKER_SPIN_NS;
+    for (unsigned i = 0;; i++) {
+        if (atomic_load_explicit(&db->queued, memory_order_acquire) > 0) return;
+        cpu_relax();
+        if ((i & 31) == 31 && now_ns() > end) return;
+    }
+}
+
 static void* worker(void* arg) {
     NSDb* db = (NSDb*)arg;
+    int spin = 0;
     for (;;) {
+        if (spin) spin_for_work(db);
         pthread_mutex_lock(&db->mu);
         Req* r;
         while (!(r = pick(db)) && !db->close_req) pthread_cond_wait(&db->cv, &db->mu);
@@ -641,9 +673,11 @@ static void* worker(void* arg) {
             nssqlite_db_release(db); /* the worker's reference */
             return NULL;
         }
+        atomic_fetch_sub_explicit(&db->queued, 1, memory_order_release);
         pthread_mutex_unlock(&db->mu);
         handle(db, r);
         req_free(r);
+        spin = 1;
     }
 }
 
@@ -658,6 +692,7 @@ static int submit(NSDb* db, Req* r) {
     }
     if (db->tail) db->tail->next = r; else db->head = r;
     db->tail = r;
+    atomic_fetch_add_explicit(&db->queued, 1, memory_order_release);
     pthread_cond_signal(&db->cv);
     pthread_mutex_unlock(&db->mu);
     return 0;
@@ -680,6 +715,7 @@ NSDb* nssqlite_open(NSEngine* e, const char* path, const NSOpenOptions* opts, NS
     if (!db) return NULL;
     db->eng = e;
     atomic_init(&db->refs, 2); /* caller + worker */
+    atomic_init(&db->queued, 1); /* the open request */
     pthread_mutex_init(&db->mu, NULL);
     pthread_cond_init(&db->cv, NULL);
     db->path = dup_cstr(path);

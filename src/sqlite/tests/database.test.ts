@@ -456,3 +456,46 @@ describe('concurrency', () => {
 after(() => {
     // all databases are closed by the tests: nothing left to do, this only makes the intent explicit
 });
+
+describe('blocking calls', () => {
+    it('run statements on the calling thread', () =>
+        withDb(async (db) => {
+            assert.deepEqual(db.executeSync('CREATE TABLE t(a, b)'), { changes: 0, lastInsertRowId: 0 });
+            assert.deepEqual(db.executeSync('INSERT INTO t VALUES (?, ?)', [1, 'x']), { changes: 1, lastInsertRowId: 1 });
+            db.executeSync('INSERT INTO t VALUES (?, ?)', [2, 'y']);
+            assert.deepEqual(db.selectSync('SELECT * FROM t ORDER BY a'), [{ a: 1, b: 'x' }, { a: 2, b: 'y' }]);
+            assert.deepEqual(db.selectArraySync('SELECT a FROM t ORDER BY a'), [[1], [2]]);
+            assert.deepEqual(db.getSync('SELECT b FROM t WHERE a = ?', 2), { b: 'y' });
+            assert.deepEqual(db.getArraySync('SELECT b FROM t WHERE a = ?', 1), ['x']);
+            assert.equal(db.getSync('SELECT * FROM t WHERE a = 99'), null);
+            assert.equal(db.getSync('SELECT ? AS big', 9007199254740993n, { int64: 'auto' }).big, 9007199254740993n);
+            // and they see what the asynchronous calls wrote
+            await db.execute('INSERT INTO t VALUES (3, "z")');
+            assert.equal(db.getSync('SELECT COUNT(*) AS n FROM t').n, 3);
+        }));
+
+    it('throw SqliteError', () =>
+        withDb(async (db) => {
+            assert.throws(() => db.selectSync('SELEKT 1'), (e: SqliteError) => e instanceof SqliteError && e.code === 1 && e.sql === 'SELEKT 1');
+            assert.throws(() => db.getSync('SELECT ?, ?', [1]), (e: SqliteError) => e.code === -2);
+            assert.equal(db.getSync('SELECT 1 AS one').one, 1);
+        }));
+
+    it('join a transaction instead of waiting for its end', () =>
+        withDb(async (db) => {
+            db.executeSync('CREATE TABLE t(a)');
+            const tx = db.transaction(async (cancel) => {
+                db.executeSync('INSERT INTO t VALUES (1)'); // the BEGIN is not even done: must not deadlock
+                assert.equal(db.getSync('SELECT COUNT(*) AS n FROM t').n, 1);
+                cancel();
+            });
+            await tx;
+            assert.equal(db.getSync('SELECT COUNT(*) AS n FROM t').n, 0);
+        }));
+
+    it('fail on a closed database', async () => {
+        const db = open();
+        await db.close();
+        assert.throws(() => db.getSync('SELECT 1'), (e: SqliteError) => e.code === -1);
+    });
+});

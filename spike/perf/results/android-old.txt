@@ -1,0 +1,24 @@
+[PERF] old insert 500 rows, one awaited execute each, autocommit {"ms":5309.6,"min":4839.2}
+[PERF] old insert 5000 rows in a transaction, awaited one by one {"ms":189.9,"min":173}
+[PERF] old insert 5000 rows in a transaction, all started at once {"ms":215.9,"min":185}
+[PERF] old select 20000 rows x 3 (int, short text, real) {"ms":937.9,"min":856.3,"info":20000}
+[PERF] old select 5000 rows x 12 (mixed, nulls) {"ms":777.6,"min":717,"info":5000}
+[PERF] old select 5000 rows x 3 (200 char text) {"ms":289.2,"min":247.9,"info":5000}
+[PERF] old select 1000 rows with 2 KB blobs {"ms":2455.6,"min":2318.6,"info":1000}
+[PERF] old 500 small selects (100 rows), one after the other {"ms":1787.8,"min":1645}
+[PERF] old 1000 get by primary key, one after the other {"ms":164,"min":157.3}
+[PERF] old 1000 get by primary key, all started at once {"ms":156.8,"min":145}
+[PERF] old each over 20000 rows {"ms":829.7,"min":806.5,"info":20000}
+[PERF] old jank during select of 100000 rows x 4 {"maxGapMs":5702.2,"totalMs":5702.2}
+[PERF] old jank during 20 selects of 2000 rows {"maxGapMs":1798.7,"totalMs":1798.7}
+[PERF] old-threaded insert 500 rows, one awaited execute each, autocommit {"ms":5480.3,"min":4782.7}
+[PERF] old-threaded select 20000 rows x 3 (int, short text, real) {"ms":829.2,"min":792.2,"info":20000}
+[PERF] old-threaded select 5000 rows x 12 (mixed, nulls) {"ms":761.9,"min":716.4,"info":5000}
+[PERF] old-threaded select 5000 rows x 3 (200 char text) {"ms":304.2,"min":285.6,"info":5000}
+[PERF] old-threaded select 1000 rows with 2 KB blobs {"ms":1695.3,"min":1607.8,"info":1000}
+[PERF] old-threaded 500 small selects (100 rows), one after the other {"ms":2143.2,"min":2008.3}
+[PERF] old-threaded 1000 get by primary key, one after the other {"ms":974.8,"min":820.2}
+[PERF] old-threaded 1000 get by primary key, all started at once {"ms":268.4,"min":251.9}
+[PERF] old-threaded each over 20000 rows {"ms":887.6,"min":802.7,"info":20000}
+[PERF] old-threaded jank during select of 100000 rows x 4 {"maxGapMs":126.3,"totalMs":5582.3}
+[PERF] old-threaded jank during 20 selects of 2000 rows {"maxGapMs":11.4,"totalMs":1638}

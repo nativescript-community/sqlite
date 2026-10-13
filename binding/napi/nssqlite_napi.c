@@ -15,6 +15,7 @@
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "napi_dyn.h"
 #include "nssqlite.h"
@@ -466,6 +467,100 @@ static napi_value Close(napi_env env, napi_callback_info info) {
     return int_result(env, rc);
 }
 
+/* ---- blocking calls ---- */
+
+typedef struct SyncWait {
+    pthread_mutex_t mu;
+    pthread_cond_t cv;
+    atomic_int done;
+    NSResult res;
+} SyncWait;
+
+static void on_sync_result(void* user, NSResult r) {
+    SyncWait* w = (SyncWait*)user;
+    pthread_mutex_lock(&w->mu);
+    w->res = r;
+    atomic_store_explicit(&w->done, 1, memory_order_release);
+    pthread_cond_signal(&w->cv);
+    pthread_mutex_unlock(&w->mu);
+}
+
+static int64_t sync_now_ns(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (int64_t)ts.tv_sec * 1000000000LL + ts.tv_nsec;
+}
+
+/* execSync(db, tx, sql, params | null, flags) -> [status, data | null, message | null, changes, lastInsertRowId]
+ * Blocks the calling thread until the database thread answers: no event loop round trip, the right choice for
+ * tiny statements in a loop; every blocked millisecond is a blocked UI otherwise. */
+static napi_value ExecSync(napi_env env, napi_callback_info info) {
+    ARGS(5);
+    NSDb* db = get_db(env, argv[0]);
+    if (!db) return throw_error(env, "invalid database");
+    int32_t tx = 0, flags = 0;
+    napi_get_value_int32(env, argv[1], &tx);
+    napi_get_value_int32(env, argv[4], &flags);
+    size_t sql_len = 0;
+    char* sql = get_utf8(env, argv[2], &sql_len);
+    if (!sql) return throw_error(env, "sql must be a string");
+    const uint8_t* params;
+    size_t params_len;
+    if (get_bytes(env, argv[3], &params, &params_len)) {
+        free(sql);
+        return throw_error(env, "params must be an ArrayBuffer or a typed array");
+    }
+    SyncWait w;
+    memset(&w, 0, sizeof(w));
+    pthread_mutex_init(&w.mu, NULL);
+    pthread_cond_init(&w.cv, NULL);
+    int rc = nssqlite_exec(db, (uint32_t)tx, sql, sql_len, params, params_len, (uint32_t)flags, 0, on_sync_result, &w);
+    free(sql);
+    napi_value out = NULL;
+    napi_create_array_with_length(env, 5, &out);
+    NSResult r;
+    memset(&r, 0, sizeof(r));
+    if (rc) {
+        r.status = rc;
+    } else {
+        /* poll briefly first: the answer of a small statement arrives within microseconds, a sleep and wake-up costs more */
+        int64_t end = sync_now_ns() + 80000;
+        for (unsigned i = 0; !atomic_load_explicit(&w.done, memory_order_acquire); i++) {
+            if ((i & 31) == 31 && sync_now_ns() > end) break;
+        }
+        pthread_mutex_lock(&w.mu);
+        while (!atomic_load_explicit(&w.done, memory_order_acquire)) pthread_cond_wait(&w.cv, &w.mu);
+        pthread_mutex_unlock(&w.mu);
+        r = w.res;
+    }
+    pthread_cond_destroy(&w.cv);
+    pthread_mutex_destroy(&w.mu);
+    napi_value v;
+    napi_create_int32(env, r.status, &v);
+    napi_set_element(env, out, 0, v);
+    if (r.data) {
+        if (napi_create_external_arraybuffer(env, r.data, r.len, free_external_buffer, NULL, &v) != napi_ok) {
+            nssqlite_free(r.data);
+            napi_get_null(env, &v);
+        }
+    } else {
+        napi_get_null(env, &v);
+    }
+    napi_set_element(env, out, 1, v);
+    if (r.message) {
+        napi_create_string_utf8(env, r.message, NAPI_AUTO_LENGTH, &v);
+        nssqlite_free(r.message);
+    } else {
+        napi_get_null(env, &v);
+    }
+    napi_set_element(env, out, 2, v);
+    napi_create_int64(env, r.changes, &v);
+    napi_set_element(env, out, 3, v);
+    napi_create_int64(env, r.last_insert_rowid, &v);
+    napi_set_element(env, out, 4, v);
+    return out;
+}
+
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor props[] = {
         {"engine", NULL, Engine, NULL, NULL, NULL, napi_enumerable, NULL},
@@ -478,6 +573,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"txEnd", NULL, TxEnd, NULL, NULL, NULL, napi_enumerable, NULL},
         {"loadExtension", NULL, LoadExtension, NULL, NULL, NULL, napi_enumerable, NULL},
         {"close", NULL, Close, NULL, NULL, NULL, napi_enumerable, NULL},
+        {"execSync", NULL, ExecSync, NULL, NULL, NULL, napi_enumerable, NULL},
     };
     napi_define_properties(env, exports, sizeof(props) / sizeof(props[0]), props);
     napi_value v;

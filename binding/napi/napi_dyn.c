@@ -9,6 +9,7 @@
 #undef napi_call_function
 #undef napi_call_threadsafe_function
 #undef napi_close_handle_scope
+#undef napi_create_array_with_length
 #undef napi_create_external
 #undef napi_create_external_arraybuffer
 #undef napi_create_function
@@ -39,6 +40,7 @@
 #undef napi_module_register
 #undef napi_open_handle_scope
 #undef napi_ref_threadsafe_function
+#undef napi_set_element
 #undef napi_set_instance_data
 #undef napi_set_named_property
 #undef napi_throw_error
@@ -64,6 +66,8 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_call_threadsafe_function) missing++;
     *(void**)&g_napi.p_napi_close_handle_scope = lookup(extra, "napi_close_handle_scope");
     if (!g_napi.p_napi_close_handle_scope) missing++;
+    *(void**)&g_napi.p_napi_create_array_with_length = lookup(extra, "napi_create_array_with_length");
+    if (!g_napi.p_napi_create_array_with_length) missing++;
     *(void**)&g_napi.p_napi_create_external = lookup(extra, "napi_create_external");
     if (!g_napi.p_napi_create_external) missing++;
     *(void**)&g_napi.p_napi_create_external_arraybuffer = lookup(extra, "napi_create_external_arraybuffer");
@@ -124,6 +128,8 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_open_handle_scope) missing++;
     *(void**)&g_napi.p_napi_ref_threadsafe_function = lookup(extra, "napi_ref_threadsafe_function");
     if (!g_napi.p_napi_ref_threadsafe_function) missing++;
+    *(void**)&g_napi.p_napi_set_element = lookup(extra, "napi_set_element");
+    if (!g_napi.p_napi_set_element) missing++;
     *(void**)&g_napi.p_napi_set_instance_data = lookup(extra, "napi_set_instance_data");
     if (!g_napi.p_napi_set_instance_data) missing++;
     *(void**)&g_napi.p_napi_set_named_property = lookup(extra, "napi_set_named_property");

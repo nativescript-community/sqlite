@@ -53,6 +53,43 @@ abstract class QueryApi implements SQLiteQueryApi {
         raw.release && raw.release();
     }
 
+    /** Runs a statement and waits for it on the calling thread: no event loop round trip. */
+    private runSync(query: string, params: SqliteParams | undefined, flags = 0): RawResult {
+        if (!this.backend.execSync) {
+            throw new Error('Synchronous calls are not available with this binding');
+        }
+        const raw = this.backend.execSync(this.handle(), this.txId(), query, encodeParams(params), flags);
+        if (raw.status !== 0) {
+            const err = toError(raw, query);
+            raw.release && raw.release();
+            throw err;
+        }
+        return raw;
+    }
+
+    executeSync(query: string, params?: SqliteParams): ExecResult {
+        const raw = this.runSync(query, params);
+        const { changes, lastInsertRowId } = raw;
+        raw.release && raw.release();
+        return { changes, lastInsertRowId };
+    }
+
+    selectSync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): SqliteRow[] {
+        return rowsOf(this.runSync(query, params), decodeOptions(this.options, options, true)).rows;
+    }
+
+    selectArraySync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): any[][] {
+        return rowsOf(this.runSync(query, params), decodeOptions(this.options, options, false)).rows;
+    }
+
+    getSync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): SqliteRow | null {
+        return this.selectSync(query, params, options)[0] || null;
+    }
+
+    getArraySync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): any[] | null {
+        return this.selectArraySync(query, params, options)[0] || null;
+    }
+
     private async query(query: string, params: SqliteParams | undefined, options: SqliteRequestOptions | undefined, objects: boolean) {
         const raw = await request((cb) => this.backend.exec(this.handle(), this.txId(), query, encodeParams(params), 0, 0, cb), query);
         return rowsOf(raw, decodeOptions(this.options, options, objects)).rows;
@@ -244,9 +281,16 @@ export class Database extends QueryApi implements SQLiteDatabase {
             id = this.backend.txBegin(this.handle(), mode, cb);
             return id ? 0 : -2;
         }, 'BEGIN');
-        const begin = await begun;
-        begin.release && begin.release();
+        // calls made from now on belong to the transaction (they wait for its BEGIN): a blocking call must not queue
+        // outside of it, it would wait for an end that only the blocked thread can request
         this.activeTx = id;
+        try {
+            const begin = await begun;
+            begin.release && begin.release();
+        } catch (e) {
+            this.activeTx = 0;
+            throw e;
+        }
         const tx = new Transaction(this, id);
         let result: T;
         try {

@@ -8,6 +8,7 @@ typedef struct NapiTable {
     __typeof__(napi_call_function)* p_napi_call_function;
     __typeof__(napi_call_threadsafe_function)* p_napi_call_threadsafe_function;
     __typeof__(napi_close_handle_scope)* p_napi_close_handle_scope;
+    __typeof__(napi_create_array_with_length)* p_napi_create_array_with_length;
     __typeof__(napi_create_external)* p_napi_create_external;
     __typeof__(napi_create_external_arraybuffer)* p_napi_create_external_arraybuffer;
     __typeof__(napi_create_function)* p_napi_create_function;
@@ -38,6 +39,7 @@ typedef struct NapiTable {
     __typeof__(napi_module_register)* p_napi_module_register;
     __typeof__(napi_open_handle_scope)* p_napi_open_handle_scope;
     __typeof__(napi_ref_threadsafe_function)* p_napi_ref_threadsafe_function;
+    __typeof__(napi_set_element)* p_napi_set_element;
     __typeof__(napi_set_instance_data)* p_napi_set_instance_data;
     __typeof__(napi_set_named_property)* p_napi_set_named_property;
     __typeof__(napi_throw_error)* p_napi_throw_error;
@@ -53,6 +55,7 @@ int napi_dyn_load(void);
 #define napi_call_function (g_napi.p_napi_call_function)
 #define napi_call_threadsafe_function (g_napi.p_napi_call_threadsafe_function)
 #define napi_close_handle_scope (g_napi.p_napi_close_handle_scope)
+#define napi_create_array_with_length (g_napi.p_napi_create_array_with_length)
 #define napi_create_external (g_napi.p_napi_create_external)
 #define napi_create_external_arraybuffer (g_napi.p_napi_create_external_arraybuffer)
 #define napi_create_function (g_napi.p_napi_create_function)
@@ -83,6 +86,7 @@ int napi_dyn_load(void);
 #define napi_module_register (g_napi.p_napi_module_register)
 #define napi_open_handle_scope (g_napi.p_napi_open_handle_scope)
 #define napi_ref_threadsafe_function (g_napi.p_napi_ref_threadsafe_function)
+#define napi_set_element (g_napi.p_napi_set_element)
 #define napi_set_instance_data (g_napi.p_napi_set_instance_data)
 #define napi_set_named_property (g_napi.p_napi_set_named_property)
 #define napi_throw_error (g_napi.p_napi_throw_error)

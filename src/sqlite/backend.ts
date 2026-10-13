@@ -39,6 +39,11 @@ export interface Backend {
     open(engine: any, path: string, params: OpenParams, callback: ResultCallback): any;
     exec(db: any, tx: number, sql: string, params: ArrayBuffer | null, flags: number, chunkRows: number, callback: ResultCallback): number;
     batch(db: any, tx: number, request: ArrayBuffer, flags: number, callback: ResultCallback): number;
+    /**
+     * Optional: runs one statement and blocks the calling thread until the database thread answers. Saves the event
+     * loop round trip of the asynchronous calls (about 0.05 ms on iOS, 0.4 ms on Android) for tiny statements.
+     */
+    execSync?(db: any, tx: number, sql: string, params: ArrayBuffer | null, flags: number): RawResult;
     /** returns the transaction id, 0 when refused */
     txBegin(db: any, mode: number, callback: ResultCallback): number;
     txEnd(db: any, tx: number, commit: boolean, callback: ResultCallback): number;

@@ -136,6 +136,24 @@ Not done yet: typeorm / nanosql integration tests (adapters compile and were ada
 physical-device run, the benchmark of the final TS pipeline against the old plugin, SQLCipher / static extension provider examples,
 CI scripts, `each` backpressure, API documentation (`docs/`).
 
+## Performance against 3.5.9 (2026-10-13)
+
+Full table, method and caveats in `spike/perf/README.md`; raw logs in `spike/perf/results/`. Headlines (Android emulator / iOS simulator):
+reads 20-1000x faster, UI thread stall for a 100000 row query 5.7 s -> 30 ms, batched or concurrent writes 2-30x faster, but awaited one by
+one statements 4-8x slower (event loop and thread hand-off per call) unless the new blocking `*Sync` methods are used (then faster than 3.x).
+
+Things found and fixed while measuring:
+
+- JNI bridge: the NativeScript Android runtime pins a global reference per Java object / JS buffer it converts and aborts the process at 51200
+  (`global reference table overflow`). Per request callbacks and `ArrayBuffer` parameters reached it after a few thousand queries. The bridge now
+  moves only numbers across the boundary: SQL + parameters through a per-thread request arena, results through a per-thread result arena
+  (copied by JS right away; results over 512 KB use a one-off buffer), requests numbered, one callback object per thread.
+- Cross-thread hand-off latency (50-300 us on a virtualised CPU) dominated tiny statements: the database thread now polls ~60 us after each
+  request, and the blocking `execSync` polls ~80 us before sleeping.
+- `get`, `select`, ... on 3.x iOS are broken or quadratic (see the perf README): the new implementation does not share those problems.
+
+Open: physical-device numbers, `*Sync` for the bridge backend (JNI / Objective-C), a pipelined JS-side API for loops of awaited statements.
+
 ## Phases
 
 0. **Spike** (in progress, see below).

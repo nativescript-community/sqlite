@@ -17,6 +17,10 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
         engineCanLoadExtensions: (e) => addon.engineCanLoadExtensions(e),
         open: (engine, path, p: OpenParams, cb) => addon.open(engine, path, p.flags, p.busyTimeoutMs, p.wal, p.initSql, wrap(cb)),
         exec: (db, tx, sql, params, flags, chunkRows, cb) => addon.exec(db, tx, sql, params, flags, chunkRows, wrap(cb)),
+        execSync: (db, tx, sql, params, flags) => {
+            const [status, data, message, changes, lastInsertRowId] = addon.execSync(db, tx, sql, params, flags);
+            return { status, done: true, data, message, changes, lastInsertRowId };
+        },
         batch: (db, tx, request, flags, cb) => addon.batch(db, tx, request, flags, wrap(cb)),
         txBegin: (db, mode, cb) => addon.txBegin(db, mode, wrap(cb)),
         txEnd: (db, tx, commit, cb) => addon.txEnd(db, tx, commit, wrap(cb)),
