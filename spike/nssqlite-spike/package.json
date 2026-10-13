@@ -1,0 +1,17 @@
+{
+  "name": "nssqlite-spike",
+  "main": "app/app.ts",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@nativescript/core": "~9.1.0",
+    "@nativescript/theme": "^3.1.0"
+  },
+  "devDependencies": {
+    "@nativescript/android": "9.1.1",
+    "@nativescript/ios": "9.1.0",
+    "@nativescript/types": "~9.0.0",
+    "@nativescript/webpack": "~5.0.25",
+    "typescript": "~6.0.0"
+  }
+}
