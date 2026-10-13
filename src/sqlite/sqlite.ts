@@ -9,9 +9,10 @@ const config: GlobalConfig = {};
 let backend: Backend | undefined;
 
 /**
- * Global settings. `engine` is the SQLite library databases use unless their `engine` option says otherwise
- * (default: `libsqliteJni.so`, androidx sqlite-bundled, on Android; the system SQLite on iOS). `backend` forces a
- * binding for the databases opened afterwards.
+ * Global settings. `engine` is the SQLite library databases use unless their `engine` option says otherwise: a library
+ * name the platform can dlopen (`libsqlcipher.so`), or `null` for the SQLite of the process (iOS). This package ships
+ * none; `defaultEngine` is what a provider package (@nativescript-community/sqlite) sets. `backend` forces a binding for
+ * the databases opened afterwards.
  */
 export function configure(options: GlobalConfig) {
     if (options.backend && options.backend !== config.backend) {
@@ -31,7 +32,8 @@ function getBackend() {
  */
 export function openOrCreate(filePath: string, options: DatabaseOptions = {}): SQLiteDatabase {
     const b = getBackend();
-    return new Database(b, resolveDatabasePath(filePath), options, config.engine !== undefined ? [config.engine] : undefined);
+    const engine = config.engine !== undefined ? config.engine : config.defaultEngine;
+    return new Database(b, resolveDatabasePath(filePath), options, engine !== undefined ? [engine] : undefined);
 }
 
 /** Like `openOrCreate`, resolves once the database is open and rejects with the open error. */

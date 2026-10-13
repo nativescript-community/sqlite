@@ -83,10 +83,17 @@ export function loadEngine(backend: Backend, candidates: Array<string | null>): 
             errors.push(`${lib === null ? '(sqlite3 symbols of the process)' : lib}: ${(e && (e as any).message) || e}`);
         }
     }
+    if (candidates.length === 0) {
+        throw new Error(
+            'No SQLite engine chosen. This package ships no SQLite: set one with configure({ engine }) or the `engine` option ' +
+                "(e.g. 'libsqlcipher.so' on Android, null for the SQLite linked into the app on iOS), or use @nativescript-community/sqlite, " +
+                'which adds the default one.'
+        );
+    }
     throw new Error(
         'No usable SQLite library. Tried ' +
             errors.join('; ') +
             '. Choose one with configure({ engine }) or the `engine` option; on Android add a library that exports the sqlite3_* API ' +
-            '(androidx.sqlite:sqlite-bundled provides libsqliteJni.so) to the app.'
+            'to the app (e.g. androidx.sqlite:sqlite-bundled provides libsqliteJni.so).'
     );
 }

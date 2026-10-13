@@ -1,12 +1,12 @@
 #!/bin/sh
-# Builds static xcframeworks (device + simulator) into packages/sqlite/platforms/ios/:
+# Builds static xcframeworks (device + simulator) into packages/sqlite-core/platforms/ios/:
 #   NSSqlite.xcframework      the C core and the Objective-C bridge (any runtime). SQLite is not included.
 #   NSSqliteNapi.xcframework  the Node-API binding (inactive on runtimes without napi_*, NativeScript <= 8)
 # Usage: native/build-ios.sh
 set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 OUT=${NSSQLITE_BUILD_DIR:-$ROOT/native/.build/ios}
-DEST=$ROOT/packages/sqlite/platforms/ios
+DEST=$ROOT/packages/sqlite-core/platforms/ios
 MIN=13.0
 
 # build_lib <product> "<sources>" "<extra clang flags>"  -> $OUT/<product>/{device,simulator}/lib<product>.a
@@ -36,7 +36,7 @@ build_lib NSSqlite "$ROOT/core/wire.c $ROOT/core/engine.c $ROOT/core/db.c $ROOT/
 build_lib NSSqliteNapi "$ROOT/binding/napi/nssqlite_napi.c $ROOT/binding/napi/napi_dyn.c $ROOT/binding/ios/NSSqliteNapiLink.m" "-I$ROOT/binding/napi -I$ROOT/binding/napi/include"
 
 HDR="$OUT/Headers"; rm -rf "$HDR"; mkdir -p "$HDR"
-cp "$ROOT/binding/ios/NSSqliteBridge.h" "$HDR/"
+cp "$ROOT/binding/ios/NSSqliteBridge.h" "$ROOT/core/nssqlite.h" "$ROOT/core/provider.h" "$HDR/" # the last two are for static SQLite glue
 cat > "$HDR/module.modulemap" <<'MM'
 module NSSqlite {
     header "NSSqliteBridge.h"

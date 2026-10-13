@@ -217,6 +217,8 @@ async function androidSuite(backend: string) {
 /** The custom build, an embedded dynamic framework (native/build-custom-sqlite.sh ios) */
 /** The SQLite of iOS itself, whatever else the app links */
 const IOS_SYSTEM = '/usr/lib/libsqlite3.dylib';
+/** A SQLite linked statically into the app, registered by native/provider/NSSqliteStaticProvider.m */
+const IOS_STATIC = '@static';
 const IOS_CUSTOM = '@rpath/NSCustomSqlite.framework/NSCustomSqlite';
 
 async function iosSuite(backend: string) {
@@ -268,56 +270,65 @@ async function iosSuite(backend: string) {
         await cipherTests(tag, null);
     }
 
-    // an embedded dynamic framework picked with `engine`, next to the system SQLite
-    let framework = false;
-    try {
-        const d = openOrCreate(':memory:', { engine: IOS_CUSTOM });
-        await d.ready;
-        framework = true;
-        await d.close();
-    } catch (e) {
-        log(tag, 'no NSCustomSqlite.framework in this app:', String(e).slice(0, 120));
+    // an embedded dynamic framework, and a statically linked SQLite registered by its glue, picked with `engine`
+    const candidates: Array<{ label: string; engine: string; ext: string | null }> = [
+        { label: 'framework', engine: IOS_CUSTOM, ext: NSBundle.mainBundle.privateFrameworksPath + '/NSSampleExt.framework/NSSampleExt' },
+        { label: 'static', engine: IOS_STATIC, ext: null }
+    ];
+    for (const c of candidates) {
+        let available = false;
+        try {
+            const d = openOrCreate(':memory:', { engine: c.engine });
+            await d.ready;
+            available = true;
+            await d.close();
+        } catch (e) {
+            log(tag, 'no', c.label, 'engine in this app:', String(e).slice(0, 100));
+        }
+        if (available) {
+            await customEngineTests(tag + ' ' + c.label, c.engine, c.ext);
+        }
     }
-    if (framework) {
-        const ext = NSBundle.mainBundle.privateFrameworksPath + '/NSSampleExt.framework/NSSampleExt';
-        await check(tag + ' framework engine: version, compile options, FTS5/JSON/RTREE', async () => {
-            const db = openOrCreate(':memory:', { engine: IOS_CUSTOM });
-            eq(db.getSqliteVersion(), '3.53.4');
-            const opts = (await db.selectArray('PRAGMA compile_options')).map((r) => r[0]);
-            for (const o of ['ENABLE_FTS5', 'DQS=0', 'DEFAULT_MEMSTATUS=0']) {
-                if (opts.indexOf(o) < 0) throw new Error('missing compile option ' + o);
-            }
-            await db.execute('CREATE VIRTUAL TABLE docs USING fts5(title, body)');
-            await db.execute("INSERT INTO docs VALUES ('native threads', 'sqlite on a worker')");
-            eq((await db.select("SELECT title FROM docs WHERE docs MATCH 'worker'")), [{ title: 'native threads' }]);
-            eq((await db.getArray(`SELECT json_extract('{"a":[1,2,{"b":7}]}', '$.a[2].b')`))[0], 7);
-            await db.close();
-        });
-        await extensionTests(tag + ' framework', IOS_CUSTOM, ext, true, 'sqlite3_nsext_init');
-        await check(tag + ' framework + system SQLite at once, in parallel', async () => {
-            const dir = knownFolders.documents().path;
-            const files = [0, 1].map((i) => `${dir}/engine-ios-multi-${tag}-${i}.db`);
-            files.forEach(removeDb);
-            const a = openOrCreate(files[0], { engine: IOS_CUSTOM, wal: true });
-            const b = openOrCreate(files[1], { engine: IOS_SYSTEM, wal: true });
-            await Promise.all([a, b].map((d) => d.execute('CREATE TABLE t(i INTEGER)')));
-            await Promise.all(
-                [a, b].map((d) =>
-                    d.transaction(async (_c, tx) => {
-                        for (let i = 0; i < 300; i++) await tx.execute('INSERT INTO t VALUES (?)', [i]);
-                    })
-                )
-            );
-            const r = await Promise.all([a, b].map((d) => d.getArray('SELECT sum(i), sqlite_version() FROM t')));
-            eq(r[0][0], 44850);
-            eq(r[1][0], 44850);
-            if (r[0][1] === r[1][1]) throw new Error('both used the same SQLite ' + r[0][1]);
-            if (r[0][1] !== '3.53.4') throw new Error('framework engine is not the custom build: ' + r[0][1]);
-            eq(b.canLoadExtensions(), false);
-            await Promise.all([a.close(), b.close()]);
-            files.forEach(removeDb);
-        });
-    }
+}
+
+async function customEngineTests(tag: string, engine: string, ext: string | null) {
+    await check(tag + ' engine: version, compile options, FTS5/JSON/RTREE', async () => {
+        const db = openOrCreate(':memory:', { engine });
+        eq(db.getSqliteVersion(), '3.53.4');
+        const opts = (await db.selectArray('PRAGMA compile_options')).map((r) => r[0]);
+        for (const o of ['ENABLE_FTS5', 'DQS=0', 'DEFAULT_MEMSTATUS=0']) {
+            if (opts.indexOf(o) < 0) throw new Error('missing compile option ' + o);
+        }
+        await db.execute('CREATE VIRTUAL TABLE docs USING fts5(title, body)');
+        await db.execute("INSERT INTO docs VALUES ('native threads', 'sqlite on a worker')");
+        eq((await db.select("SELECT title FROM docs WHERE docs MATCH 'worker'")), [{ title: 'native threads' }]);
+        eq((await db.getArray(`SELECT json_extract('{"a":[1,2,{"b":7}]}', '$.a[2].b')`))[0], 7);
+        await db.close();
+    });
+    await extensionTests(tag, engine, ext, true, 'sqlite3_nsext_init');
+    await check(tag + ' engine + system SQLite at once, in parallel', async () => {
+        const dir = knownFolders.documents().path;
+        const files = [0, 1].map((i) => `${dir}/engine-ios-multi-${tag.replace(/\W/g, '')}-${i}.db`);
+        files.forEach(removeDb);
+        const a = openOrCreate(files[0], { engine, wal: true });
+        const b = openOrCreate(files[1], { engine: IOS_SYSTEM, wal: true });
+        await Promise.all([a, b].map((d) => d.execute('CREATE TABLE t(i INTEGER)')));
+        await Promise.all(
+            [a, b].map((d) =>
+                d.transaction(async (_c, tx) => {
+                    for (let i = 0; i < 300; i++) await tx.execute('INSERT INTO t VALUES (?)', [i]);
+                })
+            )
+        );
+        const r = await Promise.all([a, b].map((d) => d.getArray('SELECT sum(i), sqlite_version() FROM t')));
+        eq(r[0][0], 44850);
+        eq(r[1][0], 44850);
+        if (r[0][1] !== '3.53.4') throw new Error('engine is not the custom build: ' + r[0][1]);
+        if (r[1][1] === '3.53.4') throw new Error('system engine is the custom build');
+        eq(b.canLoadExtensions(), false);
+        await Promise.all([a.close(), b.close()]);
+        files.forEach(removeDb);
+    });
 }
 
 export async function runEngineTests(backends: string[]) {

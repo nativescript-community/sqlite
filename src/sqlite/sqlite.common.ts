@@ -33,7 +33,7 @@ export interface DatabaseOptions extends SqliteRequestOptions {
     /**
      * The SQLite library to use: a library name the platform can dlopen (`libsqliteJni.so` is androidx
      * sqlite-bundled, `libsqlcipher.so`...), or `null` for the SQLite already in the process (iOS system SQLite).
-     * Default: the value given to `configure`, else the platform default (see `configure`).
+     * Default: the `engine` given to `configure`, else its `defaultEngine`; without any this package cannot open a database.
      */
     engine?: string | null;
     /** milliseconds, default 5000, negative to disable */
@@ -47,6 +47,11 @@ export interface DatabaseOptions extends SqliteRequestOptions {
 export interface GlobalConfig {
     /** default `engine` of databases */
     engine?: string | null;
+    /**
+     * Used when neither `engine` nor the database option is set. For packages that provide a SQLite
+     * (@nativescript-community/sqlite sets androidx sqlite-bundled on Android, the SQLite of the process on iOS).
+     */
+    defaultEngine?: string | null;
     /** force a binding: 'napi' (NativeScript >= 9.1) or 'bridge' (JNI / Objective-C). Default: napi when available. */
     backend?: 'auto' | 'napi' | 'bridge';
 }

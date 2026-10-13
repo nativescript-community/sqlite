@@ -7,8 +7,8 @@ declare const NSFileManager: any;
 declare const NSData: any;
 declare const interop: any;
 
-// the SQLite of the system, already loaded in every process
-const DEFAULT_ENGINES = [null];
+// no default: the app (or @nativescript-community/sqlite, which picks the SQLite of the process) chooses the SQLite
+const DEFAULT_ENGINES: Array<string | null> = [];
 
 function loadAddon() {
     // linked into the app: registered when the app starts

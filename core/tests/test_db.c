@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include "harness.h"
+#include "provider.h"
 
 static NSEngine* E;
 
@@ -640,8 +641,32 @@ static void test_string_heap(void) {
     close_db(db);
 }
 
+static void test_registered_provider(void) {
+    /* what the iOS static glue does: hand the plugin a function table under a name */
+    NSSqliteProvider p;
+    char err[256];
+    CHECK_EQ(nssqlite_provider_load(&p, NSSQLITE_TEST_ENGINE, err, sizeof(err)), 0);
+    CHECK_EQ(nssqlite_register_provider("@reg", &p), 0);
+    CHECK_EQ(nssqlite_register_provider("@reg", &p), 0); /* idempotent */
+    NSEngine* r = nssqlite_engine("@reg", err, sizeof(err));
+    CHECK(r != NULL);
+    CHECK(r != E);
+    CHECK(nssqlite_engine("@reg", err, sizeof(err)) == r);
+    CHECK_EQ(strcmp(nssqlite_engine_version(r), nssqlite_engine_version(E)), 0);
+    NSDb* db = open_db(r, ":memory:", NULL);
+    CHECK_EQ(scalar_int(db, 0, "SELECT 40 + 2"), 42);
+    close_db(db);
+    /* incomplete tables are refused */
+    NSSqliteProvider bad;
+    memset(&bad, 0, sizeof(bad));
+    CHECK(nssqlite_register_provider("@bad", &bad) != 0);
+    CHECK(nssqlite_register_provider(NULL, &p) != 0);
+    CHECK(nssqlite_engine("@bad", err, sizeof(err)) == NULL);
+}
+
 int main(void) {
     E = test_engine();
+    test_registered_provider();
     test_engine_cache();
     test_types();
     test_errors();

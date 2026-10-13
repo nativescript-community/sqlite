@@ -1,7 +1,9 @@
 import { strict as assert } from 'assert';
 import { after, describe, it } from 'node:test';
 import { SqliteError } from '../sqlite.common';
-import { open, tmpDb } from './support';
+import { createNapiBackend } from '../backend.napi';
+import { Database } from '../database';
+import { loadAddon, open, tmpDb } from './support';
 
 async function withDb<T>(fn: (db: ReturnType<typeof open>) => Promise<T>, file = ':memory:', options = {}) {
     const db = open(file, options);
@@ -170,6 +172,10 @@ describe('errors', () => {
         const db = open(':memory:', { initSql: 'NOT SQL' });
         await assert.rejects(db.ready, SqliteError);
         await db.close();
+    });
+
+    it('has no default engine: it asks for one', () => {
+        assert.throws(() => new Database(createNapiBackend(loadAddon(), []), ':memory:'), /No SQLite engine chosen/);
     });
 
     it('explains an unusable engine', () => {

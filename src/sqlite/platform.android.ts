@@ -6,7 +6,8 @@ declare const com: any;
 declare const java: any;
 
 // androidx sqlite-bundled ships its SQLite as libsqliteJni.so
-const DEFAULT_ENGINES = ['libsqliteJni.so'];
+// no default: the app (or @nativescript-community/sqlite, which adds androidx sqlite-bundled) chooses the SQLite
+const DEFAULT_ENGINES: Array<string | null> = [];
 
 function loadAddon() {
     // The module registers itself process wide when its library loads: the bare name works afterwards (also in

@@ -1,11 +1,5 @@
-/* Include.gradle configuration: http://docs.nativescript.org/plugins/plugins#includegradle-specification */
-
-android {
-	
-}
-
+/* The default SQLite of @nativescript-community/sqlite on Android: androidx sqlite-bundled (libsqliteJni.so).
+ * To use another SQLite (SQLCipher, your own build) depend on @nativescript-community/sqlite-core instead of this package. */
 dependencies {
-    // Describe plugin native Android dependencies like
-	// implementation "groupName:pluginName:ver" 
-    // EXAMPLE: implementation "com.facebook.fresco:fresco:0.9.0+"
+    implementation 'androidx.sqlite:sqlite-bundled:2.7.1'
 }

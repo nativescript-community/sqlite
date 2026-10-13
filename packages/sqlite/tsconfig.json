@@ -1,25 +1,13 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "rootDir": "../../src/sqlite",
+        "rootDir": "../../src/sqlite-default",
         "outDir": "./",
+        "baseUrl": ".",
         "paths": {
-            "tns-core-modules": [
-                "./node_modules/@nativescript/core"
-            ],
-            "tns-core-modules/*": [
-                "./node_modules/@nativescript/core/*"
-            ]
+            "@nativescript-community/sqlite-core": ["../sqlite-core/sqlite"],
+            "@nativescript-community/sqlite-core/*": ["../sqlite-core/*"]
         }
     },
-    "include": [
-        "../../src/sqlite/**/*",
-        "../../references.d.ts",
-        "../../tools/references.d.ts",
-        "../../src/references.d.ts"
-    ],
-    "exclude": [
-        "../../src/sqlite/angular/**",
-        "../../src/sqlite/tests/**"
-    ]
+    "include": ["../../src/sqlite-default/**/*", "../../references.d.ts", "../../tools/references.d.ts", "../../src/references.d.ts"]
 }

@@ -60,9 +60,10 @@ packages/**/*.metadata.json
 
 *.tsbuildinfo
 # Packaging: plugin sources under packages/*/platforms are tracked, built binaries are not
+!/packages/sqlite-core/platforms
 !/packages/sqlite/platforms
-/packages/sqlite/platforms/android/jniLibs/
-/packages/sqlite/platforms/ios/*.xcframework
+/packages/sqlite-core/platforms/android/jniLibs/
+/packages/sqlite-core/platforms/ios/*.xcframework
 native/.build/
 
 # staged by hand from native/build-custom-sqlite.sh for the engine tests

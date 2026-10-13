@@ -14,3 +14,10 @@ still the system one, `engine: '@rpath/NSCustomSqlite.framework/NSCustomSqlite'`
 
 Android: `native/build-custom-sqlite.sh` builds `libsqlite_custom.so` and `libns_ext.so` (`.build/custom/android/<abi>`); the app
 packages them in `jniLibs` and uses `engine: 'libsqlite_custom.so'`. The device tests are `spike/nssqlite-spike/app/engine-test.ts`.
+
+## Statically linked SQLite (iOS)
+
+`native/build-custom-sqlite.sh ios-static` builds `NSCustomSqliteStatic.xcframework`: the same SQLite as a static library, with
+`native/provider/NSSqliteStaticProvider.m` (the glue). Put it in `platforms/ios` instead of the dynamic frameworks and open databases
+with `engine: '@static'`. Why the glue: symbols of a static library are not reliably visible to `dlsym`; the glue references
+`sqlite3_*` directly (so the linker pulls in the right SQLite) and registers the table with `nssqlite_register_provider`.

@@ -45,6 +45,13 @@ typedef struct NSDb NSDb;
  * Otherwise dlopen(library). Engines are cached by name and never unloaded.
  * Returns NULL and fills err (if given) on failure. */
 NSSQLITE_API NSEngine* nssqlite_engine(const char* library, char* err, size_t errlen);
+
+/* Registers a SQLite linked statically into the app under a name, e.g. "@static": nssqlite_engine("@static") then
+ * returns it, with no dlopen / dlsym involved (a static library's symbols are not visible to dlsym). The provider
+ * (see provider.h) is copied. A small piece of glue shipped with the static SQLite calls this at startup, see
+ * native/provider/NSSqliteStaticProvider.m. Returns 0 on success. */
+struct NSSqliteProvider;
+NSSQLITE_API int nssqlite_register_provider(const char* name, const struct NSSqliteProvider* p);
 NSSQLITE_API const char* nssqlite_engine_version(const NSEngine* e);
 NSSQLITE_API int nssqlite_engine_can_load_extensions(const NSEngine* e);
 /* Register a statically linked extension init function (sqlite3_auto_extension) so it is applied to

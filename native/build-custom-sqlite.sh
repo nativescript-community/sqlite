@@ -3,6 +3,8 @@
 # the sample extension compiled in.
 #   Android: native/.build/custom/android/<abi>/libsqlite_custom.so, plus the loadable form of the extension,
 #            libns_ext.so (for db.loadExtension). Usage: native/build-custom-sqlite.sh [abi...]  (default: arm64-v8a x86_64)
+#   iOS static: native/build-custom-sqlite.sh ios-static -> native/.build/custom/ios/NSCustomSqliteStatic.xcframework
+#            (a static library + the glue native/provider/NSSqliteStaticProvider.m; the app uses `engine: '@static'`)
 #   iOS:     native/build-custom-sqlite.sh ios -> native/.build/custom/ios/{NSCustomSqlite,NSSampleExt}.xcframework
 #            (dynamic frameworks: the app embeds them and gives `engine: '@rpath/NSCustomSqlite.framework/NSCustomSqlite'`)
 # SQLITE_SRC = folder with sqlite3.c / sqlite3.h / sqlite3ext.h (the amalgamation zip from sqlite.org)
@@ -11,6 +13,32 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 SRC=${SQLITE_SRC:-$(ls -d "$ROOT"/native/.build/sqlite-src/sqlite-amalgamation-* | tail -1)}
 ABIS=${*:-arm64-v8a x86_64}
 DEFS="-DSQLITE_CORE -DSQLITE_THREADSAFE=1 -DSQLITE_DQS=0 -DSQLITE_DEFAULT_MEMSTATUS=0 -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_RTREE -DSQLITE_ENABLE_JSON1 -DSQLITE_ENABLE_MATH_FUNCTIONS -DSQLITE_ENABLE_STAT4 -DSQLITE_EXTRA_INIT=ns_ext_register"
+
+if [ "$1" = ios-static ]; then
+  OUT=$ROOT/native/.build/custom/ios-static
+  MIN=13.0
+  rm -rf "$OUT"; mkdir -p "$OUT"
+  for slice in "device iphoneos arm64" "simulator iphonesimulator arm64 x86_64"; do
+    set -- $slice
+    sl=$1; sdk=$2; shift 2
+    case $sdk in iphoneos) minflag="-miphoneos-version-min=$MIN";; *) minflag="-mios-simulator-version-min=$MIN";; esac
+    archs=""
+    for arch in "$@"; do
+      d="$OUT/$sl-$arch"; mkdir -p "$d"
+      for src in "$SRC/sqlite3.c" "$ROOT/native/ext/ns_ext.c" "$ROOT/native/ext/custom_init.c"; do
+        xcrun --sdk "$sdk" clang -arch "$arch" $minflag -O2 -w -I"$SRC" -I"$ROOT/native/ext" $DEFS -c "$src" -o "$d/$(basename "$src").o"
+      done
+      xcrun --sdk "$sdk" clang -arch "$arch" $minflag -O2 -w -fobjc-arc -I"$SRC" -I"$ROOT/core" -c "$ROOT/native/provider/NSSqliteStaticProvider.m" -o "$d/glue.o"
+      xcrun libtool -static -o "$d/libNSCustomSqliteStatic.a" "$d"/*.o
+      archs="$archs $d/libNSCustomSqliteStatic.a"
+    done
+    mkdir -p "$OUT/$sl"
+    xcrun lipo -create $archs -output "$OUT/$sl/libNSCustomSqliteStatic.a"
+  done
+  xcodebuild -create-xcframework -library "$OUT/device/libNSCustomSqliteStatic.a" -library "$OUT/simulator/libNSCustomSqliteStatic.a" -output "$OUT/NSCustomSqliteStatic.xcframework"
+  du -sh "$OUT/NSCustomSqliteStatic.xcframework"
+  exit 0
+fi
 
 if [ "$1" = ios ]; then
   OUT=$ROOT/native/.build/custom/ios

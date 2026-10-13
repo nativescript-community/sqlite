@@ -41,9 +41,9 @@ binding/napi/         one C file (nssqlite_napi.c). napi_threadsafe_function -> 
 binding/android/      JNI (nssqlite_jni.c) + CMake for libnssqlite.so (core + JNI) and libnssqlite_napi.so
 binding/ios/          Objective-C bridge (NSSqliteBridge) + the +load anchor of the napi static lib
 src/sqlite/           single TS implementation (replaces .android.ts / .ios.ts / worker.ts)
-native/                build-android.sh / build-ios.sh: write the prebuilt libs into packages/sqlite/platforms
-packages/sqlite/platforms/android/jniLibs/<abi>/{libnssqlite,libnssqlite_napi}.so + java/.../NativeSqlite.java
-packages/sqlite/platforms/ios/{NSSqlite,NSSqliteNapi}.xcframework  (static, device + simulator)
+native/                build-android.sh / build-ios.sh: write the prebuilt libs into packages/sqlite-core/platforms
+packages/sqlite-core/platforms/android/jniLibs/<abi>/{libnssqlite,libnssqlite_napi}.so + java/.../NativeSqlite.java
+packages/sqlite-core/platforms/ios/{NSSqlite,NSSqliteNapi}.xcframework  (static, device + simulator)
 ```
 
 Removed: `sqlite.android.ts`, `sqlite.ios.ts`, `sqlitedatabase.android.ts`, `worker.ts`, `WorkersContext.java`, FMDB pod, JS cursor code, NSData/ByteBuffer special cases in `paramToString`.
@@ -252,3 +252,11 @@ Findings:
 3. New `Database.canLoadExtensions()` so apps can branch instead of catching.
 4. The SQLCipher pod is built from the CLI's `use_frameworks!` Podfile; a stale `platforms/ios/Podfile` made `ns run` fail with a Podfile syntax error until `platforms/ios` was removed (CLI behaviour, unrelated to the plugin).
 5. Not tested: NativeScript 8 with custom engines (same JNI / bridge code path as the 9.1 bridge runs), physical devices, iOS device slices of the custom frameworks (built, not run), Android armeabi-v7a/x86.
+
+## Package split and static providers (2026-10-13)
+
+- **Current dependencies**: the plugin had none: empty `include.gradle`, no Podfile. The app added `androidx.sqlite:sqlite-bundled` itself and iOS used the process SQLite.
+- **Two packages now**: `@nativescript-community/sqlite-core` (`packages/sqlite-core`: sources of `src/sqlite`, the prebuilt binaries, typeorm / nanosql adapters; no dependency, no default engine: `openOrCreate` throws "No SQLite engine chosen" until `configure({ engine })` or the `engine` option) and `@nativescript-community/sqlite` (`packages/sqlite`, sources `src/sqlite-default`): depends on core, `include.gradle` adds androidx sqlite-bundled, `configure({ defaultEngine })` at import (`libsqliteJni.so` / `null`), re-exports core, `/typeorm`, `/nanosql`. `engine` still wins over `defaultEngine`, whatever the import order. Users who bring their own SQLite depend on core only and have nothing to remove.
+- **Proven** (`npm pack` of both, only `sqlite` in the app's dependencies): the CLI picks up the transitive core plugin (platform libs, java) and the gradle dependency from the default package; API 12/12 per binding, ORM 8/8, engine tests on Android (28/28) and iOS (default engine = system SQLite). Bare: an app with only `sqlite-core` + SQLCipher: no engine throws the explicit error, androidx is not in the APK (opening `libsqliteJni.so` fails), `configure({engine})` works (`app/bare-test.ts`, Android and iOS).
+- **iOS static SQLite**: `dlsym` cannot be relied on for the symbols of a static library (not exported, not even linked unless referenced). Fix: `nssqlite_register_provider(name, table)` in the core, called at startup by `native/provider/NSSqliteStaticProvider.m`, which sits in the same static library as the SQLite and references `sqlite3_*` directly (so the linker pulls the right object in). The app uses `engine: '@static'`. Host test added; device test: static custom build next to the system SQLite, FTS5/JSON, compiled-in extension, both in parallel (10/10, napi and bridge). Note: in that debug build the default engine (`null`) also found the static symbols through `dlsym`; not guaranteed (release / dead-strip), hence the registry.
+- Not done: publishing metadata (versions, changelog for the new package), static provider for release builds with `-dead_strip`, CocoaPods static pod example, NativeScript 8 run of the split packages.
