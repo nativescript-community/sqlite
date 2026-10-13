@@ -41,5 +41,11 @@
     },
     "dependencies": {
         "@nativescript/hook": "~2.0.0"
-    }
+    },
+    "files": [
+        "platforms",
+        "**/*.js",
+        "**/*.d.ts",
+        "**/*.mjs"
+    ]
 }

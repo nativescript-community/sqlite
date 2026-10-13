@@ -59,3 +59,8 @@ packages/**/*.metadata.json
 /blueprint.md
 
 *.tsbuildinfo
+# Packaging: plugin sources under packages/*/platforms are tracked, built binaries are not
+!/packages/sqlite/platforms
+/packages/sqlite/platforms/android/jniLibs/
+/packages/sqlite/platforms/ios/*.xcframework
+native/.build/
