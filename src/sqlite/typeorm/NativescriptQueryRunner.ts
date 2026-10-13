@@ -36,9 +36,14 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner implement
         try {
             const db: NSQlite.SQLiteDatabase = await this.connect();
             const queryStartTime = +new Date();
-            const result = isInsertQuery // when isInsertQuery == true, result is the id
-                ? await db.execute(query, parameters)
-                : await db.select(query, parameters);
+            let result: any;
+            if (isInsertQuery) {
+                // TypeORM expects the id of an INSERT, the number of changed rows of an UPDATE
+                const res = await db.execute(query, parameters);
+                result = query.startsWith('INSERT INTO') ? res.lastInsertRowId : res.changes;
+            } else {
+                result = await db.select(query, parameters);
+            }
             const queryEndTime = +new Date();
             const queryExecutionTime = queryEndTime - queryStartTime;
             const maxQueryExecutionTime = connection.options.maxQueryExecutionTime;

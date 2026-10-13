@@ -5,7 +5,6 @@
  * - Requests run on the core's database threads. Results are queued to the env that made the call
  *   with one napi_threadsafe_function per env, so it works on the main thread and in Workers.
  * - Result buffers are external ArrayBuffers over the core's memory (no copy).
- * - decodeRows builds the JS rows natively from a rows block, on the JS thread.
  * - napi_* functions are resolved at runtime (napi_dyn.h): nothing is linked against the runtime.
  *
  * JS callback: (status, done, data: ArrayBuffer | null, message: string | null, changes, lastInsertRowId)
@@ -25,6 +24,7 @@
 
 typedef struct Dispatcher {
     napi_threadsafe_function tsfn;
+    napi_env env;
     pthread_mutex_t mu;
     int closed;          /* env is gone: results are dropped */
     atomic_int pending;  /* requests in flight */
@@ -97,7 +97,8 @@ static void call_js(napi_env env, napi_value unused, void* context, void* data) 
     }
     nssqlite_free(r.message);
     if (done) {
-        atomic_fetch_sub(&call->d->pending, 1);
+        /* the event loop only has to stay alive while requests are in flight (Node.js; no-op in NativeScript) */
+        if (atomic_fetch_sub(&call->d->pending, 1) == 1 && env) napi_unref_threadsafe_function(env, call->d->tsfn);
         dispatcher_unref(call->d);
         free(call);
     }
@@ -149,6 +150,7 @@ static Dispatcher* dispatcher_get(napi_env env) {
     if (napi_get_instance_data(env, (void**)&d) == napi_ok && d) return d;
     d = (Dispatcher*)calloc(1, sizeof(*d));
     if (!d) return NULL;
+    d->env = env;
     pthread_mutex_init(&d->mu, NULL);
     atomic_init(&d->pending, 0);
     atomic_init(&d->refs, 1);
@@ -160,6 +162,7 @@ static Dispatcher* dispatcher_get(napi_env env) {
         free(d);
         return NULL;
     }
+    napi_unref_threadsafe_function(env, d->tsfn);
     napi_set_instance_data(env, d, dispatcher_finalize, NULL);
     return d;
 }
@@ -242,7 +245,7 @@ static Call* call_new(napi_env env, napi_value cb) {
         return NULL;
     }
     c->d = d;
-    atomic_fetch_add(&d->pending, 1);
+    if (atomic_fetch_add(&d->pending, 1) == 0) napi_ref_threadsafe_function(env, d->tsfn);
     atomic_fetch_add(&d->refs, 1);
     return c;
 }
@@ -251,7 +254,7 @@ static Call* call_new(napi_env env, napi_value cb) {
 static void call_drop(napi_env env, Call* c) {
     if (!c) return;
     napi_delete_reference(env, c->cb);
-    atomic_fetch_sub(&c->d->pending, 1);
+    if (atomic_fetch_sub(&c->d->pending, 1) == 1) napi_unref_threadsafe_function(env, c->d->tsfn);
     dispatcher_unref(c->d);
     free(c);
 }
@@ -463,92 +466,6 @@ static napi_value Close(napi_env env, napi_callback_info info) {
     return int_result(env, rc);
 }
 
-/* ---- native row decoding ---- */
-
-#define DECODE_OBJECTS 1  /* rows as {column: value}, otherwise arrays */
-#define DECODE_BIGINT 2   /* INT64 values as BigInt, otherwise numbers */
-
-static int cell_to_js(napi_env env, const NSValue* v, uint32_t flags, napi_value* out) {
-    switch (v->type) {
-        case NS_T_NULL: return napi_get_null(env, out);
-        case NS_T_INT32: return napi_create_int32(env, (int32_t)v->i, out);
-        case NS_T_INT64: return (flags & DECODE_BIGINT) ? napi_create_bigint_int64(env, v->i, out) : napi_create_int64(env, v->i, out);
-        case NS_T_DOUBLE: return napi_create_double(env, v->d, out);
-        case NS_T_TEXT:
-            return v->ascii ? napi_create_string_latin1(env, (const char*)v->ptr, v->len, out) : napi_create_string_utf8(env, (const char*)v->ptr, v->len, out);
-        case NS_T_BLOB: {
-            void* p;
-            napi_value ab;
-            if (napi_create_arraybuffer(env, v->len, &p, &ab) != napi_ok) return napi_generic_failure;
-            if (v->len) memcpy(p, v->ptr, v->len);
-            return napi_create_typedarray(env, napi_uint8_array, v->len, ab, 0, out);
-        }
-    }
-    return napi_generic_failure;
-}
-
-/* decodeRows(buffer, byteOffset, byteLength, flags) -> { columns, rows, changes, lastInsertRowId } */
-static napi_value DecodeRows(napi_env env, napi_callback_info info) {
-    ARGS(4);
-    const uint8_t* data;
-    size_t len;
-    if (get_bytes(env, argv[0], &data, &len) || !data) return throw_error(env, "buffer must be an ArrayBuffer or a typed array");
-    uint32_t off = 0, n = 0, flags = 0;
-    napi_get_value_uint32(env, argv[1], &off);
-    napi_get_value_uint32(env, argv[2], &n);
-    napi_get_value_uint32(env, argv[3], &flags);
-    if (off > len || n > len - off) return throw_error(env, "range outside of the buffer");
-    NSRows rows;
-    if (nssqlite_rows_init(&rows, data + off, n)) return throw_error(env, "malformed rows block");
-
-    napi_value columns, rowsArr, result;
-    napi_create_array_with_length(env, rows.ncols, &columns);
-    for (uint32_t c = 0; c < rows.ncols; c++) {
-        const uint8_t* name;
-        uint32_t nl;
-        if (nssqlite_rows_name(&rows, c, &name, &nl)) return throw_error(env, "malformed rows block");
-        napi_value s;
-        napi_create_string_utf8(env, (const char*)name, nl, &s);
-        napi_set_element(env, columns, c, s);
-    }
-    napi_create_array_with_length(env, rows.nrows, &rowsArr);
-    NSValue* vals = (NSValue*)malloc(sizeof(NSValue) * (rows.ncols ? rows.ncols : 1));
-    if (!vals) return throw_error(env, "out of memory");
-    for (uint32_t r = 0; r < rows.nrows; r++) {
-        int rc = nssqlite_rows_next(&rows, vals);
-        if (rc <= 0) {
-            free(vals);
-            return throw_error(env, "malformed rows block");
-        }
-        napi_value row, cellv;
-        if (flags & DECODE_OBJECTS) napi_create_object(env, &row); else napi_create_array_with_length(env, rows.ncols, &row);
-        for (uint32_t c = 0; c < rows.ncols; c++) {
-            if (cell_to_js(env, &vals[c], flags, &cellv) != napi_ok) {
-                free(vals);
-                return throw_error(env, "cannot decode a value");
-            }
-            if (flags & DECODE_OBJECTS) {
-                napi_value key;
-                napi_get_element(env, columns, c, &key);
-                napi_set_property(env, row, key, cellv);
-            } else {
-                napi_set_element(env, row, c, cellv);
-            }
-        }
-        napi_set_element(env, rowsArr, r, row);
-    }
-    free(vals);
-    napi_create_object(env, &result);
-    napi_value ch, id;
-    napi_create_int64(env, rows.changes, &ch);
-    napi_create_int64(env, rows.last_insert_rowid, &id);
-    napi_set_named_property(env, result, "columns", columns);
-    napi_set_named_property(env, result, "rows", rowsArr);
-    napi_set_named_property(env, result, "changes", ch);
-    napi_set_named_property(env, result, "lastInsertRowId", id);
-    return result;
-}
-
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor props[] = {
         {"engine", NULL, Engine, NULL, NULL, NULL, napi_enumerable, NULL},
@@ -561,7 +478,6 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"txEnd", NULL, TxEnd, NULL, NULL, NULL, napi_enumerable, NULL},
         {"loadExtension", NULL, LoadExtension, NULL, NULL, NULL, napi_enumerable, NULL},
         {"close", NULL, Close, NULL, NULL, NULL, napi_enumerable, NULL},
-        {"decodeRows", NULL, DecodeRows, NULL, NULL, NULL, napi_enumerable, NULL},
     };
     napi_define_properties(env, exports, sizeof(props) / sizeof(props[0]), props);
     napi_value v;

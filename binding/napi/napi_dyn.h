@@ -8,28 +8,20 @@ typedef struct NapiTable {
     __typeof__(napi_call_function)* p_napi_call_function;
     __typeof__(napi_call_threadsafe_function)* p_napi_call_threadsafe_function;
     __typeof__(napi_close_handle_scope)* p_napi_close_handle_scope;
-    __typeof__(napi_create_array_with_length)* p_napi_create_array_with_length;
-    __typeof__(napi_create_arraybuffer)* p_napi_create_arraybuffer;
-    __typeof__(napi_create_bigint_int64)* p_napi_create_bigint_int64;
-    __typeof__(napi_create_double)* p_napi_create_double;
     __typeof__(napi_create_external)* p_napi_create_external;
     __typeof__(napi_create_external_arraybuffer)* p_napi_create_external_arraybuffer;
     __typeof__(napi_create_function)* p_napi_create_function;
     __typeof__(napi_create_int32)* p_napi_create_int32;
     __typeof__(napi_create_int64)* p_napi_create_int64;
-    __typeof__(napi_create_object)* p_napi_create_object;
     __typeof__(napi_create_reference)* p_napi_create_reference;
-    __typeof__(napi_create_string_latin1)* p_napi_create_string_latin1;
     __typeof__(napi_create_string_utf8)* p_napi_create_string_utf8;
     __typeof__(napi_create_threadsafe_function)* p_napi_create_threadsafe_function;
-    __typeof__(napi_create_typedarray)* p_napi_create_typedarray;
     __typeof__(napi_define_properties)* p_napi_define_properties;
     __typeof__(napi_delete_reference)* p_napi_delete_reference;
     __typeof__(napi_get_arraybuffer_info)* p_napi_get_arraybuffer_info;
     __typeof__(napi_get_boolean)* p_napi_get_boolean;
     __typeof__(napi_get_cb_info)* p_napi_get_cb_info;
     __typeof__(napi_get_dataview_info)* p_napi_get_dataview_info;
-    __typeof__(napi_get_element)* p_napi_get_element;
     __typeof__(napi_get_global)* p_napi_get_global;
     __typeof__(napi_get_instance_data)* p_napi_get_instance_data;
     __typeof__(napi_get_null)* p_napi_get_null;
@@ -40,18 +32,17 @@ typedef struct NapiTable {
     __typeof__(napi_get_value_external)* p_napi_get_value_external;
     __typeof__(napi_get_value_int32)* p_napi_get_value_int32;
     __typeof__(napi_get_value_string_utf8)* p_napi_get_value_string_utf8;
-    __typeof__(napi_get_value_uint32)* p_napi_get_value_uint32;
     __typeof__(napi_is_arraybuffer)* p_napi_is_arraybuffer;
     __typeof__(napi_is_dataview)* p_napi_is_dataview;
     __typeof__(napi_is_typedarray)* p_napi_is_typedarray;
     __typeof__(napi_module_register)* p_napi_module_register;
     __typeof__(napi_open_handle_scope)* p_napi_open_handle_scope;
-    __typeof__(napi_set_element)* p_napi_set_element;
+    __typeof__(napi_ref_threadsafe_function)* p_napi_ref_threadsafe_function;
     __typeof__(napi_set_instance_data)* p_napi_set_instance_data;
     __typeof__(napi_set_named_property)* p_napi_set_named_property;
-    __typeof__(napi_set_property)* p_napi_set_property;
     __typeof__(napi_throw_error)* p_napi_throw_error;
     __typeof__(napi_typeof)* p_napi_typeof;
+    __typeof__(napi_unref_threadsafe_function)* p_napi_unref_threadsafe_function;
 } NapiTable;
 
 extern NapiTable g_napi;
@@ -62,28 +53,20 @@ int napi_dyn_load(void);
 #define napi_call_function (g_napi.p_napi_call_function)
 #define napi_call_threadsafe_function (g_napi.p_napi_call_threadsafe_function)
 #define napi_close_handle_scope (g_napi.p_napi_close_handle_scope)
-#define napi_create_array_with_length (g_napi.p_napi_create_array_with_length)
-#define napi_create_arraybuffer (g_napi.p_napi_create_arraybuffer)
-#define napi_create_bigint_int64 (g_napi.p_napi_create_bigint_int64)
-#define napi_create_double (g_napi.p_napi_create_double)
 #define napi_create_external (g_napi.p_napi_create_external)
 #define napi_create_external_arraybuffer (g_napi.p_napi_create_external_arraybuffer)
 #define napi_create_function (g_napi.p_napi_create_function)
 #define napi_create_int32 (g_napi.p_napi_create_int32)
 #define napi_create_int64 (g_napi.p_napi_create_int64)
-#define napi_create_object (g_napi.p_napi_create_object)
 #define napi_create_reference (g_napi.p_napi_create_reference)
-#define napi_create_string_latin1 (g_napi.p_napi_create_string_latin1)
 #define napi_create_string_utf8 (g_napi.p_napi_create_string_utf8)
 #define napi_create_threadsafe_function (g_napi.p_napi_create_threadsafe_function)
-#define napi_create_typedarray (g_napi.p_napi_create_typedarray)
 #define napi_define_properties (g_napi.p_napi_define_properties)
 #define napi_delete_reference (g_napi.p_napi_delete_reference)
 #define napi_get_arraybuffer_info (g_napi.p_napi_get_arraybuffer_info)
 #define napi_get_boolean (g_napi.p_napi_get_boolean)
 #define napi_get_cb_info (g_napi.p_napi_get_cb_info)
 #define napi_get_dataview_info (g_napi.p_napi_get_dataview_info)
-#define napi_get_element (g_napi.p_napi_get_element)
 #define napi_get_global (g_napi.p_napi_get_global)
 #define napi_get_instance_data (g_napi.p_napi_get_instance_data)
 #define napi_get_null (g_napi.p_napi_get_null)
@@ -94,17 +77,16 @@ int napi_dyn_load(void);
 #define napi_get_value_external (g_napi.p_napi_get_value_external)
 #define napi_get_value_int32 (g_napi.p_napi_get_value_int32)
 #define napi_get_value_string_utf8 (g_napi.p_napi_get_value_string_utf8)
-#define napi_get_value_uint32 (g_napi.p_napi_get_value_uint32)
 #define napi_is_arraybuffer (g_napi.p_napi_is_arraybuffer)
 #define napi_is_dataview (g_napi.p_napi_is_dataview)
 #define napi_is_typedarray (g_napi.p_napi_is_typedarray)
 #define napi_module_register (g_napi.p_napi_module_register)
 #define napi_open_handle_scope (g_napi.p_napi_open_handle_scope)
-#define napi_set_element (g_napi.p_napi_set_element)
+#define napi_ref_threadsafe_function (g_napi.p_napi_ref_threadsafe_function)
 #define napi_set_instance_data (g_napi.p_napi_set_instance_data)
 #define napi_set_named_property (g_napi.p_napi_set_named_property)
-#define napi_set_property (g_napi.p_napi_set_property)
 #define napi_throw_error (g_napi.p_napi_throw_error)
 #define napi_typeof (g_napi.p_napi_typeof)
+#define napi_unref_threadsafe_function (g_napi.p_napi_unref_threadsafe_function)
 
 #endif

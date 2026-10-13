@@ -1,10 +1,11 @@
 // You can add your native dependencies here
 dependencies {
 //  implementation 'androidx.multidex:multidex:2.0.1'
+    // the SQLite library the plugin loads on Android (exports the sqlite3_* API): androidx sqlite-bundled
+    implementation 'androidx.sqlite:sqlite-bundled:2.7.1'
 }
 
 android {
-  sourceSets { main { jniLibs.srcDirs += ["src/main/jniLibs"] } }
   compileSdkVersion 36
   buildToolsVersion "36"
   // ndkVersion ""

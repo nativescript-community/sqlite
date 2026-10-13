@@ -9,28 +9,20 @@
 #undef napi_call_function
 #undef napi_call_threadsafe_function
 #undef napi_close_handle_scope
-#undef napi_create_array_with_length
-#undef napi_create_arraybuffer
-#undef napi_create_bigint_int64
-#undef napi_create_double
 #undef napi_create_external
 #undef napi_create_external_arraybuffer
 #undef napi_create_function
 #undef napi_create_int32
 #undef napi_create_int64
-#undef napi_create_object
 #undef napi_create_reference
-#undef napi_create_string_latin1
 #undef napi_create_string_utf8
 #undef napi_create_threadsafe_function
-#undef napi_create_typedarray
 #undef napi_define_properties
 #undef napi_delete_reference
 #undef napi_get_arraybuffer_info
 #undef napi_get_boolean
 #undef napi_get_cb_info
 #undef napi_get_dataview_info
-#undef napi_get_element
 #undef napi_get_global
 #undef napi_get_instance_data
 #undef napi_get_null
@@ -41,18 +33,17 @@
 #undef napi_get_value_external
 #undef napi_get_value_int32
 #undef napi_get_value_string_utf8
-#undef napi_get_value_uint32
 #undef napi_is_arraybuffer
 #undef napi_is_dataview
 #undef napi_is_typedarray
 #undef napi_module_register
 #undef napi_open_handle_scope
-#undef napi_set_element
+#undef napi_ref_threadsafe_function
 #undef napi_set_instance_data
 #undef napi_set_named_property
-#undef napi_set_property
 #undef napi_throw_error
 #undef napi_typeof
+#undef napi_unref_threadsafe_function
 
 NapiTable g_napi;
 
@@ -73,14 +64,6 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_call_threadsafe_function) missing++;
     *(void**)&g_napi.p_napi_close_handle_scope = lookup(extra, "napi_close_handle_scope");
     if (!g_napi.p_napi_close_handle_scope) missing++;
-    *(void**)&g_napi.p_napi_create_array_with_length = lookup(extra, "napi_create_array_with_length");
-    if (!g_napi.p_napi_create_array_with_length) missing++;
-    *(void**)&g_napi.p_napi_create_arraybuffer = lookup(extra, "napi_create_arraybuffer");
-    if (!g_napi.p_napi_create_arraybuffer) missing++;
-    *(void**)&g_napi.p_napi_create_bigint_int64 = lookup(extra, "napi_create_bigint_int64");
-    if (!g_napi.p_napi_create_bigint_int64) missing++;
-    *(void**)&g_napi.p_napi_create_double = lookup(extra, "napi_create_double");
-    if (!g_napi.p_napi_create_double) missing++;
     *(void**)&g_napi.p_napi_create_external = lookup(extra, "napi_create_external");
     if (!g_napi.p_napi_create_external) missing++;
     *(void**)&g_napi.p_napi_create_external_arraybuffer = lookup(extra, "napi_create_external_arraybuffer");
@@ -91,18 +74,12 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_create_int32) missing++;
     *(void**)&g_napi.p_napi_create_int64 = lookup(extra, "napi_create_int64");
     if (!g_napi.p_napi_create_int64) missing++;
-    *(void**)&g_napi.p_napi_create_object = lookup(extra, "napi_create_object");
-    if (!g_napi.p_napi_create_object) missing++;
     *(void**)&g_napi.p_napi_create_reference = lookup(extra, "napi_create_reference");
     if (!g_napi.p_napi_create_reference) missing++;
-    *(void**)&g_napi.p_napi_create_string_latin1 = lookup(extra, "napi_create_string_latin1");
-    if (!g_napi.p_napi_create_string_latin1) missing++;
     *(void**)&g_napi.p_napi_create_string_utf8 = lookup(extra, "napi_create_string_utf8");
     if (!g_napi.p_napi_create_string_utf8) missing++;
     *(void**)&g_napi.p_napi_create_threadsafe_function = lookup(extra, "napi_create_threadsafe_function");
     if (!g_napi.p_napi_create_threadsafe_function) missing++;
-    *(void**)&g_napi.p_napi_create_typedarray = lookup(extra, "napi_create_typedarray");
-    if (!g_napi.p_napi_create_typedarray) missing++;
     *(void**)&g_napi.p_napi_define_properties = lookup(extra, "napi_define_properties");
     if (!g_napi.p_napi_define_properties) missing++;
     *(void**)&g_napi.p_napi_delete_reference = lookup(extra, "napi_delete_reference");
@@ -115,8 +92,6 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_get_cb_info) missing++;
     *(void**)&g_napi.p_napi_get_dataview_info = lookup(extra, "napi_get_dataview_info");
     if (!g_napi.p_napi_get_dataview_info) missing++;
-    *(void**)&g_napi.p_napi_get_element = lookup(extra, "napi_get_element");
-    if (!g_napi.p_napi_get_element) missing++;
     *(void**)&g_napi.p_napi_get_global = lookup(extra, "napi_get_global");
     if (!g_napi.p_napi_get_global) missing++;
     *(void**)&g_napi.p_napi_get_instance_data = lookup(extra, "napi_get_instance_data");
@@ -137,8 +112,6 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_get_value_int32) missing++;
     *(void**)&g_napi.p_napi_get_value_string_utf8 = lookup(extra, "napi_get_value_string_utf8");
     if (!g_napi.p_napi_get_value_string_utf8) missing++;
-    *(void**)&g_napi.p_napi_get_value_uint32 = lookup(extra, "napi_get_value_uint32");
-    if (!g_napi.p_napi_get_value_uint32) missing++;
     *(void**)&g_napi.p_napi_is_arraybuffer = lookup(extra, "napi_is_arraybuffer");
     if (!g_napi.p_napi_is_arraybuffer) missing++;
     *(void**)&g_napi.p_napi_is_dataview = lookup(extra, "napi_is_dataview");
@@ -149,17 +122,17 @@ int napi_dyn_load(void) {
     if (!g_napi.p_napi_module_register) missing++;
     *(void**)&g_napi.p_napi_open_handle_scope = lookup(extra, "napi_open_handle_scope");
     if (!g_napi.p_napi_open_handle_scope) missing++;
-    *(void**)&g_napi.p_napi_set_element = lookup(extra, "napi_set_element");
-    if (!g_napi.p_napi_set_element) missing++;
+    *(void**)&g_napi.p_napi_ref_threadsafe_function = lookup(extra, "napi_ref_threadsafe_function");
+    if (!g_napi.p_napi_ref_threadsafe_function) missing++;
     *(void**)&g_napi.p_napi_set_instance_data = lookup(extra, "napi_set_instance_data");
     if (!g_napi.p_napi_set_instance_data) missing++;
     *(void**)&g_napi.p_napi_set_named_property = lookup(extra, "napi_set_named_property");
     if (!g_napi.p_napi_set_named_property) missing++;
-    *(void**)&g_napi.p_napi_set_property = lookup(extra, "napi_set_property");
-    if (!g_napi.p_napi_set_property) missing++;
     *(void**)&g_napi.p_napi_throw_error = lookup(extra, "napi_throw_error");
     if (!g_napi.p_napi_throw_error) missing++;
     *(void**)&g_napi.p_napi_typeof = lookup(extra, "napi_typeof");
     if (!g_napi.p_napi_typeof) missing++;
+    *(void**)&g_napi.p_napi_unref_threadsafe_function = lookup(extra, "napi_unref_threadsafe_function");
+    if (!g_napi.p_napi_unref_threadsafe_function) missing++;
     return missing;
 }

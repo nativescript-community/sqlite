@@ -69,12 +69,15 @@ static void test_truncated_rows(void) {
     nssqlite_buf_u32(&b, 2);
     nssqlite_buf_i64(&b, 5);
     nssqlite_buf_i64(&b, 6);
+    size_t heap_off_at = b.len;
+    nssqlite_buf_u32(&b, 0); /* heap offset, patched below */
     nssqlite_buf_u32(&b, 1); nssqlite_buf_bytes(&b, "a", 1);
     nssqlite_buf_u32(&b, 3); nssqlite_buf_bytes(&b, "bcd", 3);
     for (int row = 0; row < 2; row++) {
         nssqlite_buf_value_int(&b, row);
         nssqlite_buf_value_text(&b, "txt", 3);
     }
+    nssqlite_buf_patch_u32(&b, heap_off_at, (uint32_t)b.len); /* empty heap */
     NSRows rows;
     CHECK(nssqlite_rows_init(&rows, b.data, b.len) == 0);
     CHECK_EQ(rows.ncols, 2); CHECK_EQ(rows.nrows, 2); CHECK_EQ(rows.changes, 5); CHECK_EQ(rows.last_insert_rowid, 6);
@@ -117,11 +120,11 @@ static void test_buf_take(void) {
     nssqlite_free(d);
 }
 
-/* rows block v2: ASCII strings live in a heap and are referenced, other strings stay inline */
-static void test_rows_v2(void) {
+/* ASCII strings live in the heap and are referenced, other strings stay inline */
+static void test_rows_heap(void) {
     NSBuf b;
     nssqlite_buf_init(&b);
-    nssqlite_buf_u32(&b, NS_ROWS_MAGIC2);
+    nssqlite_buf_u32(&b, NS_ROWS_MAGIC);
     nssqlite_buf_u32(&b, 2);          /* ncols */
     nssqlite_buf_u32(&b, 2);          /* nrows */
     nssqlite_buf_i64(&b, 0);
@@ -170,6 +173,6 @@ int main(void) {
     test_bad_input();
     test_truncated_rows();
     test_buf_take();
-    test_rows_v2();
+    test_rows_heap();
     return finish("wire");
 }

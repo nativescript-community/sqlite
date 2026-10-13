@@ -85,6 +85,57 @@ Sources: `NativeScript/android` and `NativeScript/ios` `docs/node-api.md`.
 - **Android loading:** addon is a normal `.so`, registered from a static constructor with `napi_module_register` (do not use `NAPI_MODULE` macros). JS: `require("name")` after the library is loaded, or `require("system_lib://libnssqlite.so")` for a `.so` in `jniLibs`. Headers from the runtime's prefab package; link a build-time-only stub of `libNativeScript.so` (excluded from packaging) or allow undefined `napi_*` symbols.
 - **iOS loading:** addon must be compiled into the app binary (no `.node` dylib loading in 9.1). Registered from a static constructor; JS: `require("name")`. A static library needs `-force_load` (or a referenced symbol) so the constructor is not dead-stripped; a dynamic framework avoids that. Open question below.
 
+## Decode benchmark and decision (2026-10-13)
+
+Question: how should a result get from the native buffer to JS rows? Candidates measured on the Node-API binding (code in git history,
+commit "chore(bench)"): TypeScript decoder (arrays / objects), native decoder in the addon (per cell napi calls), native JSON +
+`JSON.parse`, each with and without an ASCII string heap. Median of 15 interleaved runs (JIT and GC do not favour the first variant),
+Android emulator arm64 / iOS simulator, V8 on both. Decode time in ms (query time excluded):
+
+| result | TS arrays | TS arrays + heap | native arrays | native objects | JSON arrays (+native JSON query cost) |
+|---|---|---|---|---|---|
+| 20000 x 3 (int, short text, real), Android | 7.4 | **1.7** | 19 | 31 | 9.5 (+25) |
+| 5000 x 12 mixed with text, Android | 8.3 | **1.3** | 12.6 | 23.8 | 4.6 (+11) |
+| 5000 x 3 long text (10% non-ASCII), Android | 32 | 9.2 | 7.5 | 11.4 | 26 (+5) |
+| 20000 x 3, iOS simulator | 7.4 | 4.3 | 4.4 | 6.6 | 2.7 (+2.6) |
+| 5000 x 3 long text, iOS simulator | 5.8 | 3.8 | 1.8 | 2.7 | 10.9 |
+| 1000 x blob(2 KB), either | ~1.2 | ~1.2 | 1.5-2.4 | | - |
+| 1 row query round trip | 0.4-0.6 ms Android, 0.01 ms iOS, no measurable difference between decoders | | | | |
+
+Decision:
+- **One TypeScript decoder for every backend.** Native decoding (a napi call per cell) is as fast only when strings dominate and loses
+  elsewhere; a second decoder would double the maintenance. `decodeRows` was removed from the binding.
+- **ASCII string heap in the wire format** (`TEXT_REF`): ASCII strings are stored once in a heap, the reader decodes the heap with one
+  `TextDecoder` call and slices it. 2-6x faster decoding of text, costs ~+8% bytes on narrow results. Non-ASCII and empty strings stay inline.
+- **JSON dropped:** the native formatting (`%.17g`, escaping) costs more than it saves, and it loses blobs and int64 precision.
+- TextDecoder on views: use `subarray` when the runtime honours `byteOffset` (feature detected), `slice` otherwise (NS 8).
+- Remaining idea if text-heavy results matter: decode strings natively only when a result is mostly long text (not worth it now).
+
+## TypeScript layer (status)
+
+`src/sqlite/` (single implementation, platform files only for the bridge and the file system):
+
+- `sqlite.ts` public API (`openOrCreate`, `openOrCreateAsync`, `deleteDatabase`, `configure`), `sqlite.common.ts` types + `SqliteError`
+- `database.ts` `Database` (shared `QueryApi` for database and transaction): `execute`, `executeScript`, `select`, `selectArray`, `get`,
+  `getArray`, `each` (chunked streaming), `batch` (atomic), `transaction` (pinned connection, joins calls made on `db`), `get/setVersion`,
+  `loadExtension`, `close`, `ready`
+- `codec.ts` params / batch encoder, rows decoder (arrays or objects, int64 modes, blob types); `core.ts` promise helpers, engine loading
+- `backend.ts` interface, `backend.napi.ts` Node-API adapter, `platform.android.ts` / `platform.ios.ts` (bridge adapters, napi loading,
+  path handling), `platform.common.ts` (backend choice)
+
+Tests:
+
+- **Node**: `native/test-ts.sh` builds the Node-API binding for the host Node and runs `src/sqlite/tests` (node:test) against the real C
+  core and a real SQLite: 49 tests (values, errors, open options, close, `each`, `batch`, transactions, two connections, concurrency, 50k rows,
+  worker threads with their own env, codec edge cases and malformed input).
+- **Devices** (`spike/nssqlite-spike`, `app/api-test.ts`): the public API suite (12 checks per binding) passes on NativeScript 9.1 Android
+  emulator and iOS simulator with both bindings, and on NativeScript 8.9 Android emulator and iOS simulator (bridge, `auto` falls back to it).
+- Android provider is added with one gradle line (`implementation 'androidx.sqlite:sqlite-bundled:2.7.1'`), no manual copy.
+
+Not done yet: typeorm / nanosql integration tests (adapters compile and were adapted: INSERT returns the id, UPDATE the changes), a
+physical-device run, the benchmark of the final TS pipeline against the old plugin, SQLCipher / static extension provider examples,
+CI scripts, `each` backpressure, API documentation (`docs/`).
+
 ## Phases
 
 0. **Spike** (in progress, see below).

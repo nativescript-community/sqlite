@@ -10,13 +10,12 @@
  *   BLOB   (5): len:u32 bytes
  *
  * params block  := count:u32 value{count}
- * rows block    := magic:u32 'NSR1' ncols:u32 nrows:u32 changes:i64 last_insert_rowid:i64
- *                  (len:u32 utf8){ncols}  value{ncols * nrows}      (row major)
- * rows block v2 := magic:u32 'NSR2' ncols:u32 nrows:u32 changes:i64 last_insert_rowid:i64 heap_offset:u32
- *                  (len:u32 utf8){ncols}  value{ncols * nrows}  heap:bytes   (requested with NS_EXEC_STRHEAP)
- *   adds value TEXT_REF (6): offset:u32 len:u32 = an all-ASCII string stored in the heap that starts at
- *   heap_offset (byte offsets equal UTF-16 offsets, so a reader can decode the heap once and slice it).
- *   Strings with non-ASCII bytes stay inline (TEXT).
+ * rows block    := magic:u32 'NSR1' ncols:u32 nrows:u32 changes:i64 last_insert_rowid:i64 heap_offset:u32
+ *                  (len:u32 utf8){ncols}  value{ncols * nrows}  heap:bytes        (value rows are row major)
+ *   value TEXT_REF (6): offset:u32 len:u32 = a non-empty all-ASCII string stored in the heap, which starts at
+ *   heap_offset and runs to the end of the block. Byte offsets equal UTF-16 offsets, so a JS reader decodes the
+ *   heap with one TextDecoder call and slices it (measured 2-5x faster than decoding every string).
+ *   Empty strings and strings with non-ASCII bytes stay inline (TEXT); readers resolve TEXT_REF to TEXT.
  * batch request := n:u32 ( sql_len:u32 sql  params_len:u32 params block ){n}
  * batch result  := n:u32 ( block_len:u32 rows block ){n}            (n = statements completed)
  */
@@ -32,8 +31,7 @@
 extern "C" {
 #endif
 
-#define NS_ROWS_MAGIC 0x3152534Eu  /* "NSR1" little endian */
-#define NS_ROWS_MAGIC2 0x3252534Eu /* "NSR2": rows block with an ASCII string heap */
+#define NS_ROWS_MAGIC 0x3152534Eu /* "NSR1" little endian */
 
 enum { NS_T_NULL = 0, NS_T_INT32 = 1, NS_T_INT64 = 2, NS_T_DOUBLE = 3, NS_T_TEXT = 4, NS_T_BLOB = 5, NS_T_TEXT_REF = 6 };
 

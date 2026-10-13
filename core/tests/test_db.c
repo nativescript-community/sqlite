@@ -600,51 +600,26 @@ static void test_large_result(void) {
     close_db(db);
 }
 
-/* string heap: results decode to the same values, ASCII strings are referenced, others inline */
-static void test_strheap(void) {
+/* ASCII strings go to the heap (referenced), others stay inline; both decode to the same values */
+static void test_string_heap(void) {
     NSDb* db = open_db(E, ":memory:", NULL);
     CHECK_EQ(run_ok(db, "CREATE TABLE t(a, b, c)"), 0);
     CHECK_EQ(run_ok(db, "INSERT INTO t VALUES ('plain', 'caf\xc3\xa9', ''), (NULL, 'x', 'long ascii string value')"), 0);
-    const char* sql = "SELECT a, b, c FROM t";
-    Waiter w1, w2;
-    waiter_init(&w1);
-    waiter_init(&w2);
-    CHECK_EQ(nssqlite_exec(db, 0, sql, strlen(sql), NULL, 0, 0, 0, on_result, &w1), 0);
-    CHECK_EQ(nssqlite_exec(db, 0, sql, strlen(sql), NULL, 0, NS_EXEC_STRHEAP, 0, on_result, &w2), 0);
-    CHECK(waiter_wait(&w1) && waiter_wait(&w2));
-    NSRows r1, r2;
-    CHECK(nssqlite_rows_init(&r1, w1.res[0].data, w1.res[0].len) == 0);
-    CHECK(nssqlite_rows_init(&r2, w2.res[0].data, w2.res[0].len) == 0);
-    CHECK(r2.heap != NULL && r2.heap_len == strlen("plain") + strlen("x") + strlen("long ascii string value"));
-    NSValue a[3], b[3];
-    for (int row = 0; row < 2; row++) {
-        CHECK_EQ(nssqlite_rows_next(&r1, a), 1);
-        CHECK_EQ(nssqlite_rows_next(&r2, b), 1);
-        for (int c = 0; c < 3; c++) {
-            CHECK_EQ(a[c].type, b[c].type);
-            CHECK_EQ(a[c].len, b[c].len);
-            if (a[c].type == NS_T_TEXT) CHECK(memcmp(a[c].ptr, b[c].ptr, a[c].len) == 0);
-        }
-    }
-    waiter_clear(&w1);
-    waiter_clear(&w2);
-    close_db(db);
-}
-
-static void test_json(void) {
-    NSDb* db = open_db(E, ":memory:", NULL);
-    CHECK_EQ(run_ok(db, "CREATE TABLE t(i INTEGER, r REAL, s TEXT, b BLOB, n)"), 0);
-    CHECK_EQ(run_ok(db, "INSERT INTO t VALUES (7, 0.5, 'q\"\\\n\xc3\xa9', x'4d616e', NULL)"), 0);
     Waiter w;
-    waiter_init(&w);
-    const char* sql = "SELECT i, r, s, b, n FROM t";
-    CHECK_EQ(nssqlite_exec(db, 0, sql, strlen(sql), NULL, 0, NS_EXEC_JSON, 0, on_result, &w), 0);
-    CHECK(waiter_wait(&w));
-    NSResult* r = waiter_last(&w);
-    CHECK_EQ(r->status, 0);
-    const char* expect = "{\"c\":[\"i\",\"r\",\"s\",\"b\",\"n\"],\"r\":[[7,0.5,\"q\\\"\\\\\\u000a\xc3\xa9\",\"TWFu\",null]]}";
-    CHECK(r->len == strlen(expect) && memcmp(r->data, expect, r->len) == 0);
-    if (r->len != strlen(expect) || memcmp(r->data, expect, r->len)) fprintf(stderr, "json: %.*s\n", (int)r->len, r->data);
+    CHECK_EQ(run(db, 0, "SELECT a, b, c FROM t", NULL, &w), 0);
+    NSRows rows;
+    CHECK(nssqlite_rows_init(&rows, waiter_last(&w)->data, waiter_last(&w)->len) == 0);
+    /* heap holds 'plain', 'x' and 'long ascii string value'; the non-ASCII and the empty string are inline */
+    CHECK_EQ(rows.heap_len, strlen("plain") + strlen("x") + strlen("long ascii string value"));
+    NSValue v[3];
+    CHECK_EQ(nssqlite_rows_next(&rows, v), 1);
+    CHECK(v[0].type == NS_T_TEXT && v[0].ascii && v[0].len == 5 && memcmp(v[0].ptr, "plain", 5) == 0);
+    CHECK(v[1].type == NS_T_TEXT && !v[1].ascii && v[1].len == 5 && memcmp(v[1].ptr, "caf\xc3\xa9", 5) == 0);
+    CHECK(v[2].type == NS_T_TEXT && !v[2].ascii && v[2].len == 0);
+    CHECK_EQ(nssqlite_rows_next(&rows, v), 1);
+    CHECK_EQ(v[0].type, NS_T_NULL);
+    CHECK(v[1].ascii && v[1].len == 1 && v[1].ptr[0] == 'x');
+    CHECK(v[2].ascii && v[2].len == 23);
     waiter_clear(&w);
     close_db(db);
 }
@@ -667,7 +642,6 @@ int main(void) {
     test_many_submitters();
     test_parallel_databases();
     test_large_result();
-    test_json();
-    test_strheap();
+    test_string_heap();
     return finish("db");
 }
