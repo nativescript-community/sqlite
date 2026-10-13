@@ -36,11 +36,14 @@ core/                 C11. nssqlite.h (~25 functions, opaque handles, completion
   encoder             rows -> one compact buffer (header, column names once, tagged cells)
   transactions        pinned connection, batch (atomic), savepoints
   tests/              host tests: plain C harness (no framework), run under ASan+UBSan and TSan
-binding/napi/         one C file. napi_threadsafe_function -> JS thread, external ArrayBuffer
-binding/android/      Java + JNI (bridge backend)
-binding/ios/          Objective-C (bridge backend)
+binding/napi/         one C file (nssqlite_napi.c). napi_threadsafe_function -> JS thread, external
+                      ArrayBuffer, native row decoding. napi_* resolved at runtime (napi_dyn.*, generated)
+binding/android/      JNI (nssqlite_jni.c) + CMake for libnssqlite.so (core + JNI) and libnssqlite_napi.so
+binding/ios/          Objective-C bridge (NSSqliteBridge) + the +load anchor of the napi static lib
 src/sqlite/           single TS implementation (replaces .android.ts / .ios.ts / worker.ts)
-prebuilt/             android/<abi>/libnssqlite.so, ios/NSSqlite.xcframework
+native/                build-android.sh / build-ios.sh: write the prebuilt libs into packages/sqlite/platforms
+packages/sqlite/platforms/android/jniLibs/<abi>/{libnssqlite,libnssqlite_napi}.so + java/.../NativeSqlite.java
+packages/sqlite/platforms/ios/{NSSqlite,NSSqliteNapi}.xcframework  (static, device + simulator)
 ```
 
 Removed: `sqlite.android.ts`, `sqlite.ios.ts`, `sqlitedatabase.android.ts`, `worker.ts`, `WorkersContext.java`, FMDB pod, JS cursor code, NSData/ByteBuffer special cases in `paramToString`.
@@ -95,7 +98,6 @@ Sources: `NativeScript/android` and `NativeScript/ios` `docs/node-api.md`.
 ## Spike results (2026-10-13)
 
 Test app: `spike/nssqlite-spike` (NativeScript 9.1 runtimes: android 9.1.1, ios 9.1.0), see `spike/README.md`.
-Code: `core/provider.{h,c}` (dlsym provider loader), `binding/napi/spike_addon.c`, `NSSqlite.podspec`.
 
 - [x] S1. Host: provider loader resolves `sqlite3_*` via `dlopen` from macOS system SQLite (3.51.0). int64 above 2^53 round-trips exactly, typed bind works, ASan/UBSan clean. A missing library and a missing symbol produce a clear error. `RTLD_DEFAULT` only works if the process already links SQLite.
 - [x] S2. Android: Node-API addon built with the NDK (arm64-v8a 42 KB, no SQLite inside), loaded in the NS 9.1.1 app with `require("system_lib://libnssqlite.so")`. Hello call works. A native pthread delivers a result through `napi_threadsafe_function` to the JS thread, with a zero-copy external ArrayBuffer (native tid 17414, JS tid = main thread 17389).
@@ -103,18 +105,61 @@ Code: `core/provider.{h,c}` (dlsym provider loader), `binding/napi/spike_addon.c
 - [x] S4. iOS (simulator): the same addon source, compiled as a static CocoaPod into the app, loads with `require("nssqlite_spike")`. Hello, threadsafe callback (native thread -> main thread, ~10 ms) and external ArrayBuffer work.
 - [x] S5a. iOS: provider = system SQLite via `dlopen("/usr/lib/libsqlite3.dylib")` (and via `RTLD_DEFAULT`, the process already has it): SQLite 3.51.0, `load_extension` absent, as expected.
 - [ ] S5b. iOS: static custom SQLite as provider (symbols from the app binary) not done yet.
-- [ ] S6. Non-napi path: bridge binding (JNI / ObjC) on an NS 8.x app, buffer in / buffer out. Not started.
-- [ ] S7. Not done: addon used from a `Worker` (own napi env), device builds (arm64 iOS device), packaging as a real plugin (`platforms/android/src/main/jniLibs` aar and iOS xcframework instead of the podspec).
+- [x] S6. Non-napi path: JNI / ObjC bridge verified on NativeScript 8.9 (Android emulator, iOS simulator).
+- [x] S7. Worker with its own napi env (9.1 Android + iOS), packaging as a real plugin (aar from `platforms/android/{jniLibs,java}`, static xcframeworks). Physical device builds not run.
+
+## Implementation status (2026-10-13)
+
+Done and tested (commits on `feat/native-core`):
+
+- **C core** (`core/`): engine loader, one worker thread + connection per database, FIFO queue with transaction pinning
+  (`tx_begin`/`tx_end`), atomic batches (BEGIN IMMEDIATE / SAVEPOINT), chunked row streaming, 32 entry statement cache,
+  typed bind (int64 exact), wire format reader/writer, load/auto extension. Host tests (`core/tests`, plain C harness,
+  `cmake -DNSSQLITE_SANITIZE=address,undefined|thread`) pass under ASan+UBSan and TSan: types, errors, script, cache,
+  chunks, batch, transactions (queued work waits, rollback, failed BEGIN), close with queued work, open failure,
+  open options (WAL, init_sql, read only), 8 submitter threads, 4 parallel databases, 50k row result, truncated/
+  malformed wire input. Apple's system SQLite refuses `sqlite3_auto_extension` (returns SQLITE_MISUSE although the symbol
+  exists), so the extension test uses Homebrew's SQLite on macOS.
+- **JNI bridge** (`binding/android`, `NativeSqlite.java`): results are posted to the Looper of the calling thread.
+- **Objective-C bridge** (`binding/ios/NSSqliteBridge`): results are delivered on the run loop of the calling thread.
+- **Node-API binding** (`binding/napi`): used directly from JS, one `napi_threadsafe_function` per env, external
+  ArrayBuffers (zero copy), native `decodeRows` (arrays/objects, optional BigInt). Works in Workers (own env).
+  napi_* is resolved with dlsym at runtime, so the same library/archive loads on runtimes without Node-API and stays inactive.
+- **Packaging proven** with `npm pack` tarballs installed into apps: the Android plugin dir (`jniLibs`, `java`) is built into
+  an aar by the CLI, iOS static xcframeworks are linked by the CLI (no CocoaPods needed). `package.json#files` must list
+  `platforms` (npm otherwise drops it because of the ignore rules).
+
+Test matrix (all pass: open, create/insert/select with every type incl. blob/null/utf8, SQL error, close):
+
+| runtime | bridge (JNI/ObjC) | Node-API direct | Worker |
+|---|---|---|---|
+| NativeScript 9.1 Android (emulator arm64) | yes | yes | yes |
+| NativeScript 9.1 iOS (simulator) | yes | yes | yes |
+| NativeScript 8.9 Android (emulator arm64) | yes | n/a (inactive, not loaded) | - |
+| NativeScript 8.9 iOS (simulator) | yes | n/a (inactive) | - |
+
+Sizes (stripped): Android libnssqlite.so 21-33 KB + libnssqlite_napi.so 15-23 KB per ABI; iOS xcframeworks 160 KB + 72 KB
+(device + simulator slices, before app thinning). Not tested: physical devices (the arm64 device slices are built).
+
+Findings to carry into the TypeScript layer:
+
+- Android bridge: a returned `ByteBuffer` is a Java object in JS; use `ArrayBuffer.from(byteBuffer)` (works on 8.9 and 9.1, shares the
+  native memory). Callback results must expose getters (methods), not public fields, to be usable consistently.
+- NativeScript 8 `TextDecoder` ignores the `byteOffset` of a view: decode a `slice()` copy, not a `subarray()`.
+- Node-API on Android: `require("system_lib://libnssqlite_napi.so")` the first time; afterwards (Workers) the bare
+  `require("nssqlite")`. On iOS the bare require works from startup. Loading by path twice fails with "Cannot find 'NSMain'".
+- Node-API `napi_create_int64` loses precision above 2^53: `decodeRows` flag `DECODE_BIGINT` returns BigInt for INT64 cells.
+- Native object-row decoding is not obviously faster than the TS decoder yet (single noisy runs, 20k rows); needs a real
+  benchmark harness before choosing the default decode path.
 
 ### Findings that change the plan
 
-- **Android packaging:** the app template sets `jniLibs.srcDirs` to its own folders, so libs under `src/main/jniLibs` are ignored unless `app.gradle` adds the dir. For the plugin, ship them in a plugin Android library (`platforms/android/src/main/jniLibs/<abi>` + manifest) so the CLI builds an aar. To be tested.
-- **Android linking:** link against the runtime's `libNativeScript.so` as a build-time stub (kept out of packaging), as documented. It worked with `-Wl,-z,max-page-size=16384`.
-- **iOS dead-stripping is real:** CocoaPods links static pods with `-ObjC`, which only pulls objects defining ObjC classes. A C-only addon with a constructor is silently dropped (symptom: `Failed to resolve module`). Fix used: an ObjC class whose `+load` calls the (idempotent) registration function. For an xcframework, either keep that class in the same static lib or ship a dynamic framework.
-- **iOS needs `static_framework = true`** (NativeScript's Podfile uses `use_frameworks!`), otherwise the pod links as a dynamic framework and fails on the undefined `napi_*` symbols.
-- **iOS rebuild gotcha:** `ns run ios` does not rebuild native sources of a local pod; use `--clean`.
+- **Android packaging:** the app template sets `jniLibs.srcDirs` to its own folders, so *app* libs under `src/main/jniLibs` are ignored unless `app.gradle` adds the dir (needed only for the provider lib the app ships). A *plugin* puts libs in `platforms/android/jniLibs/<abi>` and the CLI builds an aar (verified).
+- **iOS dead-stripping is real:** the CLI/CocoaPods link static libraries with `-ObjC`, which only pulls objects defining ObjC classes. A C-only addon with a constructor is silently dropped (symptom: `Failed to resolve module`). Fix used: an ObjC class whose `+load` calls the (idempotent) registration function, in the same static lib.
+- **iOS rebuild gotcha:** `ns run` does not notice changed prebuilt native libs; use `--clean`.
+- **A static lib that references `napi_*` cannot link on NativeScript 8 runtimes** (undefined symbols). Resolving napi_* with dlsym (generated table) fixes that and also removes the need to link a stub `libNativeScript.so` on Android.
 - **Headers:** `node_api.h` & co are copied into `binding/napi/include` (taken from the runtime prefab package). The same copy compiled for both runtimes.
-- **Tooling:** the locally linked dev CLI (9.2.1) fails on Android with "Unsupported value: 36" (`vendor/gradle-plugin/build.gradle` passes `compileSdk` as a string); published CLI 9.1.2 works. Setting `cli.packageManager = "npm"` was needed because the user config selects yarn (berry), which fails here. CocoaPods needs `LANG=en_US.UTF-8`.
+- **Tooling:** the locally linked dev CLI failed on Android with "Unsupported value: 36" because `vendor/gradle-plugin/build.gradle` used `-PcompileSdk` as a string. Fixed in `nativescript-cli` (`compileSdk as int`, `targetSdk as int`); apps set `compileSdk = 36; targetSdk = 36` in `before-plugins.gradle`. The user config selects yarn 4, so apps need `packageManager: yarn@4` + `.yarnrc.yml` (classic yarn fails on `yarn npm info`).
 - The `ns create` command fails inside this repo (root yarn config), so the spike app was created outside and copied in.
 
 ## Open questions

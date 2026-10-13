@@ -1,6 +1,7 @@
 #!/bin/sh
 # Builds the prebuilt Android libraries into packages/sqlite/platforms/android/jniLibs/<abi>/.
 #   libnssqlite.so       core + JNI bridge (loads on every runtime)
+#   libnssqlite_napi.so  Node-API binding (loaded only by NativeScript >= 9.1 runtimes)
 # Usage: native/build-android.sh [abi...]      (default: all four)
 # Needs ANDROID_HOME (NDK is picked from there, or set ANDROID_NDK_HOME) and cmake.
 set -e
@@ -15,6 +16,6 @@ for abi in $ABIS; do
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_LIBRARY_OUTPUT_DIRECTORY="$OUT/lib/$abi"
   cmake --build "$OUT/$abi" -j8
   mkdir -p "$DEST/$abi"
-  cp "$OUT/lib/$abi/libnssqlite.so" "$DEST/$abi/"
+  cp "$OUT/lib/$abi/libnssqlite.so" "$OUT/lib/$abi/libnssqlite_napi.so" "$DEST/$abi/"
 done
 ls -l "$DEST"/*/
