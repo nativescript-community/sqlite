@@ -405,8 +405,9 @@ static void do_open(NSDb* db, Req* r) {
     if (bt > 0) p->busy_timeout(db->h, bt);
     char* msg = NULL;
     int status = 0;
-    if (db->opts.wal && strcmp(db->path, ":memory:") != 0) status = exec_simple(db, "PRAGMA journal_mode=WAL", &msg);
-    if (!status && db->init_sql) status = exec_simple(db, db->init_sql, &msg);
+    /* init_sql first: with SQLCipher `PRAGMA key` has to be the first statement on the connection */
+    if (db->init_sql) status = exec_simple(db, db->init_sql, &msg);
+    if (!status && db->opts.wal && strcmp(db->path, ":memory:") != 0) status = exec_simple(db, "PRAGMA journal_mode=WAL", &msg);
     if (status) {
         db->open_status = status;
         db->open_message = dup_cstr(msg);

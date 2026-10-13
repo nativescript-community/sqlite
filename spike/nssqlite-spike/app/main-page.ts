@@ -2,6 +2,7 @@ import { EventData, Page } from '@nativescript/core';
 import { HelloWorldModel } from './main-view-model';
 import { runApiTests } from './api-test';
 import { runOrmTests } from './orm-test';
+import { runEngineTests } from './engine-test';
 
 declare const __non_webpack_require__: any;
 
@@ -12,5 +13,6 @@ export function navigatingTo(args: EventData) {
     setTimeout(async () => {
         await runApiTests((globalThis as any).__NS_BACKENDS__ || ['napi', 'bridge']);
         await runOrmTests();
+        await runEngineTests((globalThis as any).__NS_BACKENDS__ || ['napi', 'bridge']);
     }, 300);
 }

@@ -64,3 +64,7 @@ packages/**/*.metadata.json
 /packages/sqlite/platforms/android/jniLibs/
 /packages/sqlite/platforms/ios/*.xcframework
 native/.build/
+
+# staged by hand from native/build-custom-sqlite.sh for the engine tests
+/spike/nssqlite-spike/App_Resources/Android/custom-libs/
+/spike/custom-sqlite-plugin/platforms/

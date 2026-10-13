@@ -39,6 +39,8 @@
 
 * [Installation](#installation)
 	* [Choose the SQLite library](#choose-the-sqlite-library)
+	* [SQLCipher and other `PRAGMA key` setups](#sqlcipher-and-other-pragma-key-setups)
+	* [Extensions](#extensions)
 * [Usage](#usage)
 	* [Runtimes](#runtimes)
 	* [TypeORM](#typeorm)
@@ -57,7 +59,7 @@ Run the following command from the root of your project:
 
 The plugin does not ship a SQLite: it loads the one your app provides, so you decide the version, the compile options and the extensions.
 
-* **iOS**: the system SQLite is used by default. To use your own build (SQLCipher, extensions, newer version) link it into the app and set `engine`.
+* **iOS**: the SQLite of the process is used by default: the system one, unless your app links another (a CocoaPods `SQLCipher`, or your own dynamic framework: it is found first, nothing to configure). To pick one explicitly set `engine` to `'/usr/lib/libsqlite3.dylib'` (system) or to the path of an embedded framework, e.g. `'@rpath/MySqlite.framework/MySqlite'`.
 * **Android**: add a library that exports the `sqlite3_*` C API. The simplest is androidx sqlite-bundled (a recent SQLite with FTS5, JSON, RTREE, math functions, ~0.65 MB per ABI), in `App_Resources/Android/app.gradle`:
 
 ```gradle
@@ -73,6 +75,24 @@ import { configure } from '@nativescript-community/sqlite';
 
 configure({ engine: 'libsqlcipher.so' }); // optional, before opening databases
 ```
+
+Tested with: androidx sqlite-bundled (3.50.1), SQLCipher (`net.zetetic:sqlcipher-android` on Android, the `SQLCipher` pod on iOS), a vanilla SQLite amalgamation built with your own options (FTS5, `DQS=0`...), and several of them in the same app at the same time (`engine` is per database).
+
+### SQLCipher and other `PRAGMA key` setups
+
+`initSql` runs first on the new connection (before `wal`), so the key is the first statement SQLCipher sees:
+
+```typescript
+const db = openOrCreate('secure.db', { engine: 'libsqlcipher.so', initSql: "PRAGMA key = 'secret'", wal: true });
+```
+
+A wrong or missing key is reported by the first query (`SqliteError`, `code === 26`, "file is not a database").
+
+### Extensions
+
+* **Compiled in**: build the extension into your SQLite (`-DSQLITE_EXTRA_INIT=...` calling `sqlite3_auto_extension`, see `native/ext/custom_init.c`). Every connection has it, no JS call needed.
+* **Loadable**: ship a shared library next to your SQLite (`jniLibs/<abi>/libmyext.so`, or a signed framework on iOS) and call `await db.loadExtension('libmyext.so')`. Pass the entry point when SQLite cannot guess it from the file name (`loadExtension(path, 'sqlite3_myext_init')`). Loading is per connection.
+* `db.canLoadExtensions()` tells whether the engine can load extensions at all. Android engines (androidx, SQLCipher, your build) can. Apple's system SQLite cannot: `loadExtension` rejects with a `SqliteError`.
 
 
 [](#usage)

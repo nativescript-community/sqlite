@@ -461,8 +461,24 @@ static void test_open_options(void) {
     waiter_clear(&w);
     CHECK_EQ(scalar_int(db, 0, "PRAGMA user_version"), 7);
     close_db(db);
+    rm_db(path);
+
+    /* init_sql runs before the WAL switch (SQLCipher needs PRAGMA key first): a journal mode set by init_sql does not win */
+    memset(&o, 0, sizeof(o));
+    o.wal = 1;
+    o.init_sql = "PRAGMA journal_mode = MEMORY";
+    db = open_db(E, path, &o);
+    CHECK_EQ(run(db, 0, "PRAGMA journal_mode", NULL, &w), 0);
+    CHECK(cell(&w, 0, 0, &v) == 0 && v.type == NS_T_TEXT && v.len == 3 && memcmp(v.ptr, "wal", 3) == 0);
+    waiter_clear(&w);
+    close_db(db);
 
     /* read only: writes fail */
+    memset(&o, 0, sizeof(o));
+    o.wal = 1;
+    o.init_sql = "PRAGMA user_version = 7";
+    db = open_db(E, path, &o);
+    close_db(db);
     memset(&o, 0, sizeof(o));
     o.flags = 0x1; /* SQLITE_OPEN_READONLY */
     db = open_db(E, path, &o);

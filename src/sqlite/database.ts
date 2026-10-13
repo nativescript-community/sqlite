@@ -254,6 +254,10 @@ export class Database extends QueryApi implements SQLiteDatabase {
         return this.backend.engineVersion(this.engineHandle);
     }
 
+    canLoadExtensions() {
+        return this.backend.engineCanLoadExtensions(this.engineHandle);
+    }
+
     async getVersion() {
         const row = await this.getArray('PRAGMA user_version');
         return row ? (row[0] as number) : 0;

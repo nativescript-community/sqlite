@@ -133,8 +133,7 @@ Tests:
 - Android provider is added with one gradle line (`implementation 'androidx.sqlite:sqlite-bundled:2.7.1'`), no manual copy.
 
 Not done yet: typeorm / nanosql integration tests (adapters compile and were adapted: INSERT returns the id, UPDATE the changes), a
-physical-device run, the benchmark of the final TS pipeline against the old plugin, SQLCipher / static extension provider examples,
-CI scripts, `each` backpressure, API documentation (`docs/`).
+physical-device run, the benchmark of the final TS pipeline against the old plugin, CI scripts, `each` backpressure, API documentation (`docs/`).
 
 ## Performance against 3.5.9 (2026-10-13)
 
@@ -173,7 +172,7 @@ Test app: `spike/nssqlite-spike` (NativeScript 9.1 runtimes: android 9.1.1, ios 
 - [x] S3. Android: `dlopen("libsqliteJni.so")` (androidx sqlite-bundled 2.7.1, packaged by the app) from the addon works: SQLite 3.50.1, threadsafe=2, `auto_extension` and `load_extension` present, select works, int64 exact.
 - [x] S4. iOS (simulator): the same addon source, compiled as a static CocoaPod into the app, loads with `require("nssqlite_spike")`. Hello, threadsafe callback (native thread -> main thread, ~10 ms) and external ArrayBuffer work.
 - [x] S5a. iOS: provider = system SQLite via `dlopen("/usr/lib/libsqlite3.dylib")` (and via `RTLD_DEFAULT`, the process already has it): SQLite 3.51.0, `load_extension` absent, as expected.
-- [ ] S5b. iOS: static custom SQLite as provider (symbols from the app binary) not done yet.
+- [x] S5b. iOS: custom SQLite as provider: an embedded dynamic framework (and the `SQLCipher` pod) linked into the app wins `dlsym(RTLD_DEFAULT)` over the system SQLite; also selectable by path. See "Custom engines and extensions".
 - [x] S6. Non-napi path: JNI / ObjC bridge verified on NativeScript 8.9 (Android emulator, iOS simulator).
 - [x] S7. Worker with its own napi env (9.1 Android + iOS), packaging as a real plugin (aar from `platforms/android/{jniLibs,java}`, static xcframeworks). Physical device builds not run.
 
@@ -236,3 +235,20 @@ Findings to carry into the TypeScript layer:
 1. iOS packaging for the final plugin: xcframework (static + ObjC `+load` anchor, or dynamic framework) vs podspec compiled from source. The podspec route works (S4); the xcframework route is untested.
 2. androidx `libsqliteJni.so` exports the `sqlite3_*` API today (S3). Google does not promise it stays: pin the androidx version, fail loudly if symbols are missing, and offer our own provider package as the stable alternative.
 3. Whether apps can mix the old (non-napi) runtime and this plugin version: decided by the bridge binding in phase 3.
+
+## Custom engines and extensions (2026-10-13)
+
+What was tested (`native/build-custom-sqlite.sh`, `native/build-ext.sh`, `native/ext/`, `spike/nssqlite-spike/app/engine-test.ts`, `src/sqlite/tests/extension.test.ts`):
+
+- **Sample extension** `native/ext/ns_ext.c`: scalar functions plus an aggregate, built three ways from one file: loadable (`libns_ext.so`, `NSSampleExt.framework`), compiled into a custom SQLite (`-DSQLITE_CORE`, `SQLITE_EXTRA_INIT` -> `sqlite3_auto_extension`), host tests.
+- **Node** (Homebrew SQLite, 6 tests): `loadExtension` with and without entry point, per connection, while requests are queued and inside a transaction, error cases, `canLoadExtensions()`; Apple's system SQLite reports `false` and a clear error.
+- **Android** (emulator, NS 9.1, napi and bridge, 28 checks): androidx 3.50.1, a custom 3.53.4 amalgamation (FTS5, JSON, RTREE, `DQS=0`, compiled-in extension, 1.5 MB per ABI), SQLCipher (`net.zetetic:sqlcipher-android:4.19.1`): file encrypted, no key and wrong key give NOTADB (26), right key + WAL; `loadExtension('libns_ext.so')` on androidx and on the custom build; `configure({engine})`; unknown engine throws naming the library; three engines (androidx, custom, SQLCipher) running transactions in parallel on separate databases.
+- **iOS** (simulator, NS 9.1, napi and bridge): system SQLite (no extension loading, clear error); custom build as embedded dynamic framework (14 checks: compile options, FTS5/JSON, compiled-in extension, `loadExtension` of a signed framework with explicit entry point, custom + system engines at once); the `SQLCipher` 4.10 pod through the default engine (6 checks).
+
+Findings:
+
+1. **Bug fixed**: the core ran `PRAGMA journal_mode=WAL` before `initSql`, so `wal: true` + `PRAGMA key` failed with "file is not a database". `initSql` now runs first (host test added).
+2. iOS: a dynamic framework or pod linked into the app is found first by `dlsym(RTLD_DEFAULT)`, so the default engine (`null`) becomes the app's SQLite without configuration. The system one stays reachable with `engine: '/usr/lib/libsqlite3.dylib'`. Static libraries were not tried (they need `-force_load` / `-export_dynamic` to be visible to `dlsym`); the dynamic framework route is the documented one.
+3. New `Database.canLoadExtensions()` so apps can branch instead of catching.
+4. The SQLCipher pod is built from the CLI's `use_frameworks!` Podfile; a stale `platforms/ios/Podfile` made `ns run` fail with a Podfile syntax error until `platforms/ios` was removed (CLI behaviour, unrelated to the plugin).
+5. Not tested: NativeScript 8 with custom engines (same JNI / bridge code path as the 9.1 bridge runs), physical devices, iOS device slices of the custom frameworks (built, not run), Android armeabi-v7a/x86.

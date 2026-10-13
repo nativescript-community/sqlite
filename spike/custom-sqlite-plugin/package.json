@@ -1,0 +1,12 @@
+{
+  "name": "nssqlite-custom-sqlite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Example: a plugin (or the app itself) that carries its own SQLite build. Frameworks are built by native/build-custom-sqlite.sh ios",
+  "nativescript": {
+    "platforms": {
+      "ios": "9.0.0",
+      "android": "8.0.0"
+    }
+  }
+}

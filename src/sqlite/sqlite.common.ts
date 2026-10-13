@@ -133,7 +133,14 @@ export interface SQLiteDatabase extends SQLiteQueryApi {
      * use the `tx` argument to be explicit. Requests of other parts of the app wait for the end.
      */
     transaction<T = any>(action: (cancel: () => void, tx: SQLiteTransaction) => Promise<T> | T, options?: TransactionOptions): Promise<T>;
+    /**
+     * Loads a SQLite extension (shared library) into this connection. Needs an engine that allows it: androidx
+     * sqlite-bundled and SQLCipher on Android do, Apple's system SQLite does not (see `canLoadExtensions`).
+     * `entryPoint` defaults to the one SQLite derives from the file name (`libfoo.so` -> `sqlite3_foo_init`).
+     */
     loadExtension(path: string, entryPoint?: string): Promise<void>;
+    /** false when the engine in use cannot load extensions (`loadExtension` would reject) */
+    canLoadExtensions(): boolean;
     /** version of the SQLite library in use */
     getSqliteVersion(): string;
     close(): Promise<void>;
