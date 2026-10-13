@@ -10,7 +10,7 @@ Run the following command from the root of your project:
 
 `ns plugin add {{ pkg.name }}`
 
-This is [`@nativescript-community/sqlite-core`](../sqlite-core) (the API, the native threads, the Node-API / JNI / Objective-C bindings) **plus a default SQLite**, so it works without any setup:
+This brings everything and needs no setup: [`sqlite-core`](../sqlite-core) (the API and the native core), [`sqlite-napi`](../sqlite-napi) (Node-API binding, NativeScript 9.1+), [`sqlite-bridge`](../sqlite-bridge) (JNI / Objective-C, any NativeScript version) **plus a default SQLite**:
 
 * **Android**: androidx `sqlite-bundled` (a recent SQLite with FTS5, JSON, RTREE, math functions, ~0.65 MB per ABI), added to your app by this package's `include.gradle`. Engine `libsqliteJni.so`.
 * **iOS**: the SQLite of the process: the system SQLite, or the one your app links (e.g. a CocoaPods `SQLCipher`).
@@ -109,4 +109,4 @@ The webpack changes TypeORM's browser build needs are listed in the [core docume
 
 ### Do not want the default SQLite?
 
-Depend on [`@nativescript-community/sqlite-core`](../sqlite-core) instead of this package: it brings no SQLite and no gradle dependency, so there is nothing to override or patch out when you use SQLCipher or your own build.
+Depend on [`@nativescript-community/sqlite-core`](../sqlite-core) and the binding you need instead of this package: no SQLite and no gradle dependency come with them, so there is nothing to override or patch out when you use SQLCipher or your own build. Only need NativeScript 9.1+? `sqlite-core` + `sqlite-napi` leaves the JNI / Objective-C bridges out. See *Which packages* in the core documentation.

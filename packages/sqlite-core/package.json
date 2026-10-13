@@ -1,7 +1,7 @@
 {
     "name": "@nativescript-community/sqlite-core",
     "version": "3.5.9",
-    "description": "SQLite for NativeScript without a SQLite library: you provide the engine (SQLCipher, a custom build...). Use @nativescript-community/sqlite for the ready-to-use setup.",
+    "description": "SQLite for NativeScript: the API and the native core, without a SQLite library and without a binding. Add @nativescript-community/sqlite-napi (NativeScript 9.1+) and/or sqlite-bridge, and a SQLite engine; or use @nativescript-community/sqlite for all of it.",
     "main": "sqlite",
     "typings": "sqlite.d.ts",
     "sideEffects": false,

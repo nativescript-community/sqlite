@@ -6,7 +6,8 @@ declare const __ANDROID__: boolean;
 
 const log = (...a: any[]) => console.log('[BARE]', ...a);
 
-export async function runBareTests() {
+/** which bindings the app installed: 'napi' (sqlite-napi only), 'bridge' (sqlite-bridge only), 'none' (sqlite-core only) */
+export async function runBareTests(installed: 'napi' | 'bridge' | 'none') {
     let passed = 0;
     let failed = 0;
     const check = async (name: string, fn: () => Promise<void> | void) => {
@@ -28,6 +29,19 @@ export async function runBareTests() {
         throw new Error('did not throw');
     };
 
+    if (installed === 'none') {
+        await check('no binding installed: says what to install', () => throws(() => openOrCreate(':memory:', { engine: 'x' }), /No native binding found/));
+        log(`RESULT passed ${passed} failed ${failed}`);
+        return;
+    }
+    if (installed === 'napi') {
+        configure({ backend: 'bridge' });
+        await check('napi only: the bridge is reported missing', () => throws(() => openOrCreate(':memory:', { engine: 'x' }), /bridge is not available.*sqlite-bridge/));
+    } else {
+        configure({ backend: 'napi' });
+        await check('bridge only: Node-API is reported missing', () => throws(() => openOrCreate(':memory:', { engine: 'x' }), /Node-API binding is not available.*sqlite-napi/));
+    }
+    configure({ backend: installed === 'napi' ? 'napi' : 'auto' }); // 'auto' falls back to the bridge
     await check('no engine chosen: asks for one', () => throws(() => openOrCreate(':memory:'), /No SQLite engine chosen/));
     if (__ANDROID__) {
         await check('androidx is not there unless the app adds it', () => throws(() => openOrCreate(':memory:', { engine: 'libsqliteJni.so' }), /No usable SQLite library/));

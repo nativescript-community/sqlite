@@ -71,3 +71,9 @@ native/.build/
 /spike/custom-sqlite-plugin/platforms/
 !/packages/sqlite-android-framework/platforms
 /packages/sqlite-android-framework/platforms/android/jniLibs/
+!/packages/sqlite-napi/platforms
+!/packages/sqlite-bridge/platforms
+/packages/sqlite-napi/platforms/android/jniLibs/
+/packages/sqlite-bridge/platforms/android/jniLibs/
+/packages/sqlite-napi/platforms/ios/*.xcframework
+/packages/sqlite-bridge/platforms/ios/*.xcframework

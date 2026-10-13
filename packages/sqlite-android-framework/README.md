@@ -46,9 +46,9 @@
 
 ## Installation
 
-Needs [`@nativescript-community/sqlite-core`](../sqlite-core). Run from the root of your project:
+Needs [`@nativescript-community/sqlite-core`](../sqlite-core) and a binding ([`sqlite-napi`](../sqlite-napi) for NativeScript 9.1+, [`sqlite-bridge`](../sqlite-bridge) for any version). Run from the root of your project:
 
-`ns plugin add @nativescript-community/sqlite-core @nativescript-community/sqlite-android-framework`
+`ns plugin add @nativescript-community/sqlite-core @nativescript-community/sqlite-napi @nativescript-community/sqlite-android-framework`
 
 ```typescript
 import { openOrCreate } from '@nativescript-community/sqlite-core';

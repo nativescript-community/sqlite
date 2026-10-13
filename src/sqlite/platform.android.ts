@@ -29,7 +29,15 @@ function loadAddon() {
  * right away. Requests are numbered; one Java callback object serves all of them.
  */
 function createJniBackend(): Backend {
-    const N = com.akylas.sqlite.NativeSqlite;
+    let N: any;
+    try {
+        N = com.akylas.sqlite.NativeSqlite;
+    } catch (e) {
+        // the class is not there
+    }
+    if (!N) {
+        throw new Error('com.akylas.sqlite.NativeSqlite not found');
+    }
     const pending = new Map<number, ResultCallback>();
     let nextId = 1;
     let registered = false;

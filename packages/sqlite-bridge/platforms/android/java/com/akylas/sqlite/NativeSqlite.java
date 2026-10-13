@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class NativeSqlite {
     static {
-        System.loadLibrary("nssqlite");
+        System.loadLibrary("nssqlite_jni");
     }
 
     private NativeSqlite() {}

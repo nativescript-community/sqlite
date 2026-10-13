@@ -284,3 +284,15 @@ Phone measurement: 500 awaited one-statement writes 2600 ms with androidx's defa
 ones given to `openOrCreate` win, `{ wal: false }` opts out). `sqlite-core` itself defaults to nothing. Core: `wal` is ignored for read-only connections (switching the journal
 mode needs a write); a database that failed to open now answers later requests with the SQLite error of the open instead of `-1` (SQLCipher wrong key + `wal` now reports code 26 on the first request).
 Device suites on Android emulator and iOS simulator: API 13/13 per binding (new check: default WAL on Android, `delete` on iOS, `wal: false`, read-only, `:memory:`), ORM 8/8, engines 28/28 (Android).
+
+## Packages: core / napi / bridge / default / framework (2026-10-13)
+
+The bridges are split from the core and every binding is its own package (all `3.5.9` for now, bumped together by lerna):
+
+- `sqlite-core`: TypeScript API + the C core as its own library (`libnssqlite_core.so`, `NSSqliteCore.xcframework`; its headers are the ones the static-SQLite glue needs). No binding, no SQLite, no dependency.
+- `sqlite-napi`: `libnssqlite_napi.so` / `NSSqliteNapi.xcframework` (links the core). `sqlite-bridge`: `libnssqlite_jni.so` + `NativeSqlite.java` / `NSSqliteBridge.xcframework` (links the core).
+- `sqlite`: core + napi + bridge + androidx (`include.gradle`) + `defaultEngine` / `defaultOptions` (WAL on Android). `sqlite-android-framework`: engine only (needs core + a binding).
+- Sizes (arm64): Android core 28 KB, napi 23 KB, JNI 10 KB; iOS device slice core 32 KB, napi 29 KB, bridge 17 KB.
+- TS binding discovery (`platform.common.ts`): `auto` tries Node-API then the bridge; a missing package is reported by name ("install @nativescript-community/sqlite-napi / sqlite-bridge"), `backend: 'napi'|'bridge'` fail instead of falling back.
+- Proven: umbrella on NativeScript 9.1 Android emulator (API 13/13 per binding, ORM 8/8, engines 28/28) and iOS simulator (13/13, 8/8, 2/2); NativeScript 8.9.2 Android (umbrella, `auto` falls back to the bridge, 13/13 per mode); lean apps: core + napi only (Android, iOS) and core + bridge only (Android) with SQLCipher, checking the error naming the missing package and that the APK has no JNI library or `NativeSqlite` class. NativeScript 8.9 needed the SDK level pinned in `before-plugins.gradle` (`compileSdk = 35`, an int) with the local CLI, unrelated to the split.
+- Not done: iOS lean app with the bridge only, NativeScript 8 on iOS with the split, the sqlite-android-framework on the split (builds, not rerun), publishing metadata for the two new packages.

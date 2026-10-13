@@ -17,6 +17,9 @@ function loadAddon() {
 
 /** Objective-C bridge (NSSqliteBridge), for runtimes without Node-API. */
 function createObjcBackend(): Backend {
+    if (typeof NSSqliteBridge === 'undefined') {
+        throw new Error('NSSqliteBridge not found');
+    }
     const B = NSSqliteBridge;
     const cb = (callback: ResultCallback) => (status: number, done: boolean, data: any, message: string | null, changes: number, lastInsertRowId: number) => {
         const raw: RawResult = { status, done, data: data ? interop.bufferFromData(data) : null, message, changes: Number(changes), lastInsertRowId: Number(lastInsertRowId) };

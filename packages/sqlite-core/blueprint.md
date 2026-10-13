@@ -5,16 +5,33 @@
 
 {{ template:toc }}
 
-## Which package
+## Which packages
 
-* **`@nativescript-community/sqlite-core`** (this one): the API and the native core. It depends on nothing and ships **no SQLite**: you choose the engine (`engine` option or `configure`), so there is nothing to patch out when you want SQLCipher or your own build.
-* **[`@nativescript-community/sqlite`](../sqlite)**: this package plus a default engine: androidx sqlite-bundled on Android (it adds the gradle dependency, and opens databases in WAL mode) and the SQLite of the process on iOS. Pick it if you just want SQLite.
-* **[`@nativescript-community/sqlite-android-framework`](../sqlite-android-framework)** (prototype): the SQLite of Android itself (`android.database.sqlite`) as the engine, for apps that want no SQLite library at all.
+The plugin is several small packages, so an app only carries what it uses:
+
+| package | what it is | native size (arm64 / Android, iOS device slice) |
+|---|---|---|
+| **`@nativescript-community/sqlite-core`** (this one) | the TypeScript API and the C core. No SQLite, no binding, no dependency | 28 KB / 32 KB |
+| [`sqlite-napi`](../sqlite-napi) | the **Node-API** binding, for NativeScript 9.1+ (needs `sqlite-core`) | 23 KB / 29 KB |
+| [`sqlite-bridge`](../sqlite-bridge) | the **JNI** and **Objective-C** bridges, for any NativeScript version and required by NativeScript 8 (needs `sqlite-core`) | 10 KB / 17 KB |
+| [`sqlite`](../sqlite) | all of the above **plus a default SQLite** (androidx sqlite-bundled on Android, the SQLite of the process on iOS) and WAL on Android | + the androidx library |
+| [`sqlite-android-framework`](../sqlite-android-framework) | the SQLite of Android itself (`android.database.sqlite`) as an engine, no SQLite library in the app (prototype) | 24 KB |
+
+What to install:
+
+| you want | install |
+|---|---|
+| it to just work on every NativeScript version | `@nativescript-community/sqlite` |
+| NativeScript 9.1+ only, your own SQLite (SQLCipher, a custom build) | `sqlite-core` + `sqlite-napi` |
+| NativeScript 8 (or 8 and 9), your own SQLite | `sqlite-core` + `sqlite-bridge` (+ `sqlite-napi` to use Node-API on 9.1+) |
+| no SQLite library in the Android app | `sqlite-core` + a binding + `sqlite-android-framework` |
+
+Without a binding installed, opening a database throws an error saying which package to add.
 
 ## Installation
-Run the following command from the root of your project:
+Run the following command from the root of your project, with the binding you need:
 
-`ns plugin add {{ pkg.name }}`
+`ns plugin add {{ pkg.name }} @nativescript-community/sqlite-napi`
 
 ### Choose the SQLite library
 
@@ -133,143 +150,18 @@ const rows = await db.select("SELECT my_function('x')");
 
 ## Bindings: Node-API, JNI, Objective-C
 
-The TypeScript API above is the same whatever runs underneath; this section is for knowing what is used, and for calling the bindings yourself.
+The TypeScript API above is the same whatever runs underneath; the binding is picked when the first database opens:
 
-| runtime | binding | what to know |
-|---|---|---|
-| NativeScript 9.1+ | **Node-API**, used directly from JS | the default; `*Sync` methods; works from Workers (each Worker has its own environment) |
-| NativeScript 8 | **JNI** (Android) / **Objective-C** (iOS) bridge | the fallback; same native core, same API, no `*Sync` |
+| runtime | binding | package | what to know |
+|---|---|---|---|
+| NativeScript 9.1+ | **Node-API**, used directly from JS | [`sqlite-napi`](../sqlite-napi) | the default; `*Sync` methods; works from Workers (each Worker has its own environment) |
+| any, required by NativeScript 8 | **JNI** (Android) / **Objective-C** (iOS) bridge | [`sqlite-bridge`](../sqlite-bridge) | same native core, same API, no `*Sync` |
 
-`configure({ backend: 'napi' | 'bridge' | 'auto' })` picks one (`'auto'`: Node-API when the runtime has it); it applies to databases opened afterwards.
+`configure({ backend: 'napi' | 'bridge' | 'auto' })` picks one (`'auto'`, the default: Node-API when it is installed and the runtime has it, otherwise the bridge); it applies to databases opened afterwards, and a missing binding is an explicit error naming the package to install.
 
-### If your runtime has Node-API: ignore the JNI and Objective-C parts
+**If your runtime has Node-API, ignore the JNI and Objective-C parts: do not install `sqlite-bridge`.** Nothing of the bridges is then in your app: no `NativeSqlite.java`, no `libnssqlite_jni.so`, no `NSSqliteBridge`, and the limits of the bridges (no `*Sync`, the Android JNI reference limit they work around) do not concern you. `configure({ backend: 'napi' })` makes a missing Node-API an error instead of a silent fallback. The reverse holds too: on NativeScript 8 only `sqlite-bridge` is needed.
 
-On NativeScript 9.1+ you never touch, load or configure the bridges: the JNI class (`NativeSqlite.java`) and the Objective-C class (`NSSqliteBridge`) are only used when the Node-API binding is unavailable or when you force `backend: 'bridge'`. Nothing about them appears in your code, the limits of the bridges (no `*Sync`, the Android JNI reference limit the bridge works around) do not apply to you, and you can skip the *bridges* subsection below. `configure({ backend: 'napi' })` makes a missing Node-API an explicit error instead of a silent fallback.
-
-What this costs: the bridge code is still packaged, because it shares a library with the C core (about 32 KB in `libnssqlite.so` per Android ABI, next to the 22 KB `libnssqlite_napi.so`; on iOS the static `NSSqlite` / `NSSqliteNapi` xcframeworks add 48 KB / 28 KB per architecture). It is never called.
-
-### Using the Node-API binding directly
-
-The addon exchanges bytes in the wire format of `core/nssqlite_wire.h` (also documented in the repository): you encode the parameters and decode the rows block yourself (`src/sqlite/codec.ts` is a reference implementation). In NativeScript get the addon with `require('nssqlite')` (on Android the first load goes through `require('system_lib://libnssqlite_napi.so')`); the example below is from a Node test, where `process.dlopen` loads the same module.
-
-```javascript
-const m = { exports: {} };
-process.dlopen(m, '/path/to/nssqlite.node');
-const ns = m.exports;
-
-// params block: count:u32, then per value a tag byte + payload (0 NULL, 1 INT32, 3 DOUBLE, 4 TEXT = len:u32 + utf8)
-function params(...values) {
-    const enc = new TextEncoder();
-    const chunks = [];
-    const count = new Uint8Array(4);
-    new DataView(count.buffer).setUint32(0, values.length, true);
-    chunks.push(count);
-    for (const v of values) {
-        let b;
-        if (v === null) b = Uint8Array.of(0);
-        else if (typeof v === 'string') {
-            const t = enc.encode(v);
-            b = new Uint8Array(5 + t.length);
-            b[0] = 4;
-            new DataView(b.buffer).setUint32(1, t.length, true);
-            b.set(t, 5);
-        } else if (Number.isInteger(v)) {
-            b = new Uint8Array(5);
-            b[0] = 1;
-            new DataView(b.buffer).setInt32(1, v, true);
-        } else {
-            b = new Uint8Array(9);
-            b[0] = 3;
-            new DataView(b.buffer).setFloat64(1, v, true);
-        }
-        chunks.push(b);
-    }
-    const out = new Uint8Array(chunks.reduce((n, c) => n + c.length, 0));
-    let o = 0;
-    for (const c of chunks) { out.set(c, o); o += c.length; }
-    return out.buffer;
-}
-
-const engine = ns.engine('libsqliteJni.so'); // null = the SQLite of the process; throws if unusable
-console.log(ns.engineVersion(engine), ns.engineCanLoadExtensions(engine));
-
-// open returns the handle at once; callbacks get (status, done, data, message, changes, lastInsertRowId) on the calling thread
-const db = ns.open(engine, '/path/app.db', 0x6 /* READWRITE | CREATE */, 5000, /* wal */ true, /* initSql */ null,
-    (status, _done, _data, message) => console.log(status === 0 ? 'open ok' : message));
-
-const run = (sql, p) => new Promise((resolve, reject) => {
-    // exec(db, tx = 0 (none), sql, params | null, flags = 0, chunkRows = 0 (no streaming), callback)
-    const rc = ns.exec(db, 0, sql, p || null, 0, 0, (status, _done, data, message, changes, rowid) =>
-        status ? reject(new Error(`${status}: ${message}`)) : resolve({ data, changes, rowid }));
-    if (rc) reject(new Error('refused ' + rc)); // the callback is not called when the request is refused
-});
-
-await run('CREATE TABLE t(a INTEGER, b TEXT)');
-const { changes, rowid } = await run('INSERT INTO t VALUES (?, ?)', params(7, 'seven'));
-const { data } = await run('SELECT * FROM t'); // ArrayBuffer holding a rows block, starting with the magic 'NSR1'
-const view = new DataView(data);
-console.log(view.getUint32(4, true), 'columns', view.getUint32(8, true), 'rows');
-
-// blocking: returns [status, data, message, changes, lastInsertRowId], no callback, no event loop round trip
-const [status, blocked] = ns.execSync(db, 0, 'SELECT count(*) FROM t', null, 0);
-
-ns.close(db, () => console.log('closed'));
-```
-
-Other exports: `batch(db, tx, request, flags, cb)`, `txBegin(db, mode, cb)` (returns the transaction id, 0 when refused), `txEnd(db, tx, commit, cb)`, `loadExtension(db, path, entry, cb)`, `apiVersion()`. Pass `chunkRows > 0` to `exec` to receive big results in several `done = false` chunks.
-
-### Using the bridges directly
-
-Only for NativeScript 8 (or when you force `backend: 'bridge'`). The calls map one to one to the Node-API ones; results are the same rows blocks. Prefer the TypeScript API, which does this for you (`platform.android.ts` / `platform.ios.ts`).
-
-**iOS**: `NSSqliteBridge` (Objective-C), callbacks run on the run loop of the thread that made the call.
-
-```typescript
-declare const NSSqliteBridge: any, NSData: any, interop: any;
-const B = NSSqliteBridge;
-
-const engine = B.engineError(null); // nil = the SQLite of the process
-const db = B.openPathFlagsBusyMsWalInitSqlCallback(engine, path, 0x6, 5000, true, null, (status, done, data, message) => {});
-const onResult = (status, done, data, message, changes, rowid) => {
-    const rows = data ? interop.bufferFromData(data) : null; // ArrayBuffer, the rows block
-};
-// exec(db, tx, sql, NSData | null, flags, chunkRows, callback): 0 = queued, negative = refused
-B.execTxSqlParamsFlagsChunkRowsCallback(db, 0, 'SELECT * FROM t', NSData.dataWithData(params(1)), 0, 0, onResult);
-B.closeCallback(db, () => B.releaseDb(db));
-```
-
-**Android**: `com.akylas.sqlite.NativeSqlite` (JNI). The NativeScript Android runtime keeps a global reference for every Java object or JS buffer it converts and aborts at 51200, so only numbers cross per request: the SQL and the parameters go through a request arena (one direct `ByteBuffer`, wrapped once) and results come back as numbers with their bytes in a result arena.
-
-```typescript
-declare const com: any;
-const N = com.akylas.sqlite.NativeSqlite;
-const resultBuffer = (ArrayBuffer as any).from(N.resultArena());
-const request = new Uint8Array((ArrayBuffer as any).from(N.requestArena(64 * 1024)));
-const pending = new Map<number, (r: any) => void>();
-let nextId = 1;
-
-N.setCallback(new N.Callback({
-    onResult(id, status, done, dataLen, changes, rowid) {
-        const callback = pending.get(Number(id));
-        if (done) pending.delete(Number(id));
-        const data = dataLen >= 0 ? resultBuffer.slice(0, dataLen) // copy it now: the arena is reused
-            : dataLen === -2 ? (ArrayBuffer as any).from(N.takeBigData()).slice(0) : null; // bigger than the arena
-        callback && callback({ status, done, data, message: status ? N.takeMessage() : null, changes: Number(changes), rowid: Number(rowid) });
-    }
-}));
-
-const engine = N.engine('libsqliteJni.so');
-let id = nextId++;
-pending.set(id, (r) => console.log('open', r.status));
-const db = N.open(engine, path, 0x6, 5000, true, null, id);
-
-// exec: the SQL (UTF-8) at the start of the request arena, then the params block
-const sql = new TextEncoder().encode('SELECT * FROM t');
-request.set(sql, 0);
-id = nextId++;
-pending.set(id, (r) => console.log(r.data && r.data.byteLength));
-N.exec(db, 0, sql.length, 0, 0, 0, id); // (db, tx, sqlLen, paramsLen, flags, chunkRows, id)
-```
+The raw use of each binding (calling the native module without the TypeScript layer) is documented in the binding's own package: [`sqlite-napi`](../sqlite-napi) and [`sqlite-bridge`](../sqlite-bridge).
 
 ### TypeORM
 
