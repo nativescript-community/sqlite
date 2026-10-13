@@ -66,9 +66,23 @@ await db.close();
 
 NativeScript 9.1+ uses the Node-API binding directly; NativeScript 8 uses a thin JNI / Objective-C bridge over the same native core. `configure({ backend: 'napi' | 'bridge' })` forces one.
 
-### TypeORM, nano-sql
+### TypeORM
 
-`@nativescript-community/sqlite/typeorm` and `@nativescript-community/sqlite/nanosql` keep working on the new API.
+```typescript
+import 'reflect-metadata';
+import { DataSource } from 'typeorm/browser';
+import { installMixins } from '@nativescript-community/sqlite/typeorm';
+
+installMixins();
+const dataSource = new DataSource({ type: 'nativescript', database: 'app.db', entities: [/* ... */], synchronize: true, extra: { /* openOrCreate options */ } });
+await dataSource.initialize();
+```
+
+TypeORM's browser build references every database driver and a few node modules, so the webpack config needs (see `spike/nssqlite-spike/webpack.config.js` for a working one): the `browser` alias field, an alias for the `typeorm/browser` prefix, `false` fallbacks for the node built-ins and an `IgnorePlugin` for the drivers you do not use (`pg`, `mysql`, `mongodb`, `sql.js`, ...). The driver is covered by integration tests (schema sync, repositories, relations, query builder, transactions) in Node and on NativeScript 9.1 Android and iOS.
+
+### nano-sql
+
+`@nativescript-community/sqlite/nanosql` uses `openOrCreate`, `execute` and `each` and keeps working on the new API (not covered by tests yet).
 
 ## Migrating from 3.x
 

@@ -6,7 +6,9 @@
   "dependencies": {
     "@nativescript/core": "~9.1.0",
     "@nativescript/theme": "^3.1.0",
-    "@nativescript-community/sqlite": "file:../../packages/sqlite"
+    "@nativescript-community/sqlite": "file:../../packages/sqlite",
+    "typeorm": "0.3.17",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@nativescript/android": "9.1.1",
