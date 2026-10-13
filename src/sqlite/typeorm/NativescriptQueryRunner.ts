@@ -30,17 +30,21 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner implement
         }
 
         const connection = this.driver.connection;
-        const isInsertQuery = query.startsWith('INSERT INTO') || query.startsWith('UPDATE');
+        // writes go through execute (they have no rows): TypeORM reads the id of an INSERT and `affected` from the result
+        const kind = /^\s*(INSERT|REPLACE|UPDATE|DELETE)\b/i.exec(query);
+        const isInsert = !!kind && /^(INSERT|REPLACE)$/i.test(kind[1]);
         connection.logger.logQuery(query, parameters, this);
 
         try {
             const db: NSQlite.SQLiteDatabase = await this.connect();
             const queryStartTime = +new Date();
             let result: any;
-            if (isInsertQuery) {
-                // TypeORM expects the id of an INSERT, the number of changed rows of an UPDATE
+            let affected: number | undefined;
+            if (kind) {
                 const res = await db.execute(query, parameters);
-                result = query.startsWith('INSERT INTO') ? res.lastInsertRowId : res.changes;
+                affected = res.changes;
+                // the id of an INSERT, the number of changed rows of an UPDATE / DELETE
+                result = isInsert ? res.lastInsertRowId : res.changes;
             } else {
                 result = await db.select(query, parameters);
             }
@@ -53,7 +57,7 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner implement
             }
 
             if (useStructuredResult) {
-                return { records: result, raw: result } as QueryResult;
+                return { records: kind ? [] : result, raw: result, affected } as QueryResult;
             } else {
                 return result;
             }
