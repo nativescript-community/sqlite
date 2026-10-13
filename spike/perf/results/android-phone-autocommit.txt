@@ -1,0 +1,7 @@
+[PERF] autocommit androidx default (journal DELETE, sync FULL) journal=delete synchronous=2 {"ms":2600,"min":2327}
+[PERF] autocommit androidx journal TRUNCATE journal=truncate synchronous=2 {"ms":2529,"min":2333}
+[PERF] autocommit androidx WAL journal=wal synchronous=1 {"ms":38,"min":38}
+[PERF] autocommit androidx WAL + synchronous NORMAL journal=wal synchronous=1 {"ms":67,"min":39}
+[PERF] autocommit platform SQLite default journal=truncate synchronous=2 {"ms":711,"min":698}
+[PERF] autocommit platform SQLite WAL journal=wal synchronous=1 {"ms":679,"min":290}
+[PERF] done
