@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/sqlite-bridge",
-    "version": "3.5.9",
+    "version": "4.0.0",
     "description": "JNI and Objective-C bridges of @nativescript-community/sqlite-core, for NativeScript runtimes without Node-API (NativeScript 8 and older).",
     "sideEffects": false,
     "scripts": {
@@ -31,7 +31,7 @@
     "repository": "nativescript-community/sqlite",
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/sqlite-core": "3.5.9"
+        "@nativescript-community/sqlite-core": "^4.0.0"
     },
     "files": [
         "platforms"
