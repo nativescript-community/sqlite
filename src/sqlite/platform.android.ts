@@ -1,5 +1,6 @@
 import { Utils } from '@nativescript/core';
 import { Backend, OpenParams, ResultCallback } from './backend';
+import { encodeUtf8 } from './codec';
 import { nativeRequire, pickBackend } from './platform.common';
 
 declare const com: any;
@@ -45,7 +46,6 @@ function createJniBackend(): Backend {
     // arenas, wrapped once
     let requestU8: Uint8Array;
     let resultAB: ArrayBuffer;
-    let encoder: TextEncoder;
 
     const ensureRequest = (size: number) => {
         if (!requestU8 || requestU8.length < size) {
@@ -91,8 +91,7 @@ function createJniBackend(): Backend {
         for (let i = 0; i < n; i++) {
             const c = sql.charCodeAt(i);
             if (c > 127) {
-                encoder = encoder || new TextEncoder();
-                const bytes = encoder.encode(sql);
+                const bytes = encodeUtf8(sql);
                 ensureRequest(bytes.length + reserve);
                 requestU8.set(bytes, 0);
                 return bytes.length;

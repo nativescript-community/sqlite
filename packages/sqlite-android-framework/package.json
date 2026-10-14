@@ -37,7 +37,6 @@
     "peerDependencies": {
         "@nativescript-community/sqlite-core": "3.5.9"
     },
-    "dependencies": {},
     "files": [
         "platforms",
         "**/*.js",

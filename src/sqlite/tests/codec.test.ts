@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { describe, it } from 'node:test';
-import { decodeBatch, decodeRows, encodeBatch, encodeParams } from '../codec';
+import { decodeBatch, decodeRows, encodeBatch, encodeParams, utf8DecodeJs, utf8EncodeJs } from '../codec';
 
 const u32 = (v: number) => new Uint8Array(new Uint32Array([v]).buffer);
 
@@ -112,5 +112,61 @@ describe('decodeRows', () => {
         const r = decodeBatch(buf, { objects: true });
         assert.equal(r.length, 2);
         assert.deepEqual(r[1].rows, [{ a: 5 }]);
+    });
+});
+
+describe('utf-8 without TextDecoder / TextEncoder', () => {
+    const samples = ['', 'abc', 'héllo € 😀 ünï', '😀'.repeat(5000), 'a\u0000b', '߿ࠀ￿', 'x'.repeat(100000)];
+
+    it('encodes like TextEncoder', () => {
+        const native = new TextEncoder();
+        for (const s of samples.concat(['lone \ud800 high', 'lone \udc00 low', '\ud800', 'a\udbff'])) {
+            assert.deepEqual(Array.from(utf8EncodeJs(s)), Array.from(native.encode(s)));
+        }
+    });
+
+    it('decodes like TextDecoder', () => {
+        const native = new TextDecoder();
+        for (const s of samples) {
+            const b = new TextEncoder().encode(s);
+            assert.equal(utf8DecodeJs(b, 0, b.length), native.decode(b));
+        }
+        // invalid input (never produced by SQLite for text): both give U+FFFD, the number of replacements may differ
+        for (const bad of [[0x80], [0xc3], [0xe2, 0x82], [0xf0, 0x9f, 0x98], [0xc0, 0x80], [0xed, 0xa0, 0x80], [0xf4, 0x90, 0x80, 0x80], [0xff, 0x41], [0xe2, 0x28, 0xa1]]) {
+            const b = new Uint8Array(bad);
+            const js = utf8DecodeJs(b, 0, b.length);
+            assert.ok(js.includes('\ufffd'), bad.join(','));
+            assert.ok(native.decode(b).includes('\ufffd'));
+        }
+    });
+
+    it('decodes a range of a bigger buffer', () => {
+        const b = new TextEncoder().encode('xxhéllo 😀yy');
+        assert.equal(utf8DecodeJs(b, 2, b.length - 2), 'héllo 😀');
+    });
+
+    it('round trips rows through the codec without the globals', () => {
+        const g: any = globalThis;
+        const saved = [g.TextDecoder, g.TextEncoder];
+        // a fresh module instance that has not seen the globals yet
+        g.TextDecoder = undefined;
+        g.TextEncoder = undefined;
+        try {
+            for (const key of Object.keys(require.cache)) {
+                if (/[\\/]codec\.js$/.test(key)) {
+                    delete require.cache[key];
+                }
+            }
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const fresh = require('../codec');
+            const params = fresh.encodeParams(['héllo 😀', 7]);
+            assert.ok(params.byteLength > 0);
+            const batch = fresh.encodeBatch([{ sql: 'SELECT ? AS é', params: ['😀'] }]);
+            assert.ok(batch.byteLength > 0);
+            assert.equal(Array.from(new Uint8Array(batch)).length, batch.byteLength);
+        } finally {
+            g.TextDecoder = saved[0];
+            g.TextEncoder = saved[1];
+        }
     });
 });

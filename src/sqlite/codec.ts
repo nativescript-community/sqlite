@@ -17,28 +17,126 @@ const ROWS_MAGIC = 0x3152534e; // "NSR1"
 const HEADER_SIZE = 32;
 const TWO32 = 4294967296;
 
-const textDecoder = new TextDecoder();
-const textEncoder = new TextEncoder();
-
 /**
- * NativeScript 8 runtimes ship a TextDecoder that ignores the byteOffset of a view: there, decode copies
- * (`slice`) instead of views (`subarray`).
+ * UTF-8 without a hard dependency on the globals: a runtime installs TextDecoder / TextEncoder lazily (NativeScript
+ * core polyfills them when its globals load, which may be after this module is evaluated), and some have none. The
+ * native ones are used as soon as they exist; until then (or without them) small pure JS versions do the work.
  */
-function detectSubarrayDecoding() {
-    try {
-        return textDecoder.decode(new Uint8Array([65, 66, 67, 68]).subarray(2)) === 'CD';
-    } catch (e) {
-        return false;
+declare const TextDecoder: any;
+declare const TextEncoder: any;
+
+let nativeDecoder: any;
+let nativeEncoder: any;
+/** NativeScript 8 runtimes ship a TextDecoder that ignores the byteOffset of a view: there, decode copies (`slice`) instead of views (`subarray`). */
+let subarrayOk = false;
+
+function nativeCodecs() {
+    if (!nativeDecoder && typeof TextDecoder !== 'undefined') {
+        const d = new TextDecoder();
+        try {
+            subarrayOk = d.decode(new Uint8Array([65, 66, 67, 68]).subarray(2)) === 'CD';
+        } catch (e) {
+            subarrayOk = false;
+        }
+        nativeDecoder = d;
+    }
+    if (!nativeEncoder && typeof TextEncoder !== 'undefined') {
+        nativeEncoder = new TextEncoder();
     }
 }
-const subarrayOk = detectSubarrayDecoding();
 
-function view(u8: Uint8Array, start: number, end: number) {
-    return subarrayOk ? u8.subarray(start, end) : u8.slice(start, end);
+/** UTF-8 -> string. Invalid sequences become U+FFFD. */
+export function utf8DecodeJs(u8: Uint8Array, start: number, end: number): string {
+    let out = '';
+    let chunk: number[] = [];
+    let i = start;
+    const flush = () => {
+        out += String.fromCharCode.apply(null, chunk as any);
+        chunk = [];
+    };
+    while (i < end) {
+        const b0 = u8[i++];
+        let cp: number;
+        if (b0 < 0x80) {
+            cp = b0;
+        } else if (b0 >= 0xc2 && b0 < 0xe0 && i < end && (u8[i] & 0xc0) === 0x80) {
+            cp = ((b0 & 0x1f) << 6) | (u8[i++] & 0x3f);
+        } else if (b0 >= 0xe0 && b0 < 0xf0 && i + 1 < end && (u8[i] & 0xc0) === 0x80 && (u8[i + 1] & 0xc0) === 0x80) {
+            cp = ((b0 & 0x0f) << 12) | ((u8[i] & 0x3f) << 6) | (u8[i + 1] & 0x3f);
+            i += 2;
+            if (cp < 0x800 || (cp >= 0xd800 && cp < 0xe000)) {
+                cp = 0xfffd;
+            }
+        } else if (b0 >= 0xf0 && b0 < 0xf5 && i + 2 < end && (u8[i] & 0xc0) === 0x80 && (u8[i + 1] & 0xc0) === 0x80 && (u8[i + 2] & 0xc0) === 0x80) {
+            cp = ((b0 & 0x07) << 18) | ((u8[i] & 0x3f) << 12) | ((u8[i + 1] & 0x3f) << 6) | (u8[i + 2] & 0x3f);
+            i += 3;
+            if (cp < 0x10000 || cp > 0x10ffff) {
+                cp = 0xfffd;
+            }
+        } else {
+            cp = 0xfffd;
+        }
+        if (cp >= 0x10000) {
+            cp -= 0x10000;
+            chunk.push(0xd800 + (cp >> 10), 0xdc00 + (cp & 0x3ff));
+        } else {
+            chunk.push(cp);
+        }
+        if (chunk.length >= 8192) {
+            flush();
+        }
+    }
+    flush();
+    return out;
+}
+
+/** string -> UTF-8. Lone surrogates become U+FFFD, like TextEncoder. */
+export function utf8EncodeJs(s: string): Uint8Array {
+    const n = s.length;
+    const out = new Uint8Array(n * 3);
+    let o = 0;
+    for (let i = 0; i < n; i++) {
+        let c = s.charCodeAt(i);
+        if (c >= 0xd800 && c < 0xdc00 && i + 1 < n) {
+            const d = s.charCodeAt(i + 1);
+            if (d >= 0xdc00 && d < 0xe000) {
+                c = 0x10000 + ((c - 0xd800) << 10) + (d - 0xdc00);
+                i++;
+            }
+        }
+        if (c >= 0xd800 && c < 0xe000) {
+            c = 0xfffd;
+        }
+        if (c < 0x80) {
+            out[o++] = c;
+        } else if (c < 0x800) {
+            out[o++] = 0xc0 | (c >> 6);
+            out[o++] = 0x80 | (c & 0x3f);
+        } else if (c < 0x10000) {
+            out[o++] = 0xe0 | (c >> 12);
+            out[o++] = 0x80 | ((c >> 6) & 0x3f);
+            out[o++] = 0x80 | (c & 0x3f);
+        } else {
+            out[o++] = 0xf0 | (c >> 18);
+            out[o++] = 0x80 | ((c >> 12) & 0x3f);
+            out[o++] = 0x80 | ((c >> 6) & 0x3f);
+            out[o++] = 0x80 | (c & 0x3f);
+        }
+    }
+    return out.subarray(0, o);
 }
 
 function decodeUtf8(u8: Uint8Array, start: number, end: number): string {
-    return textDecoder.decode(view(u8, start, end));
+    nativeCodecs();
+    if (!nativeDecoder) {
+        return utf8DecodeJs(u8, start, end);
+    }
+    return nativeDecoder.decode(subarrayOk ? u8.subarray(start, end) : u8.slice(start, end));
+}
+
+export function encodeUtf8(s: string): Uint8Array {
+    nativeCodecs();
+    return nativeEncoder ? nativeEncoder.encode(s) : utf8EncodeJs(s);
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -164,7 +262,7 @@ class Writer {
                 return;
             }
         }
-        const bytes = textEncoder.encode(s);
+        const bytes = encodeUtf8(s);
         this.ensure(5 + bytes.length);
         this.u8[this.len++] = T_TEXT;
         this.dv.setUint32(this.len, bytes.length, true);
@@ -237,7 +335,7 @@ export function encodeBatch(statements: Array<{ sql: string; params?: SqlitePara
     w.reset();
     w.u32(statements.length);
     for (const st of statements) {
-        const sql = textEncoder.encode(st.sql);
+        const sql = encodeUtf8(st.sql);
         w.u32(sql.length);
         w.bytes(sql);
         const lenAt = w.len;

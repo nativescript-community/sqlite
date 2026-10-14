@@ -39,10 +39,10 @@
         "@nativescript/core": "*"
     },
     "dependencies": {
-        "@nativescript-community/sqlite-core": "3.5.9",
-        "@nativescript-community/sqlite-napi": "3.5.9",
         "@nativescript-community/sqlite-bridge": "3.5.9",
-        "@nativescript-community/sqlite-default-engine": "3.5.9"
+        "@nativescript-community/sqlite-core": "3.5.9",
+        "@nativescript-community/sqlite-default-engine": "3.5.9",
+        "@nativescript-community/sqlite-napi": "3.5.9"
     },
     "files": [
         "platforms",
