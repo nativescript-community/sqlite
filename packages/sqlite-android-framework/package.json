@@ -35,7 +35,7 @@
     "readmeFilename": "README.md",
     "repository": "nativescript-community/sqlite",
     "peerDependencies": {
-        "@nativescript-community/sqlite-core": "3.5.9"
+        "@nativescript-community/sqlite-core": "^4.0.0"
     },
     "files": [
         "platforms",
