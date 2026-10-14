@@ -43,7 +43,7 @@ const rows = await a.select('SELECT sqlite_version() AS v, count(*) AS n FROM sq
 * **The platform decides** the SQLite version (older Android versions ship much older SQLites, OEMs differ) and its options: check `db.getSqliteVersion()` at run time. No extensions (`canLoadExtensions()` is false), no SQLCipher, a fixed busy timeout (`busyTimeout` is ignored).
 * One statement per call, as with the other engines; `executeScript` and `batch` split statements with a small scanner (strings, comments, `CREATE TRIGGER ... END` are handled).
 * Transactions use the framework's session (`BEGIN` is `IMMEDIATE`, or `EXCLUSIVE` when asked; `DEFERRED` is run as `IMMEDIATE`).
-* A row bigger than the framework's cursor window (2 MB) cannot be read.
+* **Big rows:** a row has to fit in the framework's cursor window, 2 MB by default. This package uses 16 MB; set it with `useFrameworkEngine({ cursorWindowSize })` or `loadFrameworkEngine({ cursorWindowSize })` (bytes, `0` keeps the platform's 2 MB). The memory is mapped but only the pages a query fills are used. A row over the window fails with an error that names `cursorWindowSize`.
 * The first read of a result makes the framework count all rows: very big results cost twice the stepping.
 * `changes` / `lastInsertRowId` after an `INSERT` cost a second tiny query.
 * Speed (emulator, warm, against androidx sqlite-bundled through the same core): `select` of 20000 rows ~14 ms vs ~3 ms, 1000 awaited point lookups ~55 ms vs ~40 ms, 5000 inserts in a transaction ~80 ms vs ~20 ms, `batch()` of 5000 inserts ~60 ms vs ~7 ms.

@@ -1,6 +1,7 @@
 package com.akylas.sqlite.framework;
 
 import android.database.Cursor;
+import android.database.CursorWindow;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;
@@ -32,6 +33,38 @@ public final class FrameworkEngine {
 
     /** Loads the native shim. Call before opening a database with the framework engine. */
     public static void init() {}
+
+    /**
+     * Size of the CursorWindow of every query. A row has to fit in one: the platform default is 2 MB, which cannot hold a
+     * long route stored as one JSON text. The memory is mapped, but only the pages a query fills are used.
+     */
+    private static volatile long cursorWindowSize = 16L << 20;
+    private static final String WINDOW_NAME = "nssqlite";
+
+    /** @param bytes window size, 0 keeps the platform default (2 MB) */
+    public static void setCursorWindowSize(long bytes) {
+        cursorWindowSize = Math.max(0, bytes);
+    }
+
+    private static CursorWindow newWindow() throws Exception {
+        long size = cursorWindowSize;
+        if (size <= 0) return null;
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            return new CursorWindow(WINDOW_NAME, size);
+        }
+        // before API 28 the size is a hidden static: set it for the creation of the window, like the 3.x plugin did
+        synchronized (FrameworkEngine.class) {
+            java.lang.reflect.Field f = CursorWindow.class.getDeclaredField("sCursorWindowSize");
+            f.setAccessible(true);
+            int old = f.getInt(null);
+            f.setInt(null, (int) Math.min(size, Integer.MAX_VALUE));
+            try {
+                return new CursorWindow(WINDOW_NAME);
+            } finally {
+                f.setInt(null, old);
+            }
+        }
+    }
 
     // return codes of begin / more
     private static final long ERR_BASE = -(1L << 40); // ERR_BASE - code
@@ -223,7 +256,14 @@ public final class FrameworkEngine {
             final ByteBuffer bound = p;
             SQLiteDatabase.CursorFactory factory = (d, driver, editTable, query) -> {
                 bind(query, bound);
-                return new SQLiteCursor(driver, editTable, query);
+                SQLiteCursor cursor = new SQLiteCursor(driver, editTable, query);
+                try {
+                    CursorWindow window = newWindow();
+                    if (window != null) cursor.setWindow(window);
+                } catch (Throwable ignored) {
+                    // the default window then
+                }
+                return cursor;
             };
             Cursor c = db.rawQueryWithFactory(factory, sql, null, null);
             Stmt s = new Stmt();
@@ -261,6 +301,9 @@ public final class FrameworkEngine {
 
     private static long fail(Throwable e) {
         String m = String.valueOf(e.getMessage());
+        if (e instanceof android.database.sqlite.SQLiteBlobTooBigException) {
+            m += " (the cursor window is " + cursorWindowSize + " bytes: raise cursorWindowSize)";
+        }
         int code = 1;
         Matcher mt = CODE.matcher(m);
         if (mt.find()) {

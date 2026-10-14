@@ -110,6 +110,25 @@ async function runSuite(withPerf: boolean) {
         eq(row.c.length, 50002);
         await db.close();
     });
+    await check('a row bigger than the platform cursor window (2 MB)', async () => {
+        const file = `${dir}/fw-bigrow.db`;
+        removeDb(file);
+        const db = openOrCreate(file, { engine: FRAMEWORK_ENGINE });
+        const big = 'é€x'.repeat(1200000); // ~ 7 MB of UTF-8
+        await db.execute('CREATE TABLE t(a TEXT)');
+        await db.execute('INSERT INTO t VALUES (?)', [big]);
+        // default window (16 MB): reads
+        eq((await db.get('SELECT a FROM t')).a === big, true, 'default window');
+        // a window smaller than the row: a clear error
+        loadFrameworkEngine({ cursorWindowSize: 1 << 20 });
+        await rejects(db.get('SELECT a FROM t'), (e) => /cursorWindowSize/.test(String(e.message)), 'small window');
+        loadFrameworkEngine({ cursorWindowSize: 8 << 20 });
+        eq((await db.get('SELECT length(a) AS n FROM t')).n, big.length);
+        eq((await db.get('SELECT a FROM t')).a === big, true, '8 MB window');
+        loadFrameworkEngine({ cursorWindowSize: 16 << 20 });
+        await db.close();
+        removeDb(file);
+    });
     await check('batch is atomic, non atomic keeps going', async () => {
         const db = mem();
         await db.execute('CREATE TABLE t(id INTEGER PRIMARY KEY)');
