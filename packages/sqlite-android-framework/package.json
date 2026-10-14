@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/sqlite-android-framework",
-    "version": "4.0.0",
+    "version": "3.5.9",
     "description": "Use the SQLite of the Android platform (android.database.sqlite) as the engine of @nativescript-community/sqlite-core: no SQLite library in the app.",
     "main": "index",
     "typings": "index.d.ts",
