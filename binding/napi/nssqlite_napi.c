@@ -11,6 +11,10 @@
  */
 #include <node_api.h>
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -587,6 +591,19 @@ static napi_module sModule = {
     NAPI_MODULE_VERSION, 0, __FILE__, Init, "nssqlite", NULL, {0},
 };
 
+/* The standard Node-API entry point: runtimes that load a module through its exports (the NativeScript QuickJS runtime,
+ * Node itself) call it. Runtimes with napi_module_register get the legacy registration below instead; both exist so the
+ * same library loads everywhere. */
+__attribute__((visibility("default"))) napi_value napi_register_module_v1(napi_env env, napi_value exports) {
+    if (napi_dyn_load() != 0) {
+#ifdef __ANDROID__
+        __android_log_print(ANDROID_LOG_ERROR, "nssqlite", "the runtime does not provide the Node-API function %s", napi_dyn_missing_name());
+#endif
+        return NULL;
+    }
+    return Init(env, exports);
+}
+
 /* Idempotent. Constructor for dlopen'ed libraries (Android), explicit call from +load on iOS where the
  * static library object would otherwise be dead-stripped. */
 __attribute__((visibility("default"))) void nssqlite_napi_register(void) {
@@ -594,7 +611,10 @@ __attribute__((visibility("default"))) void nssqlite_napi_register(void) {
     if (atomic_exchange(&done, 1) != 0) return;
     /* Runtimes without Node-API (NativeScript <= 8): stay inactive, the bridge binding is used instead. */
     if (napi_dyn_load() != 0) return;
-    napi_module_register(&sModule);
+    /* runtimes that only load through napi_register_module_v1 do not provide this */
+    if (g_napi.p_napi_module_register) napi_module_register(&sModule);
 }
 
+#ifndef NSSQLITE_NAPI_V1_ONLY
 __attribute__((constructor)) static void nssqlite_napi_ctor(void) { nssqlite_napi_register(); }
+#endif

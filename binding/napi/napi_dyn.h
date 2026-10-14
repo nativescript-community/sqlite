@@ -51,6 +51,8 @@ extern NapiTable g_napi;
 
 /* Resolves every function from the runtime. Returns 0 when all are available. */
 int napi_dyn_load(void);
+/* The first required function the runtime did not provide, NULL when none (for diagnostics). */
+const char* napi_dyn_missing_name(void);
 
 #define napi_call_function (g_napi.p_napi_call_function)
 #define napi_call_threadsafe_function (g_napi.p_napi_call_threadsafe_function)

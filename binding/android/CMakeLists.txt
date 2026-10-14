@@ -21,7 +21,7 @@ target_link_options(nssqlite_core PRIVATE -Wl,-z,max-page-size=16384 -Wl,--gc-se
 add_library(nssqlite_napi SHARED ${NAPI}/nssqlite_napi.c ${NAPI}/napi_dyn.c)
 target_include_directories(nssqlite_napi PRIVATE ${NAPI} ${NAPI}/include ${CORE})
 target_compile_options(nssqlite_napi PRIVATE ${COMMON_FLAGS})
-target_link_libraries(nssqlite_napi PRIVATE nssqlite_core dl)
+target_link_libraries(nssqlite_napi PRIVATE nssqlite_core dl log)
 target_link_options(nssqlite_napi PRIVATE -Wl,--no-undefined -Wl,-z,max-page-size=16384 -Wl,--gc-sections -Wl,--strip-all)
 
 # libnssqlite_jni.so (package sqlite-bridge): the JNI bridge for runtimes without Node-API (NativeScript <= 8).

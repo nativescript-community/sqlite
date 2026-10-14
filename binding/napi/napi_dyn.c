@@ -55,90 +55,215 @@ static void* lookup(void* extra, const char* name) {
     return p;
 }
 
+static int g_loaded = 0;
+static int g_missing = 0;
+static const char* g_missing_name = 0;
+
+const char* napi_dyn_missing_name(void) { return g_missing_name; }
+
 int napi_dyn_load(void) {
-    if (g_napi.p_napi_module_register) return 0;
+    if (g_loaded) return g_missing;
+    g_loaded = 1;
     /* Android loads the runtime library with local scope: look it up explicitly when the global scope misses */
     void* extra = dlopen("libNativeScript.so", RTLD_NOW | RTLD_NOLOAD);
     int missing = 0;
     *(void**)&g_napi.p_napi_call_function = lookup(extra, "napi_call_function");
-    if (!g_napi.p_napi_call_function) missing++;
+    if (!g_napi.p_napi_call_function) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_call_function";
+    }
     *(void**)&g_napi.p_napi_call_threadsafe_function = lookup(extra, "napi_call_threadsafe_function");
-    if (!g_napi.p_napi_call_threadsafe_function) missing++;
+    if (!g_napi.p_napi_call_threadsafe_function) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_call_threadsafe_function";
+    }
     *(void**)&g_napi.p_napi_close_handle_scope = lookup(extra, "napi_close_handle_scope");
-    if (!g_napi.p_napi_close_handle_scope) missing++;
+    if (!g_napi.p_napi_close_handle_scope) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_close_handle_scope";
+    }
     *(void**)&g_napi.p_napi_create_array_with_length = lookup(extra, "napi_create_array_with_length");
-    if (!g_napi.p_napi_create_array_with_length) missing++;
+    if (!g_napi.p_napi_create_array_with_length) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_array_with_length";
+    }
     *(void**)&g_napi.p_napi_create_external = lookup(extra, "napi_create_external");
-    if (!g_napi.p_napi_create_external) missing++;
+    if (!g_napi.p_napi_create_external) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_external";
+    }
     *(void**)&g_napi.p_napi_create_external_arraybuffer = lookup(extra, "napi_create_external_arraybuffer");
-    if (!g_napi.p_napi_create_external_arraybuffer) missing++;
+    if (!g_napi.p_napi_create_external_arraybuffer) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_external_arraybuffer";
+    }
     *(void**)&g_napi.p_napi_create_function = lookup(extra, "napi_create_function");
-    if (!g_napi.p_napi_create_function) missing++;
+    if (!g_napi.p_napi_create_function) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_function";
+    }
     *(void**)&g_napi.p_napi_create_int32 = lookup(extra, "napi_create_int32");
-    if (!g_napi.p_napi_create_int32) missing++;
+    if (!g_napi.p_napi_create_int32) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_int32";
+    }
     *(void**)&g_napi.p_napi_create_int64 = lookup(extra, "napi_create_int64");
-    if (!g_napi.p_napi_create_int64) missing++;
+    if (!g_napi.p_napi_create_int64) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_int64";
+    }
     *(void**)&g_napi.p_napi_create_reference = lookup(extra, "napi_create_reference");
-    if (!g_napi.p_napi_create_reference) missing++;
+    if (!g_napi.p_napi_create_reference) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_reference";
+    }
     *(void**)&g_napi.p_napi_create_string_utf8 = lookup(extra, "napi_create_string_utf8");
-    if (!g_napi.p_napi_create_string_utf8) missing++;
+    if (!g_napi.p_napi_create_string_utf8) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_string_utf8";
+    }
     *(void**)&g_napi.p_napi_create_threadsafe_function = lookup(extra, "napi_create_threadsafe_function");
-    if (!g_napi.p_napi_create_threadsafe_function) missing++;
+    if (!g_napi.p_napi_create_threadsafe_function) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_create_threadsafe_function";
+    }
     *(void**)&g_napi.p_napi_define_properties = lookup(extra, "napi_define_properties");
-    if (!g_napi.p_napi_define_properties) missing++;
+    if (!g_napi.p_napi_define_properties) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_define_properties";
+    }
     *(void**)&g_napi.p_napi_delete_reference = lookup(extra, "napi_delete_reference");
-    if (!g_napi.p_napi_delete_reference) missing++;
+    if (!g_napi.p_napi_delete_reference) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_delete_reference";
+    }
     *(void**)&g_napi.p_napi_get_arraybuffer_info = lookup(extra, "napi_get_arraybuffer_info");
-    if (!g_napi.p_napi_get_arraybuffer_info) missing++;
+    if (!g_napi.p_napi_get_arraybuffer_info) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_arraybuffer_info";
+    }
     *(void**)&g_napi.p_napi_get_boolean = lookup(extra, "napi_get_boolean");
-    if (!g_napi.p_napi_get_boolean) missing++;
+    if (!g_napi.p_napi_get_boolean) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_boolean";
+    }
     *(void**)&g_napi.p_napi_get_cb_info = lookup(extra, "napi_get_cb_info");
-    if (!g_napi.p_napi_get_cb_info) missing++;
+    if (!g_napi.p_napi_get_cb_info) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_cb_info";
+    }
     *(void**)&g_napi.p_napi_get_dataview_info = lookup(extra, "napi_get_dataview_info");
-    if (!g_napi.p_napi_get_dataview_info) missing++;
+    if (!g_napi.p_napi_get_dataview_info) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_dataview_info";
+    }
     *(void**)&g_napi.p_napi_get_global = lookup(extra, "napi_get_global");
-    if (!g_napi.p_napi_get_global) missing++;
+    if (!g_napi.p_napi_get_global) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_global";
+    }
     *(void**)&g_napi.p_napi_get_instance_data = lookup(extra, "napi_get_instance_data");
-    if (!g_napi.p_napi_get_instance_data) missing++;
+    if (!g_napi.p_napi_get_instance_data) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_instance_data";
+    }
     *(void**)&g_napi.p_napi_get_null = lookup(extra, "napi_get_null");
-    if (!g_napi.p_napi_get_null) missing++;
+    if (!g_napi.p_napi_get_null) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_null";
+    }
     *(void**)&g_napi.p_napi_get_reference_value = lookup(extra, "napi_get_reference_value");
-    if (!g_napi.p_napi_get_reference_value) missing++;
+    if (!g_napi.p_napi_get_reference_value) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_reference_value";
+    }
     *(void**)&g_napi.p_napi_get_typedarray_info = lookup(extra, "napi_get_typedarray_info");
-    if (!g_napi.p_napi_get_typedarray_info) missing++;
+    if (!g_napi.p_napi_get_typedarray_info) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_typedarray_info";
+    }
     *(void**)&g_napi.p_napi_get_undefined = lookup(extra, "napi_get_undefined");
-    if (!g_napi.p_napi_get_undefined) missing++;
+    if (!g_napi.p_napi_get_undefined) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_undefined";
+    }
     *(void**)&g_napi.p_napi_get_value_bool = lookup(extra, "napi_get_value_bool");
-    if (!g_napi.p_napi_get_value_bool) missing++;
+    if (!g_napi.p_napi_get_value_bool) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_value_bool";
+    }
     *(void**)&g_napi.p_napi_get_value_external = lookup(extra, "napi_get_value_external");
-    if (!g_napi.p_napi_get_value_external) missing++;
+    if (!g_napi.p_napi_get_value_external) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_value_external";
+    }
     *(void**)&g_napi.p_napi_get_value_int32 = lookup(extra, "napi_get_value_int32");
-    if (!g_napi.p_napi_get_value_int32) missing++;
+    if (!g_napi.p_napi_get_value_int32) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_value_int32";
+    }
     *(void**)&g_napi.p_napi_get_value_string_utf8 = lookup(extra, "napi_get_value_string_utf8");
-    if (!g_napi.p_napi_get_value_string_utf8) missing++;
+    if (!g_napi.p_napi_get_value_string_utf8) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_get_value_string_utf8";
+    }
     *(void**)&g_napi.p_napi_is_arraybuffer = lookup(extra, "napi_is_arraybuffer");
-    if (!g_napi.p_napi_is_arraybuffer) missing++;
+    if (!g_napi.p_napi_is_arraybuffer) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_is_arraybuffer";
+    }
     *(void**)&g_napi.p_napi_is_dataview = lookup(extra, "napi_is_dataview");
-    if (!g_napi.p_napi_is_dataview) missing++;
+    if (!g_napi.p_napi_is_dataview) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_is_dataview";
+    }
     *(void**)&g_napi.p_napi_is_typedarray = lookup(extra, "napi_is_typedarray");
-    if (!g_napi.p_napi_is_typedarray) missing++;
+    if (!g_napi.p_napi_is_typedarray) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_is_typedarray";
+    }
     *(void**)&g_napi.p_napi_module_register = lookup(extra, "napi_module_register");
-    if (!g_napi.p_napi_module_register) missing++;
+
     *(void**)&g_napi.p_napi_open_handle_scope = lookup(extra, "napi_open_handle_scope");
-    if (!g_napi.p_napi_open_handle_scope) missing++;
+    if (!g_napi.p_napi_open_handle_scope) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_open_handle_scope";
+    }
     *(void**)&g_napi.p_napi_ref_threadsafe_function = lookup(extra, "napi_ref_threadsafe_function");
-    if (!g_napi.p_napi_ref_threadsafe_function) missing++;
+    if (!g_napi.p_napi_ref_threadsafe_function) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_ref_threadsafe_function";
+    }
     *(void**)&g_napi.p_napi_set_element = lookup(extra, "napi_set_element");
-    if (!g_napi.p_napi_set_element) missing++;
+    if (!g_napi.p_napi_set_element) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_set_element";
+    }
     *(void**)&g_napi.p_napi_set_instance_data = lookup(extra, "napi_set_instance_data");
-    if (!g_napi.p_napi_set_instance_data) missing++;
+    if (!g_napi.p_napi_set_instance_data) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_set_instance_data";
+    }
     *(void**)&g_napi.p_napi_set_named_property = lookup(extra, "napi_set_named_property");
-    if (!g_napi.p_napi_set_named_property) missing++;
+    if (!g_napi.p_napi_set_named_property) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_set_named_property";
+    }
     *(void**)&g_napi.p_napi_throw_error = lookup(extra, "napi_throw_error");
-    if (!g_napi.p_napi_throw_error) missing++;
+    if (!g_napi.p_napi_throw_error) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_throw_error";
+    }
     *(void**)&g_napi.p_napi_typeof = lookup(extra, "napi_typeof");
-    if (!g_napi.p_napi_typeof) missing++;
+    if (!g_napi.p_napi_typeof) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_typeof";
+    }
     *(void**)&g_napi.p_napi_unref_threadsafe_function = lookup(extra, "napi_unref_threadsafe_function");
-    if (!g_napi.p_napi_unref_threadsafe_function) missing++;
+    if (!g_napi.p_napi_unref_threadsafe_function) {
+        missing++;
+        if (!g_missing_name) g_missing_name = "napi_unref_threadsafe_function";
+    }
+    g_missing = missing;
     return missing;
 }

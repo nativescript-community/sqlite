@@ -10,7 +10,9 @@ case $(uname) in
   Darwin) LDFLAGS="-shared -undefined dynamic_lookup" ;;
   *) LDFLAGS="-shared -ldl -lpthread" ;;
 esac
-$CC -std=gnu11 -O1 -g -fPIC -Wall -Wextra -Wno-unused-parameter $SANITIZE \
+# NSSQLITE_V1_ONLY=1: no legacy napi_module_register at load, only the napi_register_module_v1 export (how QuickJS based runtimes load it)
+[ -n "$NSSQLITE_V1_ONLY" ] && V1="-DNSSQLITE_NAPI_V1_ONLY"
+$CC -std=gnu11 $V1 -O1 -g -fPIC -Wall -Wextra -Wno-unused-parameter $SANITIZE \
   -I"$ROOT/binding/napi/include" -I"$ROOT/binding/napi" -I"$ROOT/core" \
   "$ROOT"/core/wire.c "$ROOT"/core/engine.c "$ROOT"/core/db.c "$ROOT"/core/provider.c \
   "$ROOT"/binding/napi/nssqlite_napi.c "$ROOT"/binding/napi/napi_dyn.c \
