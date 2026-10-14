@@ -5,6 +5,10 @@ import { Backend, OpenParams, RawResult, ResultCallback } from './backend';
  * invokes the callbacks as (status, done, data, message, changes, lastInsertRowId) on the calling thread.
  */
 export function createNapiBackend(addon: any, defaultEngines: Array<string | null>): Backend {
+    if (!addon || typeof addon.engine !== 'function') {
+        // a runtime that lacks a Node-API function loads the module without its functions: the module says which one
+        throw new Error((addon && addon.error) || 'the Node-API module did not export its functions');
+    }
     const wrap = (cb: ResultCallback) => (status: number, done: boolean, data: ArrayBuffer | null, message: string | null, changes: number, lastInsertRowId: number) => {
         const r: RawResult = { status, done, data, message, changes, lastInsertRowId };
         cb(r);

@@ -505,3 +505,10 @@ describe('blocking calls', () => {
         assert.throws(() => db.getSync('SELECT 1'), (e: SqliteError) => e.code === -1);
     });
 });
+
+describe('a Node-API module that did not load its functions', () => {
+    it('reports the reason the module gave', () => {
+        assert.throws(() => createNapiBackend({ error: 'the runtime does not provide the Node-API function napi_x' }, []), /does not provide the Node-API function napi_x/);
+        assert.throws(() => createNapiBackend({}, []), /did not export its functions/);
+    });
+});

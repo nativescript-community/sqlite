@@ -15,6 +15,7 @@
 #undef napi_create_function
 #undef napi_create_int32
 #undef napi_create_int64
+#undef napi_create_object
 #undef napi_create_reference
 #undef napi_create_string_utf8
 #undef napi_create_threadsafe_function
@@ -112,6 +113,8 @@ int napi_dyn_load(void) {
         missing++;
         if (!g_missing_name) g_missing_name = "napi_create_int64";
     }
+    *(void**)&g_napi.p_napi_create_object = lookup(extra, "napi_create_object");
+
     *(void**)&g_napi.p_napi_create_reference = lookup(extra, "napi_create_reference");
     if (!g_napi.p_napi_create_reference) {
         missing++;

@@ -14,6 +14,7 @@ typedef struct NapiTable {
     __typeof__(napi_create_function)* p_napi_create_function;
     __typeof__(napi_create_int32)* p_napi_create_int32;
     __typeof__(napi_create_int64)* p_napi_create_int64;
+    __typeof__(napi_create_object)* p_napi_create_object;
     __typeof__(napi_create_reference)* p_napi_create_reference;
     __typeof__(napi_create_string_utf8)* p_napi_create_string_utf8;
     __typeof__(napi_create_threadsafe_function)* p_napi_create_threadsafe_function;
@@ -63,6 +64,7 @@ const char* napi_dyn_missing_name(void);
 #define napi_create_function (g_napi.p_napi_create_function)
 #define napi_create_int32 (g_napi.p_napi_create_int32)
 #define napi_create_int64 (g_napi.p_napi_create_int64)
+#define napi_create_object (g_napi.p_napi_create_object)
 #define napi_create_reference (g_napi.p_napi_create_reference)
 #define napi_create_string_utf8 (g_napi.p_napi_create_string_utf8)
 #define napi_create_threadsafe_function (g_napi.p_napi_create_threadsafe_function)

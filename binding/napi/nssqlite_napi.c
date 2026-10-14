@@ -17,6 +17,7 @@
 
 #include <pthread.h>
 #include <stdatomic.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -595,13 +596,24 @@ static napi_module sModule = {
  * Node itself) call it. Runtimes with napi_module_register get the legacy registration below instead; both exist so the
  * same library loads everywhere. */
 __attribute__((visibility("default"))) napi_value napi_register_module_v1(napi_env env, napi_value exports) {
-    if (napi_dyn_load() != 0) {
+    int missing = napi_dyn_load();
+    if (missing != 0) {
+        const char* name = napi_dyn_missing_name();
 #ifdef __ANDROID__
-        __android_log_print(ANDROID_LOG_ERROR, "nssqlite", "the runtime does not provide the Node-API function %s", napi_dyn_missing_name());
+        __android_log_print(ANDROID_LOG_ERROR, "nssqlite", "the runtime does not provide the Node-API function %s", name);
 #endif
-        return NULL;
+        /* Never return NULL: some runtimes store the result as `exports` and fail. Hand back the (empty) exports with the
+         * reason, which the JS side reports. */
+        if (exports && g_napi.p_napi_create_string_utf8 && g_napi.p_napi_set_named_property) {
+            char msg[160];
+            snprintf(msg, sizeof(msg), "the runtime does not provide the Node-API function %s", name ? name : "?");
+            napi_value v;
+            if (napi_create_string_utf8(env, msg, NAPI_AUTO_LENGTH, &v) == napi_ok) napi_set_named_property(env, exports, "error", v);
+        }
+        return exports;
     }
-    return Init(env, exports);
+    if (!exports && g_napi.p_napi_create_object) napi_create_object(env, &exports);
+    return exports ? Init(env, exports) : exports;
 }
 
 /* Idempotent. Constructor for dlopen'ed libraries (Android), explicit call from +load on iOS where the
