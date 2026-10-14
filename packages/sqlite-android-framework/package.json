@@ -34,6 +34,9 @@
     "homepage": "https://github.com/nativescript-community/sqlite",
     "readmeFilename": "README.md",
     "repository": "nativescript-community/sqlite",
+    "devDependencies": {
+        "@nativescript-community/sqlite-core": "4.0.0"
+    },
     "peerDependencies": {
         "@nativescript-community/sqlite-core": "^4.0.0"
     },
