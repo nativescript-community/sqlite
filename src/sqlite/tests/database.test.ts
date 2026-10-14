@@ -380,7 +380,7 @@ describe('transactions', () => {
         withDb(async (db) => {
             await db.execute('CREATE TABLE t(a)');
             const order: string[] = [];
-            const before = db.execute('INSERT INTO t VALUES (0)').then(() => order.push('before'));
+            const before = db.execute('INSERT INTO t VALUES (0)');
             const tx = db.transaction(async (cancel, t) => {
                 order.push('begin');
                 await t.execute('INSERT INTO t VALUES (1)');
@@ -389,7 +389,9 @@ describe('transactions', () => {
             });
             await new Promise((r) => setTimeout(r, 10)); // the transaction is open, activeTx is set: this would join
             await Promise.all([before, tx]);
-            assert.deepEqual(order, ['before', 'begin', 'end']);
+            // the order the database ran them in (independent of how many promise hops each result takes to reach JS)
+            assert.deepEqual(await db.selectArray('SELECT a FROM t ORDER BY rowid'), [[0], [1]]);
+            assert.deepEqual(order, ['begin', 'end']);
         }));
 
     it('supports transaction modes', () =>

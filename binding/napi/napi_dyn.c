@@ -74,10 +74,7 @@ int napi_dyn_load(void) {
         if (!g_missing_name) g_missing_name = "napi_call_function";
     }
     *(void**)&g_napi.p_napi_call_threadsafe_function = lookup(extra, "napi_call_threadsafe_function");
-    if (!g_napi.p_napi_call_threadsafe_function) {
-        missing++;
-        if (!g_missing_name) g_missing_name = "napi_call_threadsafe_function";
-    }
+
     *(void**)&g_napi.p_napi_close_handle_scope = lookup(extra, "napi_close_handle_scope");
     if (!g_napi.p_napi_close_handle_scope) {
         missing++;
@@ -126,10 +123,7 @@ int napi_dyn_load(void) {
         if (!g_missing_name) g_missing_name = "napi_create_string_utf8";
     }
     *(void**)&g_napi.p_napi_create_threadsafe_function = lookup(extra, "napi_create_threadsafe_function");
-    if (!g_napi.p_napi_create_threadsafe_function) {
-        missing++;
-        if (!g_missing_name) g_missing_name = "napi_create_threadsafe_function";
-    }
+
     *(void**)&g_napi.p_napi_define_properties = lookup(extra, "napi_define_properties");
     if (!g_napi.p_napi_define_properties) {
         missing++;
@@ -233,10 +227,7 @@ int napi_dyn_load(void) {
         if (!g_missing_name) g_missing_name = "napi_open_handle_scope";
     }
     *(void**)&g_napi.p_napi_ref_threadsafe_function = lookup(extra, "napi_ref_threadsafe_function");
-    if (!g_napi.p_napi_ref_threadsafe_function) {
-        missing++;
-        if (!g_missing_name) g_missing_name = "napi_ref_threadsafe_function";
-    }
+
     *(void**)&g_napi.p_napi_set_element = lookup(extra, "napi_set_element");
     if (!g_napi.p_napi_set_element) {
         missing++;
@@ -263,10 +254,7 @@ int napi_dyn_load(void) {
         if (!g_missing_name) g_missing_name = "napi_typeof";
     }
     *(void**)&g_napi.p_napi_unref_threadsafe_function = lookup(extra, "napi_unref_threadsafe_function");
-    if (!g_napi.p_napi_unref_threadsafe_function) {
-        missing++;
-        if (!g_missing_name) g_missing_name = "napi_unref_threadsafe_function";
-    }
+
     g_missing = missing;
     return missing;
 }

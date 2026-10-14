@@ -28,8 +28,13 @@
 
 /* ---- per env dispatcher ---- */
 
+typedef struct Delivery Delivery;
+
 typedef struct Dispatcher {
     napi_threadsafe_function tsfn;
+    int has_tsfn;        /* 0: the runtime has no threadsafe functions (NativeScript QuickJS): results queue up and JS calls poll() */
+    Delivery* qhead;     /* the queue, only used without tsfn */
+    Delivery* qtail;
     napi_env env;
     pthread_mutex_t mu;
     int closed;          /* env is gone: results are dropped */
@@ -42,10 +47,19 @@ typedef struct Call {
     napi_ref cb;
 } Call;
 
-typedef struct Delivery {
+struct Delivery {
     Call* call;
     NSResult r;
-} Delivery;
+    Delivery* next;
+};
+
+/* the threadsafe function keeps a Node.js event loop alive only while requests are in flight: no-ops without one */
+static void tsfn_ref(napi_env env, Dispatcher* d) {
+    if (d->has_tsfn) napi_ref_threadsafe_function(env, d->tsfn);
+}
+static void tsfn_unref(napi_env env, Dispatcher* d) {
+    if (d->has_tsfn) napi_unref_threadsafe_function(env, d->tsfn);
+}
 
 static void dispatcher_unref(Dispatcher* d) {
     if (atomic_fetch_sub(&d->refs, 1) == 1) {
@@ -104,7 +118,7 @@ static void call_js(napi_env env, napi_value unused, void* context, void* data) 
     nssqlite_free(r.message);
     if (done) {
         /* the event loop only has to stay alive while requests are in flight (Node.js; no-op in NativeScript) */
-        if (atomic_fetch_sub(&call->d->pending, 1) == 1 && env) napi_unref_threadsafe_function(env, call->d->tsfn);
+        if (atomic_fetch_sub(&call->d->pending, 1) == 1 && env) tsfn_unref(env, call->d);
         dispatcher_unref(call->d);
         free(call);
     }
@@ -119,8 +133,19 @@ static void on_result(void* user, NSResult r) {
     if (dv) {
         dv->call = call;
         dv->r = r;
+        dv->next = NULL;
         pthread_mutex_lock(&d->mu);
-        if (!d->closed) sent = napi_call_threadsafe_function(d->tsfn, dv, napi_tsfn_nonblocking) == napi_ok;
+        if (!d->closed) {
+            if (d->has_tsfn) {
+                sent = napi_call_threadsafe_function(d->tsfn, dv, napi_tsfn_nonblocking) == napi_ok;
+            } else {
+                /* no way to wake the JS thread from here: JS polls (poll()) while requests are in flight */
+                if (d->qtail) d->qtail->next = dv;
+                else d->qhead = dv;
+                d->qtail = dv;
+                sent = 1;
+            }
+        }
         pthread_mutex_unlock(&d->mu);
     }
     if (!sent) { /* env gone or out of memory: drop the result */
@@ -141,11 +166,25 @@ static void dispatcher_finalize(napi_env env, void* data, void* hint) {
     Dispatcher* d = (Dispatcher*)data;
     pthread_mutex_lock(&d->mu);
     d->closed = 1;
+    Delivery* q = d->qhead;
+    d->qhead = d->qtail = NULL;
     pthread_mutex_unlock(&d->mu);
+    while (q) { /* results nobody will poll anymore: their callbacks died with the env */
+        Delivery* n = q->next;
+        nssqlite_free(q->r.data);
+        nssqlite_free(q->r.message);
+        if (q->r.done) {
+            atomic_fetch_sub(&d->pending, 1);
+            dispatcher_unref(d);
+            free(q->call);
+        }
+        free(q);
+        q = n;
+    }
     dispatcher_unref(d);
 }
 
-static napi_value noop(napi_env env, napi_callback_info info) {
+__attribute__((unused)) static napi_value noop(napi_env env, napi_callback_info info) {
     (void)env;
     (void)info;
     return NULL;
@@ -160,15 +199,18 @@ static Dispatcher* dispatcher_get(napi_env env) {
     pthread_mutex_init(&d->mu, NULL);
     atomic_init(&d->pending, 0);
     atomic_init(&d->refs, 1);
-    napi_value fn, name;
-    napi_create_function(env, "nssqliteNoop", NAPI_AUTO_LENGTH, noop, NULL, &fn);
-    napi_create_string_utf8(env, "nssqlite", NAPI_AUTO_LENGTH, &name);
-    if (napi_create_threadsafe_function(env, fn, NULL, name, 0, 1, NULL, NULL, NULL, call_js, &d->tsfn) != napi_ok) {
-        pthread_mutex_destroy(&d->mu);
-        free(d);
-        return NULL;
+#ifndef NSSQLITE_NAPI_NO_TSFN
+    if (g_napi.p_napi_create_threadsafe_function && g_napi.p_napi_call_threadsafe_function && g_napi.p_napi_ref_threadsafe_function &&
+        g_napi.p_napi_unref_threadsafe_function) {
+        napi_value fn, name;
+        napi_create_function(env, "nssqliteNoop", NAPI_AUTO_LENGTH, noop, NULL, &fn);
+        napi_create_string_utf8(env, "nssqlite", NAPI_AUTO_LENGTH, &name);
+        if (napi_create_threadsafe_function(env, fn, NULL, name, 0, 1, NULL, NULL, NULL, call_js, &d->tsfn) == napi_ok) {
+            d->has_tsfn = 1;
+            napi_unref_threadsafe_function(env, d->tsfn);
+        }
     }
-    napi_unref_threadsafe_function(env, d->tsfn);
+#endif
     napi_set_instance_data(env, d, dispatcher_finalize, NULL);
     return d;
 }
@@ -251,7 +293,7 @@ static Call* call_new(napi_env env, napi_value cb) {
         return NULL;
     }
     c->d = d;
-    if (atomic_fetch_add(&d->pending, 1) == 0) napi_ref_threadsafe_function(env, d->tsfn);
+    if (atomic_fetch_add(&d->pending, 1) == 0) tsfn_ref(env, d);
     atomic_fetch_add(&d->refs, 1);
     return c;
 }
@@ -260,7 +302,7 @@ static Call* call_new(napi_env env, napi_value cb) {
 static void call_drop(napi_env env, Call* c) {
     if (!c) return;
     napi_delete_reference(env, c->cb);
-    if (atomic_fetch_sub(&c->d->pending, 1) == 1) napi_unref_threadsafe_function(env, c->d->tsfn);
+    if (atomic_fetch_sub(&c->d->pending, 1) == 1) tsfn_unref(env, c->d);
     dispatcher_unref(c->d);
     free(c);
 }
@@ -569,6 +611,29 @@ static napi_value ExecSync(napi_env env, napi_callback_info info) {
     return out;
 }
 
+/* poll() -> number of requests still in flight. Delivers the results that database threads queued (runtimes without
+ * threadsafe functions: `threadsafe` is false and the JS side calls this from a timer while requests are pending). */
+static napi_value Poll(napi_env env, napi_callback_info info) {
+    (void)info;
+    Dispatcher* d = dispatcher_get(env);
+    if (!d) return throw_error(env, "no dispatcher");
+    for (;;) {
+        pthread_mutex_lock(&d->mu);
+        Delivery* list = d->qhead;
+        d->qhead = d->qtail = NULL;
+        pthread_mutex_unlock(&d->mu);
+        if (!list) break;
+        while (list) {
+            Delivery* next = list->next;
+            call_js(env, NULL, NULL, list);
+            list = next;
+        }
+    }
+    napi_value r;
+    napi_create_int32(env, atomic_load(&d->pending), &r);
+    return r;
+}
+
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor props[] = {
         {"engine", NULL, Engine, NULL, NULL, NULL, napi_enumerable, NULL},
@@ -582,12 +647,15 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"loadExtension", NULL, LoadExtension, NULL, NULL, NULL, napi_enumerable, NULL},
         {"close", NULL, Close, NULL, NULL, NULL, napi_enumerable, NULL},
         {"execSync", NULL, ExecSync, NULL, NULL, NULL, napi_enumerable, NULL},
+        {"poll", NULL, Poll, NULL, NULL, NULL, napi_enumerable, NULL},
     };
     napi_define_properties(env, exports, sizeof(props) / sizeof(props[0]), props);
     napi_value v;
     napi_create_int32(env, NSSQLITE_API_VERSION, &v);
     napi_set_named_property(env, exports, "apiVersion", v);
-    dispatcher_get(env);
+    Dispatcher* d = dispatcher_get(env);
+    napi_get_boolean(env, d && d->has_tsfn, &v);
+    napi_set_named_property(env, exports, "threadsafe", v);
     return exports;
 }
 

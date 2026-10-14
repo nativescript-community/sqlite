@@ -309,3 +309,10 @@ The default SQLite (androidx `include.gradle`, `defaultEngine`, `defaultOptions:
 with a re-export. Core + napi + default engine gives androidx without any bridge (proven on the Android emulator: SQLite 3.50.1, WAL, `getSync`, "bridge not installed" error; the umbrella still passes API 13/13 per binding, ORM 8/8, engines 28/28).
 Lean combo also proven on the iOS simulator (system SQLite 3.51.0, `delete` journal, `getSync`, "bridge not installed" error: 3/3).
 The app imports `sqlite-default-engine` once (side effect); the core's "No SQLite engine chosen" error names it.
+
+## QuickJS runtime (@nativescript/android-quickjs-ng 9.0.0-alpha.5) (2026-10-14)
+
+Found with AlpiMaps (that runtime provides 129 `napi_*` functions, not `napi_module_register`, `napi_*threadsafe_function`, async work):
+the codec no longer needs `TextDecoder` / `TextEncoder` at import (runtimes install them lazily); `napi_register_module_v1` is exported and never returns NULL;
+threadsafe functions are optional and without them results are queued natively and drained by `poll()` from a JS timer (`threadsafe: false`).
+Node tests also run in that mode (`NSSQLITE_NO_TSFN=1 native/build-node.sh`, 60/60; `NSSQLITE_V1_ONLY=1` for the export-only registration). Untested on the QuickJS runtime itself (needs AlpiMaps).

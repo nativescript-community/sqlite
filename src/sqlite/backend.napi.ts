@@ -1,5 +1,7 @@
 import { Backend, OpenParams, RawResult, ResultCallback } from './backend';
 
+declare function setTimeout(callback: () => void, ms?: number): any;
+
 /**
  * Node-API binding (binding/napi/nssqlite_napi.c), used directly. `addon` is the module's exports. The addon
  * invokes the callbacks as (status, done, data, message, changes, lastInsertRowId) on the calling thread.
@@ -12,6 +14,31 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
     const wrap = (cb: ResultCallback) => (status: number, done: boolean, data: ArrayBuffer | null, message: string | null, changes: number, lastInsertRowId: number) => {
         const r: RawResult = { status, done, data, message, changes, lastInsertRowId };
         cb(r);
+    };
+    // Runtimes without threadsafe functions (the NativeScript QuickJS runtime) cannot wake the JS thread from a database
+    // thread: `threadsafe` is false and results wait in a queue until `poll()` runs, here from a timer while requests are
+    // in flight. With them (V8 runtimes, Node.js) results are delivered by the runtime and nothing is polled.
+    const polling = addon.threadsafe === false && typeof addon.poll === 'function';
+    let scheduled = false;
+    const pump = () => {
+        scheduled = false;
+        if (addon.poll() > 0) {
+            schedule();
+        }
+    };
+    const schedule = () => {
+        if (!scheduled) {
+            scheduled = true;
+            setTimeout(pump, 0);
+        }
+    };
+    /** runs a submit call, then makes sure its result will be picked up */
+    const submit = <T>(fn: () => T): T => {
+        const r = fn();
+        if (polling) {
+            schedule();
+        }
+        return r;
     };
     return {
         kind: 'napi',
@@ -27,17 +54,17 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
         },
         engineVersion: (e) => addon.engineVersion(e),
         engineCanLoadExtensions: (e) => addon.engineCanLoadExtensions(e),
-        open: (engine, path, p: OpenParams, cb) => addon.open(engine, path, p.flags, p.busyTimeoutMs, p.wal, p.initSql, wrap(cb)),
-        exec: (db, tx, sql, params, flags, chunkRows, cb) => addon.exec(db, tx, sql, params, flags, chunkRows, wrap(cb)),
+        open: (engine, path, p: OpenParams, cb) => submit(() => addon.open(engine, path, p.flags, p.busyTimeoutMs, p.wal, p.initSql, wrap(cb))),
+        exec: (db, tx, sql, params, flags, chunkRows, cb) => submit(() => addon.exec(db, tx, sql, params, flags, chunkRows, wrap(cb))),
         execSync: (db, tx, sql, params, flags) => {
             const [status, data, message, changes, lastInsertRowId] = addon.execSync(db, tx, sql, params, flags);
             return { status, done: true, data, message, changes, lastInsertRowId };
         },
-        batch: (db, tx, request, flags, cb) => addon.batch(db, tx, request, flags, wrap(cb)),
-        txBegin: (db, mode, cb) => addon.txBegin(db, mode, wrap(cb)),
-        txEnd: (db, tx, commit, cb) => addon.txEnd(db, tx, commit, wrap(cb)),
-        loadExtension: (db, path, entry, cb) => addon.loadExtension(db, path, entry, wrap(cb)),
-        close: (db, cb) => addon.close(db, wrap(cb)),
+        batch: (db, tx, request, flags, cb) => submit(() => addon.batch(db, tx, request, flags, wrap(cb))),
+        txBegin: (db, mode, cb) => submit(() => addon.txBegin(db, mode, wrap(cb))),
+        txEnd: (db, tx, commit, cb) => submit(() => addon.txEnd(db, tx, commit, wrap(cb))),
+        loadExtension: (db, path, entry, cb) => submit(() => addon.loadExtension(db, path, entry, wrap(cb))),
+        close: (db, cb) => submit(() => addon.close(db, wrap(cb))),
         // the external handle releases its reference when it is garbage collected
         release: () => {}
     };
