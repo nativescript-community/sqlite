@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/nativescript-community/sqlite/compare/v4.0.0...v4.0.1) (2026-10-14)
+
+**Note:** Version bump only for package @nativescript-community/sqlite-android-framework
+
 ## [4.0.0](https://github.com/nativescript-community/sqlite/compare/v3.5.9...v4.0.0) (2026-10-14)
 
 ### ⚠ BREAKING CHANGES

@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/sqlite",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "description": "SQLite for NativeScript, everything included: native threads, Node-API and JNI / Objective-C bindings, a default SQLite on each platform. Pick the smaller packages (sqlite-core, sqlite-napi...) to bring your own.",
     "main": "index",
     "typings": "index.d.ts",
@@ -41,7 +41,7 @@
     "dependencies": {
         "@nativescript-community/sqlite-bridge": "^4.0.0",
         "@nativescript-community/sqlite-core": "^4.0.0",
-        "@nativescript-community/sqlite-default-engine": "^4.0.0",
+        "@nativescript-community/sqlite-default-engine": "^4.0.1",
         "@nativescript-community/sqlite-napi": "^4.0.0"
     },
     "files": [
