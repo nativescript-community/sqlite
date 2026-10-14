@@ -41,5 +41,8 @@
         "platforms",
         "**/*.js",
         "**/*.d.ts"
-    ]
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
 }

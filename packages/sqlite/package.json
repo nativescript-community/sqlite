@@ -49,5 +49,8 @@
         "**/*.js",
         "**/*.d.ts",
         "**/*.mjs"
-    ]
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
 }
