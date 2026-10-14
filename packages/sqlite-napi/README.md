@@ -52,6 +52,7 @@ The **Node-API** binding of [`@nativescript-community/sqlite-core`](../sqlite-co
 * Needs NativeScript **9.1 or newer**, and `@nativescript-community/sqlite-core` (installed with it). On older runtimes the module stays inert and the API falls back to [`sqlite-bridge`](../sqlite-bridge) when that is installed.
 * No runtime library is linked: the Node-API functions are resolved when the module loads, so it does not depend on the runtime's library name or ABI.
 * Size: 23 KB per Android ABI (arm64), 29 KB for the iOS device slice. It adds the `*Sync` methods and use from Workers.
+* Runtimes without `napi_*threadsafe_function` (the NativeScript QuickJS runtime, `@nativescript/android-quickjs-ng`) cannot be woken from a database thread: the module reports `threadsafe: false`, finished requests wait in a queue, and the TypeScript layer drains it with `poll()` from a 0 ms timer while requests are in flight (nothing runs when idle). Same API and results; results of independent calls reach JS in one batch, and the latency of a call is a timer tick (~1 ms) instead of a thread wake-up. The module is loaded through the standard `napi_register_module_v1` export, `napi_module_register` is optional.
 
 
 [](#installation)
