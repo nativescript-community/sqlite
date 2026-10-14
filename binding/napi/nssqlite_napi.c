@@ -667,9 +667,25 @@ static napi_value EncodeUtf8(napi_env env, napi_callback_info info) {
 /* poll() -> number of requests still in flight. Delivers the results that database threads queued (runtimes without
  * threadsafe functions: `threadsafe` is false and the JS side calls this from a timer while requests are pending). */
 static napi_value Poll(napi_env env, napi_callback_info info) {
-    (void)info;
+    size_t argc = 1;
+    napi_value argv[1];
+    int32_t spin_us = 0;
+    if (napi_get_cb_info(env, info, &argc, argv, NULL, NULL) == napi_ok && argc >= 1) napi_get_value_int32(env, argv[0], &spin_us);
     Dispatcher* d = dispatcher_get(env);
     if (!d) return throw_error(env, "no dispatcher");
+    /* A lone request (a loop of awaits) usually finishes within microseconds: waiting for it here is cheaper than the
+     * round trip through the event loop (a timer tick per request). With other requests in flight the wait is skipped:
+     * it would be paid by every call of a burst. */
+    if (spin_us > 0 && atomic_load(&d->pending) == 1) {
+        if (spin_us > 500) spin_us = 500;
+        int64_t end = sync_now_ns() + (int64_t)spin_us * 1000;
+        for (unsigned i = 0;; i++) {
+            pthread_mutex_lock(&d->mu);
+            int ready = d->qhead != NULL;
+            pthread_mutex_unlock(&d->mu);
+            if (ready || ((i & 15) == 15 && sync_now_ns() > end)) break;
+        }
+    }
     for (;;) {
         pthread_mutex_lock(&d->mu);
         Delivery* list = d->qhead;

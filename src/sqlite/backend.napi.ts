@@ -3,6 +3,9 @@ import { setNativeUtf8 } from './codec';
 
 declare function setTimeout(callback: () => void, ms?: number): any;
 
+/** microseconds a lone request is waited for right after it is submitted (polling mode only) */
+const POLL_SPIN_US = 150;
+
 /**
  * Node-API binding (binding/napi/nssqlite_napi.c), used directly. `addon` is the module's exports. The addon
  * invokes the callbacks as (status, done, data, message, changes, lastInsertRowId) on the calling thread.
@@ -47,7 +50,10 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
     const submit = <T>(fn: () => T): T => {
         const r = fn();
         if (polling) {
-            schedule();
+            // a request that is alone usually finishes while we wait for it a moment: no timer round trip then
+            if (addon.poll(POLL_SPIN_US) > 0) {
+                schedule();
+            }
         }
         return r;
     };
