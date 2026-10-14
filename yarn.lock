@@ -2099,15 +2099,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/sqlite-bridge@npm:3.5.9, @nativescript-community/sqlite-bridge@workspace:packages/sqlite-bridge":
+"@nativescript-community/sqlite-bridge@npm:^4.0.0, @nativescript-community/sqlite-bridge@workspace:packages/sqlite-bridge":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/sqlite-bridge@workspace:packages/sqlite-bridge"
   dependencies:
-    "@nativescript-community/sqlite-core": "npm:3.5.9"
+    "@nativescript-community/sqlite-core": "npm:^4.0.0"
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/sqlite-core@npm:3.5.9, @nativescript-community/sqlite-core@workspace:packages/sqlite-core":
+"@nativescript-community/sqlite-core@npm:^4.0.0, @nativescript-community/sqlite-core@workspace:packages/sqlite-core":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/sqlite-core@workspace:packages/sqlite-core"
   dependencies:
@@ -2118,7 +2118,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/sqlite-default-engine@npm:3.5.9, @nativescript-community/sqlite-default-engine@workspace:packages/sqlite-default-engine":
+"@nativescript-community/sqlite-default-engine@npm:^4.0.0, @nativescript-community/sqlite-default-engine@workspace:packages/sqlite-default-engine":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/sqlite-default-engine@workspace:packages/sqlite-default-engine"
   peerDependencies:
@@ -2127,11 +2127,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nativescript-community/sqlite-napi@npm:3.5.9, @nativescript-community/sqlite-napi@workspace:packages/sqlite-napi":
+"@nativescript-community/sqlite-napi@npm:^4.0.0, @nativescript-community/sqlite-napi@workspace:packages/sqlite-napi":
   version: 0.0.0-use.local
   resolution: "@nativescript-community/sqlite-napi@workspace:packages/sqlite-napi"
   dependencies:
-    "@nativescript-community/sqlite-core": "npm:3.5.9"
+    "@nativescript-community/sqlite-core": "npm:^4.0.0"
   languageName: unknown
   linkType: soft
 
@@ -2139,10 +2139,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nativescript-community/sqlite@workspace:packages/sqlite"
   dependencies:
-    "@nativescript-community/sqlite-bridge": "npm:3.5.9"
-    "@nativescript-community/sqlite-core": "npm:3.5.9"
-    "@nativescript-community/sqlite-default-engine": "npm:3.5.9"
-    "@nativescript-community/sqlite-napi": "npm:3.5.9"
+    "@nativescript-community/sqlite-bridge": "npm:^4.0.0"
+    "@nativescript-community/sqlite-core": "npm:^4.0.0"
+    "@nativescript-community/sqlite-default-engine": "npm:^4.0.0"
+    "@nativescript-community/sqlite-napi": "npm:^4.0.0"
   peerDependencies:
     "@nativescript/core": "*"
   languageName: unknown

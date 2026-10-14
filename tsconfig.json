@@ -3,7 +3,9 @@
     "compilerOptions": {
         "paths": {
             "@nativescript-community/sqlite": ["src/sqlite"],
-            "@nativescript-community/sqlite/*": ["src/sqlite/*"]
+            "@nativescript-community/sqlite/*": ["src/sqlite/*"],
+            "@nativescript-community/sqlite-core": ["src/sqlite-core"],
+            "@nativescript-community/sqlite-core/*": ["src/sqlite-core/*"],
         }
     }
 }
