@@ -185,6 +185,8 @@ TypeORM's browser build references every database driver and a few node modules,
 
 ## Migrating from 3.x
 
+The complete list, with examples, is in the [migration guide](https://github.com/nativescript-community/sqlite/blob/master/MIGRATION.md). In short:
+
 * The plugin no longer bundles SQLite on iOS (FMDB is gone) and uses no Android framework SQLite: see *Choose the SQLite library*.
 * `threading` is ignored: everything is asynchronous and native.
 * `getVersion()` / `setVersion()` are async. `wrapDb` is gone. `cursorWindowSize` and `cursorWindowName` do nothing.

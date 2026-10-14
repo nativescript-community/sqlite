@@ -38,6 +38,7 @@
 ## Table of Contents
 
 * [Installation](#installation)
+* [Migrating from 3.x](#migrating-from-3x)
 * [Usage](#usage)
 	* [Async and sync](#async-and-sync)
 	* [WAL by default on Android](#wal-by-default-on-android)
@@ -61,6 +62,13 @@ This brings everything and needs no setup: [`sqlite-core`](../sqlite-core) (the 
 * **iOS**: the SQLite of the process: the system SQLite, or the one your app links (e.g. a CocoaPods `SQLCipher`).
 
 Everything of `sqlite-core` is re-exported, and so are its `/typeorm` and `/nanosql` entries. The full reference (options, bindings, raw Node-API / bridge use) is in the [`sqlite-core` documentation](../sqlite-core).
+
+
+[](#migrating-from-3x)
+
+## Migrating from 3.x
+
+4.0 keeps the API names and shapes, but a few things changed on purpose (`close()` and `getVersion()` return promises, parameters are bound with their real types, WAL is on by default on Android, the native database objects are gone). See the [migration guide](https://github.com/nativescript-community/sqlite/blob/master/MIGRATION.md).
 
 
 [](#usage)

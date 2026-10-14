@@ -17,6 +17,10 @@ This brings everything and needs no setup: [`sqlite-core`](../sqlite-core) (the 
 
 Everything of `sqlite-core` is re-exported, and so are its `/typeorm` and `/nanosql` entries. The full reference (options, bindings, raw Node-API / bridge use) is in the [`sqlite-core` documentation](../sqlite-core).
 
+## Migrating from 3.x
+
+4.0 keeps the API names and shapes, but a few things changed on purpose (`close()` and `getVersion()` return promises, parameters are bound with their real types, WAL is on by default on Android, the native database objects are gone). See the [migration guide](https://github.com/nativescript-community/sqlite/blob/master/MIGRATION.md).
+
 ## Usage
 
 Every call runs on a native thread and returns a promise: the JS thread is never blocked.

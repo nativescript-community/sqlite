@@ -14,7 +14,7 @@
     },
     "nativescript": {
         "platforms": {
-            "android": "6.2.0"
+            "android": "8.0.0"
         }
     },
     "keywords": [
