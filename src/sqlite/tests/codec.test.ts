@@ -170,3 +170,38 @@ describe('utf-8 without TextDecoder / TextEncoder', () => {
         }
     });
 });
+
+describe('native utf-8 (Node-API module)', () => {
+    // loaded lazily: this file also runs where no addon exists
+    const { loadAddon } = require('./support');
+    const sample = 'plain ascii, accents éàü, euro €, emoji 😀, cjk 漢字, nul \u0000 inside, end';
+
+    it('decodes like the JS decoder, at any offset of a larger buffer', () => {
+        const addon = loadAddon();
+        const bytes = utf8EncodeJs(sample.repeat(50));
+        const host = new Uint8Array(bytes.length + 20);
+        host.set(bytes, 13);
+        assert.equal(addon.decodeUtf8(host.buffer, 13, 13 + bytes.length), sample.repeat(50));
+        assert.equal(addon.decodeUtf8(host.buffer, 13, 13 + 5), 'plain');
+    });
+
+    it('encodes like the JS encoder', () => {
+        const addon = loadAddon();
+        const s = sample.repeat(50) + '\ud800 lone surrogate';
+        assert.deepEqual(Array.from(new Uint8Array(addon.encodeUtf8(s))), Array.from(utf8EncodeJs(s)));
+    });
+
+    it('rejects a range outside the buffer and a non ArrayBuffer', () => {
+        const addon = loadAddon();
+        assert.throws(() => addon.decodeUtf8(new ArrayBuffer(4), 0, 9));
+        assert.throws(() => addon.decodeUtf8(new Uint8Array(4), 0, 4));
+        assert.throws(() => addon.encodeUtf8(5));
+    });
+
+    it('does not throw on invalid sequences', () => {
+        const addon = loadAddon();
+        const bad = new Uint8Array([0x61, 0xff, 0xc3, 0x28, 0xe2, 0x82, 0x62]);
+        const out = addon.decodeUtf8(bad.buffer, 0, bad.length);
+        assert.ok(out.startsWith('a') && out.includes('�') && out.endsWith('b'));
+    });
+});

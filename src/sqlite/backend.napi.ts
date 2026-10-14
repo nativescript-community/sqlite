@@ -1,4 +1,5 @@
 import { Backend, OpenParams, RawResult, ResultCallback } from './backend';
+import { setNativeUtf8 } from './codec';
 
 declare function setTimeout(callback: () => void, ms?: number): any;
 
@@ -10,6 +11,10 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
     if (!addon || typeof addon.engine !== 'function') {
         // a runtime that lacks a Node-API function loads the module without its functions: the module says which one
         throw new Error((addon && addon.error) || 'the Node-API module did not export its functions');
+    }
+    // long strings are converted by the module: the JS conversion of a runtime without TextDecoder is slow
+    if (typeof addon.decodeUtf8 === 'function' && typeof addon.encodeUtf8 === 'function') {
+        setNativeUtf8({ decode: addon.decodeUtf8, encode: addon.encodeUtf8 });
     }
     const wrap = (cb: ResultCallback) => (status: number, done: boolean, data: ArrayBuffer | null, message: string | null, changes: number, lastInsertRowId: number) => {
         const r: RawResult = { status, done, data, message, changes, lastInsertRowId };

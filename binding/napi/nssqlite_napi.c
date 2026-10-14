@@ -623,6 +623,47 @@ static napi_value ExecSync(napi_env env, napi_callback_info info) {
     return out;
 }
 
+/* decodeUtf8(arrayBuffer, start, end) -> string. For runtimes without a native TextDecoder, where decoding long text in JS
+ * costs more than the query. Offsets are absolute in the ArrayBuffer: runtimes disagree on what a view's data pointer
+ * includes. */
+static napi_value DecodeUtf8(napi_env env, napi_callback_info info) {
+    ARGS(3);
+    const uint8_t* data;
+    size_t len;
+    bool is_ab = false;
+    if (napi_is_arraybuffer(env, argv[0], &is_ab) != napi_ok || !is_ab || get_bytes(env, argv[0], &data, &len)) return throw_error(env, "decodeUtf8 needs an ArrayBuffer");
+    int64_t start = 0, end = 0;
+    napi_value r;
+    int32_t a = 0, b = 0;
+    napi_get_value_int32(env, argv[1], &a);
+    napi_get_value_int32(env, argv[2], &b);
+    start = a;
+    end = b;
+    if (start < 0 || end < start || (size_t)end > len) return throw_error(env, "decodeUtf8 range out of bounds");
+    if (napi_create_string_utf8(env, (const char*)data + start, (size_t)(end - start), &r) != napi_ok) return throw_error(env, "decodeUtf8 failed");
+    return r;
+}
+
+static void free_plain(napi_env env, void* data, void* hint) {
+    (void)env;
+    (void)hint;
+    free(data);
+}
+
+/* encodeUtf8(string) -> ArrayBuffer with the UTF-8 bytes (lone surrogates become U+FFFD). */
+static napi_value EncodeUtf8(napi_env env, napi_callback_info info) {
+    ARGS(1);
+    size_t len = 0;
+    char* s = get_utf8(env, argv[0], &len);
+    if (!s) return throw_error(env, "encodeUtf8 needs a string");
+    napi_value ab;
+    if (napi_create_external_arraybuffer(env, s, len, free_plain, NULL, &ab) != napi_ok) {
+        free(s);
+        return throw_error(env, "encodeUtf8 failed");
+    }
+    return ab;
+}
+
 /* poll() -> number of requests still in flight. Delivers the results that database threads queued (runtimes without
  * threadsafe functions: `threadsafe` is false and the JS side calls this from a timer while requests are pending). */
 static napi_value Poll(napi_env env, napi_callback_info info) {
@@ -660,6 +701,8 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"close", NULL, Close, NULL, NULL, NULL, napi_enumerable, NULL},
         {"execSync", NULL, ExecSync, NULL, NULL, NULL, napi_enumerable, NULL},
         {"poll", NULL, Poll, NULL, NULL, NULL, napi_enumerable, NULL},
+        {"decodeUtf8", NULL, DecodeUtf8, NULL, NULL, NULL, napi_enumerable, NULL},
+        {"encodeUtf8", NULL, EncodeUtf8, NULL, NULL, NULL, napi_enumerable, NULL},
     };
     napi_define_properties(env, exports, sizeof(props) / sizeof(props[0]), props);
     napi_value v;

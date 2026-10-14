@@ -514,3 +514,15 @@ describe('a Node-API module that did not load its functions', () => {
         assert.throws(() => createNapiBackend({}, []), /did not export its functions/);
     });
 });
+
+describe('long text', () => {
+    it('round trips long mixed-script text through the native utf-8 conversion', () =>
+        withDb(async (db) => {
+            const long = 'ligne é € 😀 漢字 — '.repeat(20000);
+            await db.execute('CREATE TABLE t(a TEXT, b TEXT)');
+            await db.execute('INSERT INTO t VALUES (?, ?)', [long, 'short é']);
+            const row = await db.get('SELECT * FROM t');
+            assert.equal(row.a, long);
+            assert.equal(row.b, 'short é');
+        }));
+});

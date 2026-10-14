@@ -30,6 +30,21 @@ let nativeEncoder: any;
 /** NativeScript 8 runtimes ship a TextDecoder that ignores the byteOffset of a view: there, decode copies (`slice`) instead of views (`subarray`). */
 let subarrayOk = false;
 
+/**
+ * UTF-8 done by the binding itself (the Node-API module's decodeUtf8 / encodeUtf8). Registered by the backend; used for long
+ * strings only: a call costs more than decoding a short one in JS. It beats the JS fallback by far on runtimes without a
+ * native TextDecoder.
+ */
+export interface NativeUtf8 {
+    decode(buffer: ArrayBuffer, start: number, end: number): string;
+    encode(s: string): ArrayBuffer;
+}
+let nativeUtf8: NativeUtf8 | null = null;
+const NATIVE_UTF8_MIN = 48;
+export function setNativeUtf8(codec: NativeUtf8 | null) {
+    nativeUtf8 = codec;
+}
+
 function nativeCodecs() {
     if (!nativeDecoder && typeof TextDecoder !== 'undefined') {
         const d = new TextDecoder();
@@ -127,6 +142,9 @@ export function utf8EncodeJs(s: string): Uint8Array {
 }
 
 function decodeUtf8(u8: Uint8Array, start: number, end: number): string {
+    if (nativeUtf8 && end - start >= NATIVE_UTF8_MIN) {
+        return nativeUtf8.decode(u8.buffer as ArrayBuffer, u8.byteOffset + start, u8.byteOffset + end);
+    }
     nativeCodecs();
     if (!nativeDecoder) {
         return utf8DecodeJs(u8, start, end);
@@ -135,6 +153,9 @@ function decodeUtf8(u8: Uint8Array, start: number, end: number): string {
 }
 
 export function encodeUtf8(s: string): Uint8Array {
+    if (nativeUtf8 && s.length >= NATIVE_UTF8_MIN) {
+        return new Uint8Array(nativeUtf8.encode(s));
+    }
     nativeCodecs();
     return nativeEncoder ? nativeEncoder.encode(s) : utf8EncodeJs(s);
 }
