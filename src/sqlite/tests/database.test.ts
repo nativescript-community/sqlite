@@ -3,6 +3,7 @@ import { after, describe, it } from 'node:test';
 import { SqliteError } from '../sqlite.common';
 import { createNapiBackend } from '../backend.napi';
 import { Database } from '../database';
+import { translateAndroidFlags } from '../platform.common';
 import { loadAddon, open, tmpDb } from './support';
 
 async function withDb<T>(fn: (db: ReturnType<typeof open>) => Promise<T>, file = ':memory:', options = {}) {
@@ -524,5 +525,44 @@ describe('long text', () => {
             const row = await db.get('SELECT * FROM t');
             assert.equal(row.a, long);
             assert.equal(row.b, 'short é');
+        }));
+});
+
+describe('3.x flags', () => {
+    it('translates the android.database.sqlite flags, leaves SQLITE_OPEN flags alone', () => {
+        assert.deepEqual(translateAndroidFlags({}), {});
+        assert.deepEqual(translateAndroidFlags({ flags: 1 }), { flags: 1 }); // OPEN_READONLY is the same
+        assert.deepEqual(translateAndroidFlags({ flags: 6 }), { flags: 6 }); // SQLITE_OPEN_READWRITE | CREATE
+        assert.deepEqual(translateAndroidFlags({ flags: 0x10000000 }), { flags: 0x6 }); // CREATE_IF_NECESSARY
+        assert.deepEqual(translateAndroidFlags({ flags: 0x10000000 | 0x10 | 1 }), { flags: 0x1 }); // read only wins
+        assert.deepEqual(translateAndroidFlags({ flags: 0x20000000 | 0x10000000 }), { flags: 0x6, wal: true });
+        assert.deepEqual(translateAndroidFlags({ flags: 0x20000000, wal: false }), { flags: 0x2, wal: false });
+    });
+});
+
+describe('the 3.x README sample', () => {
+    it('works as written: nothing awaited, a synchronous transaction callback', () =>
+        withDb(async (db) => {
+            const names = ['a', 'b', 'c'];
+            db.execute('CREATE TABLE names (id INT, name TEXT)');
+            db.transaction((_cancelTransaction) => {
+                names.forEach((name, id) => {
+                    db.execute('INSERT INTO names (id, name) VALUES (?, ?)', [id, name]);
+                });
+            });
+            assert.deepEqual(await db.select('SELECT * FROM names ORDER BY id'), [
+                { id: 0, name: 'a' },
+                { id: 1, name: 'b' },
+                { id: 2, name: 'c' }
+            ]);
+        }));
+    it('cancelTransaction rolls back', () =>
+        withDb(async (db) => {
+            db.execute('CREATE TABLE t (id INT)');
+            await db.transaction((cancel) => {
+                db.execute('INSERT INTO t VALUES (1)');
+                cancel();
+            });
+            assert.deepEqual(await db.select('SELECT * FROM t'), []);
         }));
 });

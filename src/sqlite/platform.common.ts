@@ -40,3 +40,25 @@ export function pickBackend(prefer: 'auto' | 'napi' | 'bridge', defaultEngines: 
         );
     }
 }
+
+const ANDROID_NO_LOCALIZED_COLLATORS = 0x10;
+const ANDROID_CREATE_IF_NECESSARY = 0x10000000;
+const ANDROID_ENABLE_WRITE_AHEAD_LOGGING = 0x20000000;
+
+/**
+ * 3.x passed `flags` to android.database.sqlite.SQLiteDatabase; they are SQLITE_OPEN_* flags now. Flags that only exist in
+ * the Android set (CREATE_IF_NECESSARY, ENABLE_WRITE_AHEAD_LOGGING, NO_LOCALIZED_COLLATORS) are translated, so code that
+ * passed them keeps working. OPEN_READONLY (1) means the same in both.
+ */
+export function translateAndroidFlags<T extends { flags?: number; wal?: boolean }>(options: T): T {
+    const f = options.flags;
+    if (!f || !(f & (ANDROID_CREATE_IF_NECESSARY | ANDROID_ENABLE_WRITE_AHEAD_LOGGING | ANDROID_NO_LOCALIZED_COLLATORS))) {
+        return options;
+    }
+    const out: T = { ...options };
+    out.flags = f & 1 ? 0x1 : 0x2 | (f & ANDROID_CREATE_IF_NECESSARY ? 0x4 : 0);
+    if (f & ANDROID_ENABLE_WRITE_AHEAD_LOGGING && out.wal === undefined) {
+        out.wal = true;
+    }
+    return out;
+}

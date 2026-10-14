@@ -95,7 +95,14 @@ Removed because there is no `android.database.sqlite.SQLiteDatabase` or `FMDatab
 If you need the Android framework SQLite itself, use `@nativescript-community/sqlite-android-framework` (a prototype, see its
 README): it runs `android.database.sqlite` as an engine of the new core.
 
-### 6. Options that no longer do anything
+### 6. `flags` are SQLite flags
+
+On Android 3.x passed `flags` to `android.database.sqlite.SQLiteDatabase`. They are `SQLITE_OPEN_*` flags now (`1` read only,
+`2` read write, `4` create). The Android-only values `CREATE_IF_NECESSARY`, `ENABLE_WRITE_AHEAD_LOGGING` and
+`NO_LOCALIZED_COLLATORS` are translated (to create, `wal: true` and nothing), and `OPEN_READONLY` is `1` in both, so code that
+passed those keeps working. For anything else prefer the options: `readOnly: true`, `wal: true`.
+
+### 7. Options that no longer do anything
 
 They are accepted so your code compiles, and ignored:
 
@@ -104,7 +111,7 @@ They are accepted so your code compiles, and ignored:
 * `cursorWindowSize`, `cursorWindowName`. There is no cursor window with androidx or the iOS SQLite: rows of any size can be
   read (3.x could not read a row over 2 MB without `cursorWindowSize`).
 
-### 7. Write-ahead logging is on by default on Android
+### 8. Write-ahead logging is on by default on Android
 
 New databases and existing ones opened by 4.0 switch to WAL. It makes writes much faster (500 separate inserts: seconds with
 the rollback journal, tens of ms with WAL), but the data of a database lives in `name.db` **plus** `name.db-wal` until a
@@ -116,7 +123,7 @@ await db.execute('PRAGMA wal_checkpoint(TRUNCATE)'); // before copying the file
 
 or open with `wal: false` (or `configure({ defaultOptions: { wal: false } })`). A read only database is never switched.
 
-### 8. Errors are `SqliteError`
+### 9. Errors are `SqliteError`
 
 While a `transaction` runs, other calls made on the same `db` join it, as in 3.x; use the `tx` argument to be explicit.
 
@@ -134,7 +141,9 @@ constraint) and the `sql`. Code that matched on the text of the 3.x error messag
 
 1. Search your code for `.getVersion(`, `.close(`, `wrapDb`, `.db.`, `threading`, `cursorWindow`.
 2. Search for `WHERE` clauses that compare an untyped column with a parameter, and for stored dates.
-3. If the app copies the database file, handle WAL (point 7).
+3. If the app copies the database file, handle WAL (point 8).
 4. Run your tests on a device: both platforms, and an old and a new Android version if you support both.
+
+The basic usage of the 3.x README (`openOrCreate`, `execute` without `await`, `transaction(cancel => { ...execute... })`) works as written.
 
 TypeORM (`@nativescript-community/sqlite/typeorm`) and nano-sql (`@nativescript-community/sqlite/nanosql`) are kept.

@@ -36,6 +36,8 @@ Full list with examples: [MIGRATION.md](https://github.com/nativescript-communit
 
 ### Bug Fixes
 
+* **core:** `transaction()` runs its action immediately (as in 3.x), so un-awaited calls and a query right after an un-awaited `transaction()` keep their order
+* **core:** the Android-only `flags` of 3.x (`CREATE_IF_NECESSARY`, `ENABLE_WRITE_AHEAD_LOGGING`, `NO_LOCALIZED_COLLATORS`) are translated
 * do not need TextDecoder / TextEncoder when the codec module loads ([ce18eea](https://github.com/nativescript-community/sqlite/commit/ce18eead8366cd7151767fe843ccee6528c1beb9))
 * **napi:** a throwing result callback no longer strands the other results in polling mode ([91b5170](https://github.com/nativescript-community/sqlite/commit/91b5170e522ff45ad20c5149072f7d872616eff3))
 * **napi:** export napi_register_module_v1, napi_module_register optional ([6086cfd](https://github.com/nativescript-community/sqlite/commit/6086cfddc209e3e524656073c2026002c717494b))

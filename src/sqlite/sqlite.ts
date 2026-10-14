@@ -1,6 +1,7 @@
 import { Backend } from './backend';
 import { Database } from './database';
 import { deleteDatabaseFiles, loadBackend, resolveDatabasePath } from './platform';
+import { translateAndroidFlags } from './platform.common';
 import { DatabaseOptions, GlobalConfig, SQLiteDatabase } from './sqlite.common';
 
 export * from './sqlite.common';
@@ -33,6 +34,7 @@ function getBackend() {
 export function openOrCreate(filePath: string, options: DatabaseOptions = {}): SQLiteDatabase {
     const b = getBackend();
     const engine = config.engine !== undefined ? config.engine : config.defaultEngine;
+    options = translateAndroidFlags(options);
     return new Database(b, resolveDatabasePath(filePath), config.defaultOptions ? { ...config.defaultOptions, ...options } : options, engine !== undefined ? [engine] : undefined);
 }
 

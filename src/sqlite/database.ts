@@ -288,17 +288,26 @@ export class Database extends QueryApi implements SQLiteDatabase {
         // calls made from now on belong to the transaction (they wait for its BEGIN): a blocking call must not queue
         // outside of it, it would wait for an end that only the blocked thread can request
         this.activeTx = id;
+        // the action starts now, like in 3.x (code that does not await its calls, or queries right after an un-awaited
+        // transaction(), relies on it): its calls queue behind the BEGIN
+        const tx = new Transaction(this, id);
+        let outcome: Promise<T>;
+        try {
+            outcome = Promise.resolve(action(cancel, tx));
+        } catch (e) {
+            outcome = Promise.reject(e);
+        }
         try {
             const begin = await begun;
             begin.release && begin.release();
         } catch (e) {
             this.activeTx = 0;
+            outcome.catch(() => {});
             throw e;
         }
-        const tx = new Transaction(this, id);
         let result: T;
         try {
-            result = await action(cancel, tx);
+            result = await outcome;
         } catch (e) {
             this.activeTx = 0;
             await this.endTransaction(id, false).catch(() => {});

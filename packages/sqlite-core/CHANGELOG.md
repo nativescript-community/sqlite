@@ -25,6 +25,11 @@ Full list with examples: [MIGRATION.md](https://github.com/nativescript-communit
 * sqlite-default-engine package, so androidx can be used without the bridges ([ebefd97](https://github.com/nativescript-community/sqlite/commit/ebefd975c475726665408c3d8a5a9a977111aaf9))
 * WAL by default on Android in @nativescript-community/sqlite, configure({ defaultOptions }) ([3030907](https://github.com/nativescript-community/sqlite/commit/30309076be96088c2016d835bfe0342ab64bf1c2))
 
+### Bug Fixes
+
+* **core:** `transaction()` runs its action immediately (as in 3.x), so un-awaited calls and a query right after an un-awaited `transaction()` keep their order
+* **core:** the Android-only `flags` of 3.x (`CREATE_IF_NECESSARY`, `ENABLE_WRITE_AHEAD_LOGGING`, `NO_LOCALIZED_COLLATORS`) are translated
+
 ## [3.5.9](https://github.com/nativescript-community/sqlite/compare/v3.5.8...v3.5.9) (2026-05-18)
 
 **Note:** Version bump only for package @nativescript-community/sqlite
