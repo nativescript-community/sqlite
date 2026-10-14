@@ -45,6 +45,8 @@
 #undef napi_set_instance_data
 #undef napi_set_named_property
 #undef napi_throw_error
+#undef napi_is_exception_pending
+#undef napi_get_and_clear_last_exception
 #undef napi_typeof
 #undef napi_unref_threadsafe_function
 
@@ -248,6 +250,10 @@ int napi_dyn_load(void) {
         missing++;
         if (!g_missing_name) g_missing_name = "napi_throw_error";
     }
+    *(void**)&g_napi.p_napi_is_exception_pending = lookup(extra, "napi_is_exception_pending");
+
+    *(void**)&g_napi.p_napi_get_and_clear_last_exception = lookup(extra, "napi_get_and_clear_last_exception");
+
     *(void**)&g_napi.p_napi_typeof = lookup(extra, "napi_typeof");
     if (!g_napi.p_napi_typeof) {
         missing++;

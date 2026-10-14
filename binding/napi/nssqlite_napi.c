@@ -74,6 +74,18 @@ static void free_external_buffer(napi_env env, void* data, void* hint) {
     nssqlite_free(data);
 }
 
+/* A callback that throws must not abort the delivery of the other results: the exception is logged and cleared. */
+static void report_callback_error(napi_env env) {
+    bool pending = false;
+    if (g_napi.p_napi_is_exception_pending && g_napi.p_napi_get_and_clear_last_exception && napi_is_exception_pending(env, &pending) == napi_ok && pending) {
+        napi_value ex;
+        napi_get_and_clear_last_exception(env, &ex);
+    }
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_ERROR, "nssqlite", "a result callback threw%s", pending ? " (exception cleared)" : "");
+#endif
+}
+
 static void call_js(napi_env env, napi_value unused, void* context, void* data) {
     (void)unused;
     (void)context;
@@ -107,7 +119,7 @@ static void call_js(napi_env env, napi_value unused, void* context, void* data) 
             napi_create_int64(env, r.changes, &argp[4]);
             napi_create_int64(env, r.last_insert_rowid, &argp[5]);
             if (napi_get_reference_value(env, call->cb, &cb) == napi_ok && cb) {
-                napi_call_function(env, global, cb, 6, argv, NULL);
+                if (napi_call_function(env, global, cb, 6, argv, NULL) != napi_ok) report_callback_error(env);
             }
             napi_close_handle_scope(env, scope);
             if (done) napi_delete_reference(env, call->cb);

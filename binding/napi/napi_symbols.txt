@@ -37,5 +37,7 @@ napi_set_element
 napi_set_instance_data
 napi_set_named_property
 napi_throw_error
+napi_is_exception_pending?
+napi_get_and_clear_last_exception?
 napi_typeof
 napi_unref_threadsafe_function?

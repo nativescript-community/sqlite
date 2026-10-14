@@ -44,6 +44,8 @@ typedef struct NapiTable {
     __typeof__(napi_set_instance_data)* p_napi_set_instance_data;
     __typeof__(napi_set_named_property)* p_napi_set_named_property;
     __typeof__(napi_throw_error)* p_napi_throw_error;
+    __typeof__(napi_is_exception_pending)* p_napi_is_exception_pending;
+    __typeof__(napi_get_and_clear_last_exception)* p_napi_get_and_clear_last_exception;
     __typeof__(napi_typeof)* p_napi_typeof;
     __typeof__(napi_unref_threadsafe_function)* p_napi_unref_threadsafe_function;
 } NapiTable;
@@ -94,6 +96,8 @@ const char* napi_dyn_missing_name(void);
 #define napi_set_instance_data (g_napi.p_napi_set_instance_data)
 #define napi_set_named_property (g_napi.p_napi_set_named_property)
 #define napi_throw_error (g_napi.p_napi_throw_error)
+#define napi_is_exception_pending (g_napi.p_napi_is_exception_pending)
+#define napi_get_and_clear_last_exception (g_napi.p_napi_get_and_clear_last_exception)
 #define napi_typeof (g_napi.p_napi_typeof)
 #define napi_unref_threadsafe_function (g_napi.p_napi_unref_threadsafe_function)
 

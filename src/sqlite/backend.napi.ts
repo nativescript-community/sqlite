@@ -22,8 +22,14 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
     let scheduled = false;
     const pump = () => {
         scheduled = false;
-        if (addon.poll() > 0) {
-            schedule();
+        let pending = 1;
+        try {
+            pending = addon.poll();
+        } finally {
+            // also when a callback threw (the exception still reaches the caller): results left in the queue must not be stranded
+            if (pending > 0) {
+                schedule();
+            }
         }
     };
     const schedule = () => {
