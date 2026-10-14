@@ -16,7 +16,15 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
     return {
         kind: 'napi',
         defaultEngines,
-        engine: (library) => addon.engine(library),
+        engine: (library) => {
+            try {
+                return addon.engine(library);
+            } catch (e) {
+                // a runtime-specific failure of the native call itself (a SQLite failure carries its own message)
+                const m = (e && (e as any).message) || String(e);
+                throw new Error(`${m} (addon.engine is ${typeof addon.engine}, exports: ${Object.keys(addon).join(',')}, thrown: ${(e && (e as any).name) || typeof e})`);
+            }
+        },
         engineVersion: (e) => addon.engineVersion(e),
         engineCanLoadExtensions: (e) => addon.engineCanLoadExtensions(e),
         open: (engine, path, p: OpenParams, cb) => addon.open(engine, path, p.flags, p.busyTimeoutMs, p.wal, p.initSql, wrap(cb)),

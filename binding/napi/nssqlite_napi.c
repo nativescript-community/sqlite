@@ -183,7 +183,7 @@ static napi_value throw_error(napi_env env, const char* msg) {
 #define ARGS(n)                                                                     \
     size_t argc = (n);                                                              \
     napi_value argv[(n) > 0 ? (n) : 1];                                             \
-    if (napi_get_cb_info(env, info, &argc, argv, NULL, NULL) != napi_ok) return NULL; \
+    if (napi_get_cb_info(env, info, &argc, argv, NULL, NULL) != napi_ok) return throw_error(env, "napi_get_cb_info failed"); \
     if (argc < (n)) return throw_error(env, "missing arguments")
 
 static char* get_utf8(napi_env env, napi_value v, size_t* out_len) {
@@ -291,6 +291,9 @@ static napi_value Engine(napi_env env, napi_callback_info info) {
     char* lib = get_utf8(env, argv[0], &n);
     char err[256] = {0};
     NSEngine* e = nssqlite_engine(lib, err, sizeof(err));
+#ifdef __ANDROID__
+    __android_log_print(e ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR, "nssqlite", "engine(%s): %s", lib ? lib : "(process)", e ? "loaded" : err);
+#endif
     free(lib);
     if (!e) return throw_error(env, err);
     napi_value r;
