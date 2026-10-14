@@ -1,0 +1,32 @@
+[PERF] new-napi insert 500 rows, one awaited execute each, autocommit {"ms":5361.8,"min":4083.1}
+[PERF] new-napi insert 5000 rows in a transaction, awaited one by one {"ms":1480.9,"min":1025.6}
+[PERF] new-napi insert 5000 rows in a transaction, all started at once {"ms":73,"min":51.4}
+[PERF] new-napi insert 5000 rows with batch() (new API only) {"ms":24.6,"min":19.6,"info":[{"changes":1,"lastInsertRowId":1,"rows":[]},{"changes":1,"lastInsertRowId":2,"rows":
+[PERF] new-napi insert 5000 rows in a transaction, blocking executeSync (new API only) {"ms":120.7,"min":48}
+[PERF] new-napi select 20000 rows x 3 (int, short text, real) {"ms":19.6,"min":8.7,"info":20000}
+[PERF] new-napi select 5000 rows x 12 (mixed, nulls) {"ms":12.2,"min":11.7,"info":5000}
+[PERF] new-napi select 5000 rows x 3 (200 char text) {"ms":18,"min":15.9,"info":5000}
+[PERF] new-napi select 1000 rows with 2 KB blobs {"ms":8.9,"min":8.6,"info":1000}
+[PERF] new-napi 500 small selects (100 rows), one after the other {"ms":206.3,"min":140.6}
+[PERF] new-napi 1000 get by primary key, one after the other {"ms":291.8,"min":264}
+[PERF] new-napi 1000 get by primary key, all started at once {"ms":15.3,"min":8.5,"info":1000}
+[PERF] new-napi 1000 get by primary key, blocking getSync (new API only) {"ms":30,"min":17.9}
+[PERF] new-napi 500 small selects (100 rows), blocking selectSync (new API only) {"ms":56.5,"min":38.7}
+[PERF] new-napi each over 20000 rows {"ms":9.8,"min":7.9,"info":20000}
+[PERF] new-napi jank during select of 100000 rows x 4 {"maxGapMs":28.2,"totalMs":66}
+[PERF] new-napi jank during 20 selects of 2000 rows {"maxGapMs":5.8,"totalMs":26}
+[PERF] new-bridge insert 500 rows, one awaited execute each, autocommit {"ms":5205.8,"min":4242.8}
+[PERF] new-bridge insert 5000 rows in a transaction, awaited one by one {"ms":2792.4,"min":2557.1}
+[PERF] new-bridge insert 5000 rows in a transaction, all started at once {"ms":290.2,"min":247.5}
+[PERF] new-bridge insert 5000 rows with batch() (new API only) {"ms":36.9,"min":21.7,"info":[{"changes":1,"lastInsertRowId":1,"rows":[]},{"changes":1,"lastInsertRowId":2,"rows
+[PERF] new-bridge select 20000 rows x 3 (int, short text, real) {"ms":15.4,"min":13.7,"info":20000}
+[PERF] new-bridge select 5000 rows x 12 (mixed, nulls) {"ms":12,"min":11.2,"info":5000}
+[PERF] new-bridge select 5000 rows x 3 (200 char text) {"ms":26.7,"min":21.4,"info":5000}
+[PERF] new-bridge select 1000 rows with 2 KB blobs {"ms":12.2,"min":9.8,"info":1000}
+[PERF] new-bridge 500 small selects (100 rows), one after the other {"ms":318.6,"min":295.2}
+[PERF] new-bridge 1000 get by primary key, one after the other {"ms":492,"min":450.9}
+[PERF] new-bridge 1000 get by primary key, all started at once {"ms":50.2,"min":43.8,"info":1000}
+[PERF] new-bridge each over 20000 rows {"ms":14.4,"min":9.8,"info":20000}
+[PERF] new-bridge jank during select of 100000 rows x 4 {"maxGapMs":29.4,"totalMs":74.4}
+[PERF] new-bridge jank during 20 selects of 2000 rows {"maxGapMs":5.3,"totalMs":41.8}
+[PERF] done

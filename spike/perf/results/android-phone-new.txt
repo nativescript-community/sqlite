@@ -1,0 +1,49 @@
+[PERF] new-napi insert 500 rows, one awaited execute each, autocommit {"ms":1738.8,"min":1675.8}
+[PERF] new-napi insert 5000 rows in a transaction, awaited one by one {"ms":313.3,"min":289.5}
+[PERF] new-napi insert 5000 rows in a transaction, all started at once {"ms":167.7,"min":87.2}
+[PERF] new-napi insert 5000 rows with batch() (new API only) {"ms":56.3,"min":50.6,"info":[{"changes":1,"lastInsertRowId":1,"rows":[]},{"changes":1,"lastInsertRowId":2,"rows":[]},{"changes":1,"lastInsertRowId":3,"rows":[]},{"changes":1,"lastInsertRowId":4,"rows":[]},{"changes":1,"lastInsertRowId":5,"rows":[]},{"changes":1,"lastInsertRowId":6,"rows":[]},{"changes":1,"lastInsertRowId":7,"rows":[]},{"changes":1,"lastInsertRowId":8,"rows":[]},{"changes":1,"lastInsertRowId":9,"rows":[]},{"changes":1,"lastInsertRowId":10,"rows":[]},{"changes":1,"lastInsertRowId":11,"rows":[]},{"changes":1,"lastInsertRowId":12,"rows":[]},{"changes":1,"lastInsertRowId":13,"rows":[]},{"changes":1,"lastInsertRowId":14,"rows":[]},{"changes":1,"lastInsertRowId":15,"rows":[]},{"changes":1,"lastInsertRowId":16,"rows":[]},{"changes":1,"lastInsertRowId":17,"rows":[]},{"changes":1,"lastInsertRowId":18,"rows":[]},{"changes":1,"lastInsertRowId":19,"rows":[]},{"changes":1,"lastInsertRowId":20,"rows":[]},{"changes":1,"lastInsertRowId...
+[PERF] new-napi insert 5000 rows in a transaction, blocking executeSync (new API only) {"ms":90.6,"min":81}
+[PERF] new-napi select 20000 rows x 3 (int, short text, real) {"ms":40,"min":24.9,"info":20000}
+[PERF] new-napi select 5000 rows x 12 (mixed, nulls) {"ms":39.9,"min":36.9,"info":5000}
+[PERF] new-napi select 5000 rows x 3 (200 char text) {"ms":37.1,"min":35,"info":5000}
+[PERF] new-napi select 1000 rows with 2 KB blobs {"ms":21.4,"min":14.1,"info":1000}
+[PERF] new-napi 500 small selects (100 rows), one after the other {"ms":244.3,"min":227.5}
+[PERF] new-napi 1000 get by primary key, one after the other {"ms":152.6,"min":87.4}
+[PERF] new-napi 1000 get by primary key, all started at once {"ms":23.6,"min":22.4,"info":1000}
+[PERF] new-napi 1000 get by primary key, blocking getSync (new API only) {"ms":39.9,"min":39.7}
+[PERF] new-napi 500 small selects (100 rows), blocking selectSync (new API only) {"ms":115.7,"min":110.3}
+[PERF] new-napi each over 20000 rows {"ms":24.5,"min":24,"info":20000}
+[PERF] new-napi jank during select of 100000 rows x 4 {"maxGapMs":160.7,"totalMs":251.3}
+[PERF] new-napi jank during 20 selects of 2000 rows {"maxGapMs":8.2,"totalMs":154.1}
+[PERF] new-bridge insert 500 rows, one awaited execute each, autocommit {"ms":3585.4,"min":3067.3}
+[PERF] new-bridge insert 5000 rows in a transaction, awaited one by one {"ms":1180.5,"min":1147.5}
+[PERF] new-bridge insert 5000 rows in a transaction, all started at once {"ms":814.9,"min":798}
+[PERF] new-bridge insert 5000 rows with batch() (new API only) {"ms":45.2,"min":40.7,"info":[{"changes":1,"lastInsertRowId":1,"rows":[]},{"changes":1,"lastInsertRowId":2,"rows":[]},{"changes":1,"lastInsertRowId":3,"rows":[]},{"changes":1,"lastInsertRowId":4,"rows":[]},{"changes":1,"lastInsertRowId":5,"rows":[]},{"changes":1,"lastInsertRowId":6,"rows":[]},{"changes":1,"lastInsertRowId":7,"rows":[]},{"changes":1,"lastInsertRowId":8,"rows":[]},{"changes":1,"lastInsertRowId":9,"rows":[]},{"changes":1,"lastInsertRowId":10,"rows":[]},{"changes":1,"lastInsertRowId":11,"rows":[]},{"changes":1,"lastInsertRowId":12,"rows":[]},{"changes":1,"lastInsertRowId":13,"rows":[]},{"changes":1,"lastInsertRowId":14,"rows":[]},{"changes":1,"lastInsertRowId":15,"rows":[]},{"changes":1,"lastInsertRowId":16,"rows":[]},{"changes":1,"lastInsertRowId":17,"rows":[]},{"changes":1,"lastInsertRowId":18,"rows":[]},{"changes":1,"lastInsertRowId":19,"rows":[]},{"changes":1,"lastInsertRowId":20,"rows":[]},{"changes":1,"lastInsertRow...
+[PERF] new-bridge select 20000 rows x 3 (int, short text, real) {"ms":34.3,"min":27.9,"info":20000}
+[PERF] new-bridge select 5000 rows x 12 (mixed, nulls) {"ms":38.7,"min":35.7,"info":5000}
+[PERF] new-bridge select 5000 rows x 3 (200 char text) {"ms":45.8,"min":33.5,"info":5000}
+[PERF] new-bridge select 1000 rows with 2 KB blobs {"ms":18.3,"min":13.2,"info":1000}
+[PERF] new-bridge 500 small selects (100 rows), one after the other {"ms":637,"min":286.8}
+[PERF] new-bridge 1000 get by primary key, one after the other {"ms":392.5,"min":343}
+[PERF] new-bridge 1000 get by primary key, all started at once {"ms":147.4,"min":142.1,"info":1000}
+[PERF] new-bridge each over 20000 rows {"ms":17.9,"min":17.6,"info":20000}
+[PERF] new-bridge jank during select of 100000 rows x 4 {"maxGapMs":61.3,"totalMs":161.9}
+[PERF] new-bridge jank during 20 selects of 2000 rows {"maxGapMs":7,"totalMs":128.5}
+[PERF] framework-napi insert 500 rows, one awaited execute each, autocommit {"ms":663.1,"min":654.1}
+[PERF] framework-napi insert 5000 rows in a transaction, awaited one by one {"ms":1443.5,"min":1309}
+[PERF] framework-napi insert 5000 rows in a transaction, all started at once {"ms":1007,"min":995.6}
+[PERF] framework-napi insert 5000 rows with batch() (new API only) {"ms":875,"min":873,"info":[{"changes":1,"lastInsertRowId":1,"rows":[]},{"changes":1,"lastInsertRowId":2,"rows":[]},{"changes":1,"lastInsertRowId":3,"rows":[]},{"changes":1,"lastInsertRowId":4,"rows":[]},{"changes":1,"lastInsertRowId":5,"rows":[]},{"changes":1,"lastInsertRowId":6,"rows":[]},{"changes":1,"lastInsertRowId":7,"rows":[]},{"changes":1,"lastInsertRowId":8,"rows":[]},{"changes":1,"lastInsertRowId":9,"rows":[]},{"changes":1,"lastInsertRowId":10,"rows":[]},{"changes":1,"lastInsertRowId":11,"rows":[]},{"changes":1,"lastInsertRowId":12,"rows":[]},{"changes":1,"lastInsertRowId":13,"rows":[]},{"changes":1,"lastInsertRowId":14,"rows":[]},{"changes":1,"lastInsertRowId":15,"rows":[]},{"changes":1,"lastInsertRowId":16,"rows":[]},{"changes":1,"lastInsertRowId":17,"rows":[]},{"changes":1,"lastInsertRowId":18,"rows":[]},{"changes":1,"lastInsertRowId":19,"rows":[]},{"changes":1,"lastInsertRowId":20,"rows":[]},{"changes":1,"lastInsertR...
+[PERF] framework-napi insert 5000 rows in a transaction, blocking executeSync (new API only) {"ms":1147.1,"min":1118.4}
+[PERF] framework-napi select 20000 rows x 3 (int, short text, real) {"ms":113.7,"min":107.4,"info":20000}
+[PERF] framework-napi select 5000 rows x 12 (mixed, nulls) {"ms":88.6,"min":84.6,"info":5000}
+[PERF] framework-napi select 5000 rows x 3 (200 char text) {"ms":125.2,"min":123.7,"info":5000}
+[PERF] framework-napi select 1000 rows with 2 KB blobs {"ms":20.7,"min":19.4,"info":1000}
+[PERF] framework-napi 500 small selects (100 rows), one after the other {"ms":547,"min":490.9}
+[PERF] framework-napi 1000 get by primary key, one after the other {"ms":547.2,"min":515}
+[PERF] framework-napi 1000 get by primary key, all started at once {"ms":315.2,"min":301.7,"info":1000}
+[PERF] framework-napi 1000 get by primary key, blocking getSync (new API only) {"ms":352.2,"min":344.6}
+[PERF] framework-napi 500 small selects (100 rows), blocking selectSync (new API only) {"ms":443.3,"min":440.9}
+[PERF] framework-napi each over 20000 rows {"ms":102.2,"min":102.1,"info":20000}
+[PERF] framework-napi jank during select of 100000 rows x 4 {"maxGapMs":64.3,"totalMs":697.7}
+[PERF] framework-napi jank during 20 selects of 2000 rows {"maxGapMs":5.5,"totalMs":233.7}
+[PERF] done

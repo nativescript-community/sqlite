@@ -1,0 +1,49 @@
+{
+    "name": "@nativescript-community/sqlite-android-framework",
+    "version": "3.5.9",
+    "description": "Use the SQLite of the Android platform (android.database.sqlite) as the engine of @nativescript-community/sqlite-core: no SQLite library in the app.",
+    "main": "index",
+    "typings": "index.d.ts",
+    "sideEffects": false,
+    "scripts": {
+        "build": "npm run tsc && npm run readme",
+        "build.all": "npm run build",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "tsc --build",
+        "clean": "bin/rimraf ./*.js ./*.js.map ./*.d.ts ./*.tsbuildinfo"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "8.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "SQLite"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/sqlite/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/sqlite",
+    "readmeFilename": "README.md",
+    "repository": "nativescript-community/sqlite",
+    "peerDependencies": {
+        "@nativescript-community/sqlite-core": "3.5.9"
+    },
+    "files": [
+        "platforms",
+        "**/*.js",
+        "**/*.d.ts",
+        "**/*.mjs"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
+}

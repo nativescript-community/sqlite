@@ -30,15 +30,24 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner implement
         }
 
         const connection = this.driver.connection;
-        const isInsertQuery = query.startsWith('INSERT INTO') || query.startsWith('UPDATE');
+        // writes go through execute (they have no rows): TypeORM reads the id of an INSERT and `affected` from the result
+        const kind = /^\s*(INSERT|REPLACE|UPDATE|DELETE)\b/i.exec(query);
+        const isInsert = !!kind && /^(INSERT|REPLACE)$/i.test(kind[1]);
         connection.logger.logQuery(query, parameters, this);
 
         try {
             const db: NSQlite.SQLiteDatabase = await this.connect();
             const queryStartTime = +new Date();
-            const result = isInsertQuery // when isInsertQuery == true, result is the id
-                ? await db.execute(query, parameters)
-                : await db.select(query, parameters);
+            let result: any;
+            let affected: number | undefined;
+            if (kind) {
+                const res = await db.execute(query, parameters);
+                affected = res.changes;
+                // the id of an INSERT, the number of changed rows of an UPDATE / DELETE
+                result = isInsert ? res.lastInsertRowId : res.changes;
+            } else {
+                result = await db.select(query, parameters);
+            }
             const queryEndTime = +new Date();
             const queryExecutionTime = queryEndTime - queryStartTime;
             const maxQueryExecutionTime = connection.options.maxQueryExecutionTime;
@@ -48,7 +57,11 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner implement
             }
 
             if (useStructuredResult) {
-                return { records: result, raw: result } as QueryResult;
+                const queryResult = new QueryResult();
+                queryResult.records = kind ? [] : result;
+                queryResult.raw = result;
+                queryResult.affected = affected;
+                return queryResult;
             } else {
                 return result;
             }

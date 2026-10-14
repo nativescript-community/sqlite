@@ -1,0 +1,42 @@
+{
+    "name": "@nativescript-community/sqlite-napi",
+    "version": "3.5.9",
+    "description": "Node-API binding of @nativescript-community/sqlite-core for NativeScript 9.1+ (native part only: no JNI / Objective-C bridge code).",
+    "sideEffects": false,
+    "scripts": {
+        "build": "npm run readme",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "8.0.0",
+            "ios": "8.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "SQLite",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/sqlite/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/sqlite",
+    "repository": "nativescript-community/sqlite",
+    "readmeFilename": "README.md",
+    "dependencies": {
+        "@nativescript-community/sqlite-core": "3.5.9"
+    },
+    "files": [
+        "platforms"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
+}

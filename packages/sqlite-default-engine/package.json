@@ -1,0 +1,48 @@
+{
+    "name": "@nativescript-community/sqlite-default-engine",
+    "version": "3.5.9",
+    "description": "The default SQLite for @nativescript-community/sqlite-core: androidx sqlite-bundled on Android (WAL by default), the SQLite of the process on iOS.",
+    "main": "index",
+    "typings": "index.d.ts",
+    "sideEffects": true,
+    "scripts": {
+        "build": "npm run tsc && npm run readme",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "tsc --build"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "8.0.0",
+            "ios": "8.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "SQLite",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/sqlite/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/sqlite",
+    "repository": "nativescript-community/sqlite",
+    "readmeFilename": "README.md",
+    "peerDependencies": {
+        "@nativescript-community/sqlite-core": "3.5.9",
+        "@nativescript/core": "*"
+    },
+    "files": [
+        "platforms",
+        "**/*.js",
+        "**/*.d.ts"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
+}

@@ -1,128 +1,160 @@
-export type SqliteParam = null | number | string | ArrayBuffer | any;
+/** A value that can be bound to a statement parameter. */
+export type SqliteParam = null | undefined | boolean | number | bigint | string | Date | ArrayBuffer | ArrayBufferView | number[];
 
 export type SqliteParams = SqliteParam | SqliteParam[];
 
+/** How INT64 cells (integers that do not fit 32 bits) are returned. */
+export type Int64Mode =
+    /** always a number: values beyond 2^53 lose precision (default) */
+    | 'number'
+    /** a number when it is a safe integer, a bigint otherwise */
+    | 'auto'
+    /** always a bigint */
+    | 'bigint';
+
 export interface SqliteRequestOptions {
+    /** BLOB values: a Uint8Array (default) or, with `false`, an ArrayBuffer. */
     transformBlobs?: boolean;
+    int64?: Int64Mode;
+    /** @deprecated Android cursor windows do not exist anymore. */
     cursorWindowSize?: number;
+    /** @deprecated Android cursor windows do not exist anymore. */
     cursorWindowName?: string;
 }
 
-export type DatabaseOptions = {
+export interface DatabaseOptions extends SqliteRequestOptions {
+    /** @deprecated Every request runs on a native thread now. */
     threading?: boolean;
     readOnly?: boolean;
+    /** sqlite3_open_v2 flags. Default: READWRITE | CREATE. */
     flags?: number;
-} & SqliteRequestOptions
+    /**
+     * The SQLite library: a name the platform can dlopen (`libsqliteJni.so` is androidx sqlite-bundled, `libsqlcipher.so`...), or `null`
+     * for the SQLite of the process (iOS). Default: `configure`'s `engine`, else its `defaultEngine`; without any, no database opens.
+     */
+    engine?: string | null;
+    /** milliseconds, default 5000, negative to disable */
+    busyTimeout?: number;
+    /** switch to write-ahead logging after opening */
+    wal?: boolean;
+    /** SQL run right after opening, e.g. `PRAGMA key = '...'` for SQLCipher */
+    initSql?: string;
+}
+
+export interface GlobalConfig {
+    /** default `engine` of databases */
+    engine?: string | null;
+    /** Used when neither `engine` nor the database option is set; provider packages set it (sqlite sets androidx sqlite-bundled on Android). */
+    defaultEngine?: string | null;
+    /** Options every database starts from; those given to `openOrCreate` win (`{ wal: false }` undoes `wal: true`). */
+    defaultOptions?: DatabaseOptions;
+    /** force a binding: 'napi' (NativeScript >= 9.1) or 'bridge' (JNI / Objective-C). Default: napi when available. */
+    backend?: 'auto' | 'napi' | 'bridge';
+}
 
 export interface SqliteRow {
-    [name: string]: SqliteParam;
+    [name: string]: any;
 }
 
-export type Db = any;
+export interface ExecResult {
+    /** rows changed by the last INSERT / UPDATE / DELETE of the statement */
+    changes: number;
+    lastInsertRowId: number;
+}
 
-export type SqliteUpgrade = (db: Db) => void;
+export interface BatchStatement {
+    sql: string;
+    params?: SqliteParams;
+}
 
-export interface SQLiteDatabase {
-    getVersion();
+export interface BatchResult extends ExecResult {
+    /** rows returned by the statement (objects) */
+    rows: SqliteRow[];
+}
 
-    setVersion(version: number);
+export interface BatchOptions {
+    /** all statements or none, default true */
+    atomic?: boolean;
+}
 
-    isOpen: boolean;
+export type TransactionMode = 'deferred' | 'immediate' | 'exclusive';
 
-    close();
+export interface TransactionOptions {
+    /** default 'immediate' */
+    mode?: TransactionMode;
+}
 
+/** The query methods, shared by a database and by a transaction. */
+export interface SQLiteQueryApi {
+    execute(query: string, params?: SqliteParams): Promise<ExecResult>;
+    /** run several statements separated by `;`, without parameters */
+    executeScript(script: string): Promise<void>;
     select(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteRow[]>;
+    selectArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<any[][]>;
+    get(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteRow | null>;
+    getArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<any[] | null>;
+    /** streams rows in chunks, resolves with the number of rows */
+    each(
+        query: string,
+        params: SqliteParams,
+        callback: (error: Error | null, row: SqliteRow) => void,
+        complete?: (error: Error | null, count: number) => void,
+        options?: SqliteRequestOptions
+    ): Promise<number>;
+    batch(statements: Array<BatchStatement | string | [string, SqliteParams?]>, options?: BatchOptions): Promise<BatchResult[]>;
 
-    selectArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteParam[][]>;
-
-    get(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteRow>;
-
-    getArray(query: string, params?: SqliteParams, options?: SqliteRequestOptions): Promise<SqliteParam[]>;
-
-    execute(query: string, params?: SqliteParams): Promise<void>;
-
-    transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T>;
-
-    each(query: string, params: SqliteParams, callback: (error: Error, result: SqliteRow) => void, complete: (error: Error, count: number) => void, options?: SqliteRequestOptions): Promise<number>;
+    /**
+     * Blocking variants: they wait for the database thread on the calling thread, saving the event loop round trip for small
+     * statements in a loop, and block it for the whole statement. Node-API binding only (NativeScript >= 9.1).
+     */
+    executeSync(query: string, params?: SqliteParams): ExecResult;
+    selectSync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): SqliteRow[];
+    selectArraySync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): any[][];
+    getSync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): SqliteRow | null;
+    getArraySync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): any[] | null;
 }
 
-export function isNothing(x: any) {
-    return x === undefined || x === null;
-}
-export function arrayToNativeByteArray(val) {
-    const length = val.length;
-    const result = Array.create('byte', length);
-    for (let i = 0; i < length; i++) {
-        result[i] = val[i];
-    }
-    return result;
+export interface SQLiteTransaction extends SQLiteQueryApi {
+    readonly id: number;
 }
 
-export function paramToString(p: SqliteParam) {
-    if (isNothing(p)) {
-        return null;
-    }
-    if (global.isAndroid) {
-        if (p instanceof java.nio.ByteBuffer) {
-            return p.array();
-        }
-        if (p instanceof java.io.ByteArrayOutputStream) {
-            return p.toByteArray();
-        }
-        if (p instanceof java.lang.Object) {
-            return p;
-        }
-        if (p instanceof ArrayBuffer) {
-            return arrayToNativeByteArray(new Uint8Array(p));
-        } else if (p.buffer) {
-            return arrayToNativeByteArray(p);
-        } else if (Array.isArray(p)) {
-            return arrayToNativeByteArray(p);
-        }
-    } else {
-        if (p instanceof NSData) {
-            return p;
-        }
-        if (p instanceof NSObject) {
-            return p;
-        }
-        if (p instanceof ArrayBuffer) {
-            return NSData.dataWithData(p as any);
-        }
-        if (p.buffer) {
-            return NSData.dataWithData(p.buffer);
-        }
-        if (Array.isArray(p)) {
-            return NSData.dataWithData(new Uint8Array(p).buffer as any);
-        }
-    }
-    if (p.hasOwnProperty('length') && !Array.isArray(p)) {
-        // native array
-        return p;
-    }
-
-    if (p['toString']) {
-        return p['toString']();
-    }
-    return p;
+export interface SQLiteDatabase extends SQLiteQueryApi {
+    readonly filePath: string;
+    /** true once the database is opened and until it is closed */
+    readonly isOpen: boolean;
+    /** resolves when the database is opened, rejects with the open error */
+    readonly ready: Promise<void>;
+    getVersion(): Promise<number>;
+    setVersion(version: number): Promise<void>;
+    /**
+     * Runs `action` in a transaction: COMMIT when it resolves, ROLLBACK when it throws or `cancel()` was called. Other calls made
+     * on this database meanwhile join it (use `tx` to be explicit); requests of other parts of the app wait for the end.
+     */
+    transaction<T = any>(action: (cancel: () => void, tx: SQLiteTransaction) => Promise<T> | T, options?: TransactionOptions): Promise<T>;
+    /**
+     * Loads a SQLite extension into this connection; needs an engine that allows it (see `canLoadExtensions`). `entryPoint`
+     * defaults to the one SQLite derives from the file name (`libfoo.so` -> `sqlite3_foo_init`).
+     */
+    loadExtension(path: string, entryPoint?: string): Promise<void>;
+    /** false when the engine in use cannot load extensions (`loadExtension` would reject) */
+    canLoadExtensions(): boolean;
+    /** version of the SQLite library in use */
+    getSqliteVersion(): string;
+    close(): Promise<void>;
 }
 
-export function paramsToStringArray(params?: SqliteParams) {
-    if (isNothing(params)) {
-        return [];
+export class SqliteError extends Error {
+    /** primary SQLite result code (1..), or a negative core code */
+    code: number;
+    /** SQLite extended result code */
+    extendedCode: number;
+    sql?: string;
+    constructor(message: string, status: number, sql?: string) {
+        super(message);
+        this.name = 'SqliteError';
+        this.extendedCode = status;
+        this.code = status > 0 ? status & 0xff : status;
+        this.sql = sql;
+        Object.setPrototypeOf(this, SqliteError.prototype);
     }
-    if (params instanceof Array) {
-        return params.map(paramToString);
-    }
-    return [paramToString(params)];
-}
-
-export function throwError(msg: string) {
-    throw new Error(`NSqlite Error: ${msg}`);
-}
-export function openOrCreate(filePath: string, flags?: number): SQLiteDatabase {
-    return null;
-}
-export function deleteDatabase(filePath: string) {
-    return false;
 }

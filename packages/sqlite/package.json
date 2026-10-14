@@ -1,21 +1,21 @@
 {
     "name": "@nativescript-community/sqlite",
     "version": "3.5.9",
-    "description": "SQLite for Nativescript",
-    "main": "sqlite",
-    "typings": "sqlite.d.ts",
-    "sideEffects": false,
+    "description": "SQLite for NativeScript, everything included: native threads, Node-API and JNI / Objective-C bindings, a default SQLite on each platform. Pick the smaller packages (sqlite-core, sqlite-napi...) to bring your own.",
+    "main": "index",
+    "typings": "index.d.ts",
+    "sideEffects": true,
     "scripts": {
         "build": "npm run tsc && npm run readme",
         "build.all": "npm run build",
         "readme": "readme generate -c ../../tools/readme/blueprint.json",
-        "tsc": "cpy '**/*.d.ts' '../../packages/sqlite' --parents --cwd=../../src/sqlite && tsc  --build",
-        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
+        "tsc": "tsc --build",
+        "clean": "bin/rimraf ./*.js ./*.js.map ./*.d.ts ./*.tsbuildinfo ./typeorm ./nanosql"
     },
     "nativescript": {
         "platforms": {
-            "android": "6.2.0",
-            "ios": "6.2.0"
+            "android": "8.0.0",
+            "ios": "8.0.0"
         }
     },
     "keywords": [
@@ -36,10 +36,21 @@
     "readmeFilename": "README.md",
     "repository": "nativescript-community/sqlite",
     "peerDependencies": {
-        "@nano-sql/core": "^2.3.7",
-        "typeorm": "^0.3.17"
+        "@nativescript/core": "*"
     },
     "dependencies": {
-        "@nativescript/hook": "~2.0.0"
+        "@nativescript-community/sqlite-bridge": "3.5.9",
+        "@nativescript-community/sqlite-core": "3.5.9",
+        "@nativescript-community/sqlite-default-engine": "3.5.9",
+        "@nativescript-community/sqlite-napi": "3.5.9"
+    },
+    "files": [
+        "platforms",
+        "**/*.js",
+        "**/*.d.ts",
+        "**/*.mjs"
+    ],
+    "publishConfig": {
+        "access": "public"
     }
 }

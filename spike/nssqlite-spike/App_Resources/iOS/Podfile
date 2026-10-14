@@ -1,0 +1,1 @@
+pod 'NSSqlite', :path => '/Volumes/dev/nativescript/sqlite'

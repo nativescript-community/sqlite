@@ -1,0 +1,52 @@
+cmake_minimum_required(VERSION 3.22)
+project(nssqlite_core C)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# -DNSSQLITE_SANITIZE=address,undefined | thread
+set(NSSQLITE_SANITIZE "" CACHE STRING "sanitizers for the host tests")
+
+add_library(nssqlite_core STATIC wire.c engine.c db.c provider.c)
+target_include_directories(nssqlite_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(nssqlite_core PRIVATE -Wall -Wextra -Wno-unused-parameter)
+find_package(Threads REQUIRED)
+target_link_libraries(nssqlite_core PUBLIC ${CMAKE_DL_LIBS} Threads::Threads)
+
+# Host tests. The core itself needs neither the SQLite headers nor the library: only the
+# extension test links SQLite, to write a sample extension.
+if(NOT ANDROID AND NOT IOS)
+  enable_testing()
+  if(NSSQLITE_SANITIZE)
+    add_compile_options(-fsanitize=${NSSQLITE_SANITIZE} -fno-omit-frame-pointer -g)
+    add_link_options(-fsanitize=${NSSQLITE_SANITIZE})
+  endif()
+  if(APPLE)
+    set(NSSQLITE_TEST_ENGINE "/usr/lib/libsqlite3.dylib")
+  else()
+    set(NSSQLITE_TEST_ENGINE "libsqlite3.so.0")
+  endif()
+  # Engine for the extension test: Apple's system SQLite refuses sqlite3_auto_extension.
+  if(APPLE AND EXISTS /opt/homebrew/opt/sqlite/lib/libsqlite3.dylib)
+    set(NSSQLITE_EXT_ENGINE "/opt/homebrew/opt/sqlite/lib/libsqlite3.dylib")
+    set(NSSQLITE_EXT_INCLUDE "/opt/homebrew/opt/sqlite/include") # Apple's sqlite3ext.h is not usable
+  elseif(NOT APPLE)
+    set(NSSQLITE_EXT_ENGINE "${NSSQLITE_TEST_ENGINE}")
+  endif()
+  find_package(SQLite3 REQUIRED) # headers only (sqlite3ext.h)
+  if(NOT NSSQLITE_EXT_INCLUDE)
+    set(NSSQLITE_EXT_INCLUDE ${SQLite3_INCLUDE_DIRS})
+  endif()
+  foreach(t wire db extension)
+    add_executable(test_${t} tests/test_${t}.c)
+    target_link_libraries(test_${t} PRIVATE nssqlite_core)
+    target_compile_definitions(test_${t} PRIVATE NSSQLITE_TEST_ENGINE="${NSSQLITE_TEST_ENGINE}")
+    target_compile_options(test_${t} PRIVATE -Wall -Wextra -Wno-unused-parameter)
+    add_test(NAME ${t} COMMAND test_${t})
+  endforeach()
+  target_include_directories(test_extension BEFORE PRIVATE ${NSSQLITE_EXT_INCLUDE})
+  if(NSSQLITE_EXT_ENGINE)
+    target_compile_definitions(test_extension PRIVATE NSSQLITE_EXT_ENGINE="${NSSQLITE_EXT_ENGINE}")
+  endif()
+endif()

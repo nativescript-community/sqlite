@@ -1,0 +1,108 @@
+import { Backend, RawResult, ResultCallback } from './backend';
+import { SqliteError } from './sqlite.common';
+
+/** Turns a failed raw result into an error and always releases the native memory behind a result. */
+export function toError(raw: RawResult, sql?: string) {
+    return new SqliteError(raw.message || `SQLite error ${raw.status}`, raw.status, sql);
+}
+
+/** Submits a request and resolves with its only result, rejects with a SqliteError. `submit` returns the core submit status. */
+export function request(submit: (cb: ResultCallback) => number, sql?: string): Promise<RawResult> {
+    return new Promise((resolve, reject) => {
+        const rc = submit((raw) => {
+            if (raw.status !== 0) {
+                const err = toError(raw, sql);
+                raw.release && raw.release();
+                reject(err);
+            } else {
+                resolve(raw);
+            }
+        });
+        if (rc) {
+            reject(new SqliteError(rc === -1 ? 'database is closed' : `request refused (${rc})`, rc, sql));
+        }
+    });
+}
+
+/**
+ * Same for streamed requests: `onChunk` gets every chunk (done = false), the promise resolves with the final result. When
+ * `onChunk` throws, the remaining chunks are released and the promise rejects once the stream ended.
+ */
+export function stream(submit: (cb: ResultCallback) => number, onChunk: (raw: RawResult) => void, sql?: string): Promise<RawResult> {
+    return new Promise((resolve, reject) => {
+        let failure: any;
+        const rc = submit((raw) => {
+            if (raw.status !== 0) {
+                const err = toError(raw, sql);
+                raw.release && raw.release();
+                reject(failure || err);
+                return;
+            }
+            if (!raw.done) {
+                if (!failure) {
+                    try {
+                        onChunk(raw);
+                    } catch (error) {
+                        failure = error;
+                    }
+                }
+                raw.release && raw.release();
+                return;
+            }
+            if (failure) {
+                raw.release && raw.release();
+                reject(failure);
+            } else {
+                resolve(raw);
+            }
+        });
+        if (rc) {
+            reject(new SqliteError(rc === -1 ? 'database is closed' : `request refused (${rc})`, rc, sql));
+        }
+    });
+}
+
+/** The message of anything that was thrown (runtimes throw their own error types). */
+export function messageOf(error: unknown): string {
+    if (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string') {
+        return error.message;
+    }
+    return String(error);
+}
+
+export function asError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(messageOf(error));
+}
+
+const engines = new Map<any, any>();
+
+/** Loads (and caches) the first SQLite library of the candidates that works. */
+export function loadEngine(backend: Backend, candidates: Array<string | null>): any {
+    const errors: string[] = [];
+    for (const lib of candidates) {
+        const key = backend.kind + ':' + lib;
+        if (engines.has(key)) {
+            return engines.get(key);
+        }
+        try {
+            const handle = backend.engine(lib);
+            engines.set(key, handle);
+            return handle;
+        } catch (error) {
+            errors.push(`${lib === null ? '(sqlite3 symbols of the process)' : lib}: ${messageOf(error)}`);
+        }
+    }
+    if (candidates.length === 0) {
+        throw new Error(
+            'No SQLite engine chosen. This package ships no SQLite: set one with configure({ engine }) or the `engine` option ' +
+                "(e.g. 'libsqlcipher.so' on Android, null for the SQLite linked into the app on iOS), or import @nativescript-community/sqlite-default-engine " +
+                '(androidx sqlite-bundled on Android, the SQLite of the process on iOS), or use @nativescript-community/sqlite which includes it.'
+        );
+    }
+    throw new Error(
+        'No usable SQLite library. Tried ' +
+            errors.join('; ') +
+            '. Choose one with configure({ engine }) or the `engine` option; on Android add a library that exports the sqlite3_* API ' +
+            'to the app (e.g. androidx.sqlite:sqlite-bundled provides libsqliteJni.so).'
+    );
+}

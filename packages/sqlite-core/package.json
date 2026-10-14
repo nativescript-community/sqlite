@@ -1,0 +1,54 @@
+{
+    "name": "@nativescript-community/sqlite-core",
+    "version": "3.5.9",
+    "description": "SQLite for NativeScript: the API and the native core, without a SQLite library and without a binding. Add @nativescript-community/sqlite-napi (NativeScript 9.1+) and/or sqlite-bridge, and a SQLite engine; or use @nativescript-community/sqlite for all of it.",
+    "main": "sqlite",
+    "typings": "sqlite.d.ts",
+    "sideEffects": false,
+    "scripts": {
+        "build": "npm run tsc && npm run readme",
+        "build.all": "npm run build",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "cpy '**/*.d.ts' '../../packages/sqlite-core' --parents --cwd=../../src/sqlite && tsc  --build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "8.0.0",
+            "ios": "8.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/sqlite/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/sqlite",
+    "readmeFilename": "README.md",
+    "repository": "nativescript-community/sqlite",
+    "peerDependencies": {
+        "@nano-sql/core": "^2.3.7",
+        "typeorm": "^0.3.17"
+    },
+    "dependencies": {
+        "@nativescript/hook": "~2.0.0"
+    },
+    "files": [
+        "platforms",
+        "**/*.js",
+        "**/*.d.ts",
+        "**/*.mjs"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
+}
