@@ -1,6 +1,6 @@
 import { BATCH_ATOMIC, Backend, EXEC_SCRIPT, OPEN_CREATE, OPEN_READONLY, OPEN_READWRITE, RawResult, TX_DEFERRED, TX_EXCLUSIVE, TX_IMMEDIATE } from './backend';
 import { DecodeOptions, decodeBatch, decodeRows, encodeBatch, encodeParams } from './codec';
-import { loadEngine, request, stream, toError } from './core';
+import { asError, loadEngine, request, stream, toError } from './core';
 import {
     BatchOptions,
     BatchResult,
@@ -122,13 +122,13 @@ abstract class QueryApi implements SQLiteQueryApi {
         let count = 0;
         let callbackThrew = false;
         const deliver = (rows: any[]) => {
-            for (let i = 0; i < rows.length; i++) {
+            for (let index = 0; index < rows.length; index++) {
                 count++;
                 try {
-                    callback(null, rows[i]);
-                } catch (e) {
+                    callback(null, rows[index]);
+                } catch (error) {
                     callbackThrew = true;
-                    throw e;
+                    throw error;
                 }
             }
         };
@@ -139,24 +139,24 @@ abstract class QueryApi implements SQLiteQueryApi {
                 query
             );
             deliver(rowsOf(last, opts).rows);
-        } catch (e) {
+        } catch (error) {
             if (callbackThrew) {
                 // the error comes from the caller's own callback: do not hand it back to the callbacks
-                throw e;
+                throw error;
             }
             if (complete) {
-                complete(e as Error, count);
+                complete(asError(error), count);
             } else {
-                callback(e as Error, null);
+                callback(asError(error), null);
             }
-            throw e;
+            throw error;
         }
         complete && complete(null, count);
         return count;
     }
 
     async batch(statements: Array<BatchStatement | string | [string, SqliteParams?]>, options?: BatchOptions): Promise<BatchResult[]> {
-        const list = statements.map((s) => (typeof s === 'string' ? { sql: s } : Array.isArray(s) ? { sql: s[0], params: s[1] } : s));
+        const list = statements.map((statement) => (typeof statement === 'string' ? { sql: statement } : Array.isArray(statement) ? { sql: statement[0], params: statement[1] } : statement));
         if (list.length === 0) {
             return [];
         }
@@ -164,7 +164,7 @@ abstract class QueryApi implements SQLiteQueryApi {
         const raw = await request((cb) => this.backend.batch(this.handle(), this.txId(), encodeBatch(list), atomic ? BATCH_ATOMIC : 0, cb));
         try {
             const blocks = raw.data ? decodeBatch(raw.data, decodeOptions(this.options, undefined, true)) : [];
-            return blocks.map((b) => ({ changes: b.changes, lastInsertRowId: b.lastInsertRowId, rows: b.rows }));
+            return blocks.map((block) => ({ changes: block.changes, lastInsertRowId: block.lastInsertRowId, rows: block.rows }));
         } finally {
             raw.release && raw.release();
         }
@@ -260,7 +260,7 @@ export class Database extends QueryApi implements SQLiteDatabase {
 
     async getVersion() {
         const row = await this.getArray('PRAGMA user_version');
-        return row ? (row[0] as number) : 0;
+        return row ? row[0] : 0;
     }
 
     async setVersion(version: number) {
@@ -294,24 +294,24 @@ export class Database extends QueryApi implements SQLiteDatabase {
         let outcome: Promise<T>;
         try {
             outcome = Promise.resolve(action(cancel, tx));
-        } catch (e) {
-            outcome = Promise.reject(e);
+        } catch (error) {
+            outcome = Promise.reject(error);
         }
         try {
             const begin = await begun;
             begin.release && begin.release();
-        } catch (e) {
+        } catch (error) {
             this.activeTx = 0;
             outcome.catch(() => {});
-            throw e;
+            throw error;
         }
         let result: T;
         try {
             result = await outcome;
-        } catch (e) {
+        } catch (error) {
             this.activeTx = 0;
             await this.endTransaction(id, false).catch(() => {});
-            throw e;
+            throw error;
         }
         this.activeTx = 0;
         await this.endTransaction(id, !cancelled);

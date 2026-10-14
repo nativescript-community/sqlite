@@ -1,7 +1,6 @@
 /**
- * TypeScript side of the wire format shared with the C core (core/nssqlite_wire.h): parameters and batches are
- * encoded here, rows blocks are decoded here. One implementation serves every backend (the decode benchmark showed
- * native decoding is not worth a second implementation).
+ * TypeScript side of the wire format shared with the C core (core/nssqlite_wire.h): parameters and batches are encoded here,
+ * rows blocks decoded here, for every backend.
  */
 import { Int64Mode, SqliteParam, SqliteParams } from './sqlite.common';
 
@@ -18,26 +17,24 @@ const HEADER_SIZE = 32;
 const TWO32 = 4294967296;
 
 /**
- * UTF-8 without a hard dependency on the globals: a runtime installs TextDecoder / TextEncoder lazily (NativeScript
- * core polyfills them when its globals load, which may be after this module is evaluated), and some have none. The
- * native ones are used as soon as they exist; until then (or without them) small pure JS versions do the work.
+ * UTF-8 without a hard dependency on the globals: a runtime installs TextDecoder / TextEncoder lazily (maybe after this module
+ * loads) and some have none. The native ones are used once they exist, small JS versions otherwise.
  */
 declare const TextDecoder: any;
 declare const TextEncoder: any;
 
 let nativeDecoder: any;
 let nativeEncoder: any;
-/** NativeScript 8 runtimes ship a TextDecoder that ignores the byteOffset of a view: there, decode copies (`slice`) instead of views (`subarray`). */
+/** NativeScript 8's TextDecoder ignores the byteOffset of a view: there, decode copies (`slice`) instead of views (`subarray`). */
 let subarrayOk = false;
 
 /**
- * UTF-8 done by the binding itself (the Node-API module's decodeUtf8 / encodeUtf8). Registered by the backend; used for long
- * strings only: a call costs more than decoding a short one in JS. It beats the JS fallback by far on runtimes without a
- * native TextDecoder.
+ * UTF-8 done by the Node-API module (decodeUtf8 / encodeUtf8), registered by the backend and used for long strings only: a call
+ * costs more than decoding a short one in JS, and beats the JS fallback by far where there is no native TextDecoder.
  */
 export interface NativeUtf8 {
     decode(buffer: ArrayBuffer, start: number, end: number): string;
-    encode(s: string): ArrayBuffer;
+    encode(text: string): ArrayBuffer;
 }
 let nativeUtf8: NativeUtf8 | null = null;
 const NATIVE_UTF8_MIN = 48;
@@ -47,13 +44,13 @@ export function setNativeUtf8(codec: NativeUtf8 | null) {
 
 function nativeCodecs() {
     if (!nativeDecoder && typeof TextDecoder !== 'undefined') {
-        const d = new TextDecoder();
+        const decoder = new TextDecoder();
         try {
-            subarrayOk = d.decode(new Uint8Array([65, 66, 67, 68]).subarray(2)) === 'CD';
-        } catch (e) {
+            subarrayOk = decoder.decode(new Uint8Array([65, 66, 67, 68]).subarray(2)) === 'CD';
+        } catch (error) {
             subarrayOk = false;
         }
-        nativeDecoder = d;
+        nativeDecoder = decoder;
     }
     if (!nativeEncoder && typeof TextEncoder !== 'undefined') {
         nativeEncoder = new TextEncoder();
@@ -64,27 +61,27 @@ function nativeCodecs() {
 export function utf8DecodeJs(u8: Uint8Array, start: number, end: number): string {
     let out = '';
     let chunk: number[] = [];
-    let i = start;
+    let index = start;
     const flush = () => {
-        out += String.fromCharCode.apply(null, chunk as any);
+        out += String.fromCharCode(...chunk);
         chunk = [];
     };
-    while (i < end) {
-        const b0 = u8[i++];
+    while (index < end) {
+        const b0 = u8[index++];
         let cp: number;
         if (b0 < 0x80) {
             cp = b0;
-        } else if (b0 >= 0xc2 && b0 < 0xe0 && i < end && (u8[i] & 0xc0) === 0x80) {
-            cp = ((b0 & 0x1f) << 6) | (u8[i++] & 0x3f);
-        } else if (b0 >= 0xe0 && b0 < 0xf0 && i + 1 < end && (u8[i] & 0xc0) === 0x80 && (u8[i + 1] & 0xc0) === 0x80) {
-            cp = ((b0 & 0x0f) << 12) | ((u8[i] & 0x3f) << 6) | (u8[i + 1] & 0x3f);
-            i += 2;
+        } else if (b0 >= 0xc2 && b0 < 0xe0 && index < end && (u8[index] & 0xc0) === 0x80) {
+            cp = ((b0 & 0x1f) << 6) | (u8[index++] & 0x3f);
+        } else if (b0 >= 0xe0 && b0 < 0xf0 && index + 1 < end && (u8[index] & 0xc0) === 0x80 && (u8[index + 1] & 0xc0) === 0x80) {
+            cp = ((b0 & 0x0f) << 12) | ((u8[index] & 0x3f) << 6) | (u8[index + 1] & 0x3f);
+            index += 2;
             if (cp < 0x800 || (cp >= 0xd800 && cp < 0xe000)) {
                 cp = 0xfffd;
             }
-        } else if (b0 >= 0xf0 && b0 < 0xf5 && i + 2 < end && (u8[i] & 0xc0) === 0x80 && (u8[i + 1] & 0xc0) === 0x80 && (u8[i + 2] & 0xc0) === 0x80) {
-            cp = ((b0 & 0x07) << 18) | ((u8[i] & 0x3f) << 12) | ((u8[i + 1] & 0x3f) << 6) | (u8[i + 2] & 0x3f);
-            i += 3;
+        } else if (b0 >= 0xf0 && b0 < 0xf5 && index + 2 < end && (u8[index] & 0xc0) === 0x80 && (u8[index + 1] & 0xc0) === 0x80 && (u8[index + 2] & 0xc0) === 0x80) {
+            cp = ((b0 & 0x07) << 18) | ((u8[index] & 0x3f) << 12) | ((u8[index + 1] & 0x3f) << 6) | (u8[index + 2] & 0x3f);
+            index += 3;
             if (cp < 0x10000 || cp > 0x10ffff) {
                 cp = 0xfffd;
             }
@@ -106,44 +103,44 @@ export function utf8DecodeJs(u8: Uint8Array, start: number, end: number): string
 }
 
 /** string -> UTF-8. Lone surrogates become U+FFFD, like TextEncoder. */
-export function utf8EncodeJs(s: string): Uint8Array {
-    const n = s.length;
-    const out = new Uint8Array(n * 3);
-    let o = 0;
-    for (let i = 0; i < n; i++) {
-        let c = s.charCodeAt(i);
-        if (c >= 0xd800 && c < 0xdc00 && i + 1 < n) {
-            const d = s.charCodeAt(i + 1);
-            if (d >= 0xdc00 && d < 0xe000) {
-                c = 0x10000 + ((c - 0xd800) << 10) + (d - 0xdc00);
-                i++;
+export function utf8EncodeJs(text: string): Uint8Array {
+    const textLength = text.length;
+    const out = new Uint8Array(textLength * 3);
+    let offset = 0;
+    for (let index = 0; index < textLength; index++) {
+        let code = text.charCodeAt(index);
+        if (code >= 0xd800 && code < 0xdc00 && index + 1 < textLength) {
+            const next = text.charCodeAt(index + 1);
+            if (next >= 0xdc00 && next < 0xe000) {
+                code = 0x10000 + ((code - 0xd800) << 10) + (next - 0xdc00);
+                index++;
             }
         }
-        if (c >= 0xd800 && c < 0xe000) {
-            c = 0xfffd;
+        if (code >= 0xd800 && code < 0xe000) {
+            code = 0xfffd;
         }
-        if (c < 0x80) {
-            out[o++] = c;
-        } else if (c < 0x800) {
-            out[o++] = 0xc0 | (c >> 6);
-            out[o++] = 0x80 | (c & 0x3f);
-        } else if (c < 0x10000) {
-            out[o++] = 0xe0 | (c >> 12);
-            out[o++] = 0x80 | ((c >> 6) & 0x3f);
-            out[o++] = 0x80 | (c & 0x3f);
+        if (code < 0x80) {
+            out[offset++] = code;
+        } else if (code < 0x800) {
+            out[offset++] = 0xc0 | (code >> 6);
+            out[offset++] = 0x80 | (code & 0x3f);
+        } else if (code < 0x10000) {
+            out[offset++] = 0xe0 | (code >> 12);
+            out[offset++] = 0x80 | ((code >> 6) & 0x3f);
+            out[offset++] = 0x80 | (code & 0x3f);
         } else {
-            out[o++] = 0xf0 | (c >> 18);
-            out[o++] = 0x80 | ((c >> 12) & 0x3f);
-            out[o++] = 0x80 | ((c >> 6) & 0x3f);
-            out[o++] = 0x80 | (c & 0x3f);
+            out[offset++] = 0xf0 | (code >> 18);
+            out[offset++] = 0x80 | ((code >> 12) & 0x3f);
+            out[offset++] = 0x80 | ((code >> 6) & 0x3f);
+            out[offset++] = 0x80 | (code & 0x3f);
         }
     }
-    return out.subarray(0, o);
+    return out.subarray(0, offset);
 }
 
 function decodeUtf8(u8: Uint8Array, start: number, end: number): string {
-    if (nativeUtf8 && end - start >= NATIVE_UTF8_MIN) {
-        return nativeUtf8.decode(u8.buffer as ArrayBuffer, u8.byteOffset + start, u8.byteOffset + end);
+    if (nativeUtf8 && end - start >= NATIVE_UTF8_MIN && u8.buffer instanceof ArrayBuffer) {
+        return nativeUtf8.decode(u8.buffer, u8.byteOffset + start, u8.byteOffset + end);
     }
     nativeCodecs();
     if (!nativeDecoder) {
@@ -152,17 +149,13 @@ function decodeUtf8(u8: Uint8Array, start: number, end: number): string {
     return nativeDecoder.decode(subarrayOk ? u8.subarray(start, end) : u8.slice(start, end));
 }
 
-export function encodeUtf8(s: string): Uint8Array {
-    if (nativeUtf8 && s.length >= NATIVE_UTF8_MIN) {
-        return new Uint8Array(nativeUtf8.encode(s));
+export function encodeUtf8(text: string): Uint8Array {
+    if (nativeUtf8 && text.length >= NATIVE_UTF8_MIN) {
+        return new Uint8Array(nativeUtf8.encode(text));
     }
     nativeCodecs();
-    return nativeEncoder ? nativeEncoder.encode(s) : utf8EncodeJs(s);
+    return nativeEncoder ? nativeEncoder.encode(text) : utf8EncodeJs(text);
 }
-
-// ---------------------------------------------------------------------------------------------------------------
-// writer
-// ---------------------------------------------------------------------------------------------------------------
 
 class Writer {
     u8 = new Uint8Array(512);
@@ -188,14 +181,14 @@ class Writer {
         this.dv = new DataView(u8.buffer);
     }
 
-    u32(v: number) {
+    u32(value: number) {
         this.ensure(4);
-        this.dv.setUint32(this.len, v, true);
+        this.dv.setUint32(this.len, value, true);
         this.len += 4;
     }
 
-    patchU32(at: number, v: number) {
-        this.dv.setUint32(at, v, true);
+    patchU32(at: number, value: number) {
+        this.dv.setUint32(at, value, true);
     }
 
     bytes(src: Uint8Array) {
@@ -204,86 +197,86 @@ class Writer {
         this.len += src.length;
     }
 
-    value(p: SqliteParam, index: number) {
-        if (p === null || p === undefined) {
+    value(param: SqliteParam, index: number) {
+        if (param === null || param === undefined) {
             this.ensure(1);
             this.u8[this.len++] = T_NULL;
             return;
         }
-        const type: string = typeof p;
-        switch (type) {
+        switch (typeof param) {
             case 'number':
-                if (Number.isInteger(p)) {
-                    this.integer(p as number);
+                if (Number.isInteger(param)) {
+                    this.integer(param);
                 } else {
-                    this.double(p as number);
+                    this.double(param);
                 }
                 return;
             case 'boolean':
-                this.integer(p ? 1 : 0);
+                this.integer(param ? 1 : 0);
                 return;
             case 'bigint':
                 this.ensure(9);
                 this.u8[this.len++] = T_INT64;
-                this.dv.setBigInt64(this.len, BigInt.asIntN(64, p as bigint), true);
+                this.dv.setBigInt64(this.len, BigInt.asIntN(64, param), true);
                 this.len += 8;
                 return;
             case 'string':
-                this.text(p as string);
+                this.text(param);
                 return;
             case 'object':
-                this.object(p, index);
+                this.object(param, index);
                 return;
+            default:
+                throw new TypeError(`unsupported parameter type ${typeof param} at index ${index}`);
         }
-        throw new TypeError(`unsupported parameter type ${type} at index ${index}`);
     }
 
-    private integer(v: number) {
+    private integer(value: number) {
         this.ensure(9);
-        if (v >= -2147483648 && v <= 2147483647) {
+        if (value >= -2147483648 && value <= 2147483647) {
             this.u8[this.len++] = T_INT32;
-            this.dv.setInt32(this.len, v, true);
+            this.dv.setInt32(this.len, value, true);
             this.len += 4;
         } else {
             // beyond 2^53 a number is not an exact integer anymore, but it is still the value the caller gave
             this.u8[this.len++] = T_INT64;
-            const hi = Math.floor(v / TWO32);
-            this.dv.setUint32(this.len, v - hi * TWO32, true);
+            const hi = Math.floor(value / TWO32);
+            this.dv.setUint32(this.len, value - hi * TWO32, true);
             this.dv.setInt32(this.len + 4, hi, true);
             this.len += 8;
         }
     }
 
-    private double(v: number) {
+    private double(value: number) {
         this.ensure(9);
         this.u8[this.len++] = T_DOUBLE;
-        this.dv.setFloat64(this.len, v, true);
+        this.dv.setFloat64(this.len, value, true);
         this.len += 8;
     }
 
-    private text(s: string) {
-        const n = s.length;
+    private text(text: string) {
+        const textLength = text.length;
         // ASCII fast path, no TextEncoder allocation for the usual identifiers and short values
-        if (n <= 64) {
-            this.ensure(5 + n);
+        if (textLength <= 64) {
+            this.ensure(5 + textLength);
             const start = this.len + 5;
             let ok = true;
-            for (let i = 0; i < n; i++) {
-                const c = s.charCodeAt(i);
-                if (c > 127) {
+            for (let index = 0; index < textLength; index++) {
+                const code = text.charCodeAt(index);
+                if (code > 127) {
                     ok = false;
                     break;
                 }
-                this.u8[start + i] = c;
+                this.u8[start + index] = code;
             }
             if (ok) {
                 this.u8[this.len] = T_TEXT;
-                this.dv.setUint32(this.len + 1, n, true);
-                this.len = start + n;
+                this.dv.setUint32(this.len + 1, textLength, true);
+                this.len = start + textLength;
                 return;
             }
         }
-        const bytes = encodeUtf8(s);
+        const bytes = encodeUtf8(text);
         this.ensure(5 + bytes.length);
         this.u8[this.len++] = T_TEXT;
         this.dv.setUint32(this.len, bytes.length, true);
@@ -301,18 +294,18 @@ class Writer {
         this.len += src.length;
     }
 
-    private object(p: any, index: number) {
-        if (p instanceof Date) {
-            this.text(p.toISOString());
-        } else if (p instanceof ArrayBuffer) {
-            this.blob(new Uint8Array(p));
-        } else if (ArrayBuffer.isView(p)) {
-            this.blob(new Uint8Array(p.buffer, p.byteOffset, p.byteLength));
-        } else if (Array.isArray(p)) {
+    private object(param: any, index: number) {
+        if (param instanceof Date) {
+            this.text(param.toISOString());
+        } else if (param instanceof ArrayBuffer) {
+            this.blob(new Uint8Array(param));
+        } else if (ArrayBuffer.isView(param)) {
+            this.blob(new Uint8Array(param.buffer, param.byteOffset, param.byteLength));
+        } else if (Array.isArray(param)) {
             // an array of byte values is a blob
-            this.blob(Uint8Array.from(p));
+            this.blob(Uint8Array.from(param));
         } else {
-            throw new TypeError(`unsupported parameter ${Object.prototype.toString.call(p)} at index ${index}`);
+            throw new TypeError(`unsupported parameter ${Object.prototype.toString.call(param)} at index ${index}`);
         }
     }
 }
@@ -320,23 +313,23 @@ class Writer {
 const scratch = new Writer();
 const scratchBatch = new Writer();
 
-function finish(w: Writer): ArrayBuffer {
-    return w.u8.buffer.slice(0, w.len) as ArrayBuffer;
+function finish(writer: Writer): ArrayBuffer {
+    return writer.u8.slice(0, writer.len).buffer;
 }
 
-function writeParams(w: Writer, params: SqliteParams | undefined) {
+function writeParams(writer: Writer, params: SqliteParams | undefined) {
     if (params === undefined || params === null) {
-        w.u32(0);
+        writer.u32(0);
         return;
     }
     if (!Array.isArray(params)) {
-        w.u32(1);
-        w.value(params as SqliteParam, 0);
+        writer.u32(1);
+        writer.value(params, 0);
         return;
     }
-    w.u32(params.length);
-    for (let i = 0; i < params.length; i++) {
-        w.value(params[i], i);
+    writer.u32(params.length);
+    for (let index = 0; index < params.length; index++) {
+        writer.value(params[index], index);
     }
 }
 
@@ -350,27 +343,22 @@ export function encodeParams(params: SqliteParams | undefined): ArrayBuffer | nu
     return finish(scratch);
 }
 
-/** A batch request block. */
 export function encodeBatch(statements: Array<{ sql: string; params?: SqliteParams }>): ArrayBuffer {
-    const w = scratchBatch;
-    w.reset();
-    w.u32(statements.length);
+    const writer = scratchBatch;
+    writer.reset();
+    writer.u32(statements.length);
     for (const st of statements) {
         const sql = encodeUtf8(st.sql);
-        w.u32(sql.length);
-        w.bytes(sql);
-        const lenAt = w.len;
-        w.u32(0);
-        const start = w.len;
-        writeParams(w, st.params);
-        w.patchU32(lenAt, w.len - start);
+        writer.u32(sql.length);
+        writer.bytes(sql);
+        const lenAt = writer.len;
+        writer.u32(0);
+        const start = writer.len;
+        writeParams(writer, st.params);
+        writer.patchU32(lenAt, writer.len - start);
     }
-    return finish(w);
+    return finish(writer);
 }
-
-// ---------------------------------------------------------------------------------------------------------------
-// reader
-// ---------------------------------------------------------------------------------------------------------------
 
 export interface DecodeOptions {
     /** rows as {column: value}, otherwise arrays */
@@ -387,9 +375,9 @@ export interface DecodedRows {
     lastInsertRowId: number;
 }
 
-function int64At(dv: DataView, o: number, mode: Int64Mode | undefined): number | bigint {
-    const lo = dv.getUint32(o, true);
-    const hi = dv.getInt32(o + 4, true);
+function int64At(dv: DataView, offset: number, mode: Int64Mode | undefined): number | bigint {
+    const lo = dv.getUint32(offset, true);
+    const hi = dv.getInt32(offset + 4, true);
     if (mode === 'bigint') {
         return (BigInt(hi) << BigInt(32)) | BigInt(lo);
     }
@@ -417,71 +405,71 @@ export function decodeRows(buf: ArrayBuffer, options: DecodeOptions, byteOffset 
     }
     const heap = heapStart < end ? decodeUtf8(u8, heapStart, end) : '';
 
-    let o = byteOffset + HEADER_SIZE;
+    let offset = byteOffset + HEADER_SIZE;
     const columns: string[] = new Array(ncols);
-    for (let c = 0; c < ncols; c++) {
-        const n = dv.getUint32(o, true);
-        o += 4;
-        columns[c] = decodeUtf8(u8, o, o + n);
-        o += n;
+    for (let column = 0; column < ncols; column++) {
+        const nameLength = dv.getUint32(offset, true);
+        offset += 4;
+        columns[column] = decodeUtf8(u8, offset, offset + nameLength);
+        offset += nameLength;
     }
 
     const objects = options.objects;
     const abBlobs = options.arrayBufferBlobs === true;
     const int64 = options.int64;
     const rows: any[] = new Array(nrows);
-    for (let r = 0; r < nrows; r++) {
+    for (let rowIndex = 0; rowIndex < nrows; rowIndex++) {
         const row: any = objects ? {} : new Array(ncols);
-        for (let c = 0; c < ncols; c++) {
-            let v: any;
-            switch (u8[o++]) {
+        for (let column = 0; column < ncols; column++) {
+            let value: any;
+            switch (u8[offset++]) {
                 case T_NULL:
-                    v = null;
+                    value = null;
                     break;
                 case T_INT32:
-                    v = dv.getInt32(o, true);
-                    o += 4;
+                    value = dv.getInt32(offset, true);
+                    offset += 4;
                     break;
                 case T_INT64:
-                    v = int64At(dv, o, int64);
-                    o += 8;
+                    value = int64At(dv, offset, int64);
+                    offset += 8;
                     break;
                 case T_DOUBLE:
-                    v = dv.getFloat64(o, true);
-                    o += 8;
+                    value = dv.getFloat64(offset, true);
+                    offset += 8;
                     break;
                 case T_TEXT_REF: {
-                    const s = dv.getUint32(o, true);
-                    v = heap.substring(s, s + dv.getUint32(o + 4, true));
-                    o += 8;
+                    const start = dv.getUint32(offset, true);
+                    value = heap.substring(start, start + dv.getUint32(offset + 4, true));
+                    offset += 8;
                     break;
                 }
                 case T_TEXT: {
-                    const n = dv.getUint32(o, true);
-                    o += 4;
-                    v = n === 0 ? '' : decodeUtf8(u8, o, o + n);
-                    o += n;
+                    const textLength = dv.getUint32(offset, true);
+                    offset += 4;
+                    value = textLength === 0 ? '' : decodeUtf8(u8, offset, offset + textLength);
+                    offset += textLength;
                     break;
                 }
                 case T_BLOB: {
-                    const n = dv.getUint32(o, true);
-                    o += 4;
-                    v = abBlobs ? buf.slice(o, o + n) : u8.slice(o, o + n);
-                    o += n;
+                    const blobLength = dv.getUint32(offset, true);
+                    offset += 4;
+                    value = abBlobs ? buf.slice(offset, offset + blobLength) : u8.slice(offset, offset + blobLength);
+                    offset += blobLength;
                     break;
                 }
                 default:
                     throw new Error('malformed result: unknown value type');
             }
             if (objects) {
-                row[columns[c]] = v;
+                row[columns[column]] = value;
             } else {
-                row[c] = v;
+                row[column] = value;
             }
         }
-        rows[r] = row;
+        rows[rowIndex] = row;
     }
-    if (o > heapStart) {
+    if (offset > heapStart) {
         throw new Error('malformed result: rows run into the string heap');
     }
     return { columns, rows, changes, lastInsertRowId };
@@ -490,14 +478,14 @@ export function decodeRows(buf: ArrayBuffer, options: DecodeOptions, byteOffset 
 /** Decodes a batch result: the rows blocks of the statements that completed. */
 export function decodeBatch(buf: ArrayBuffer, options: DecodeOptions): DecodedRows[] {
     const dv = new DataView(buf);
-    const n = dv.getUint32(0, true);
-    const out: DecodedRows[] = new Array(n);
-    let o = 4;
-    for (let i = 0; i < n; i++) {
-        const len = dv.getUint32(o, true);
-        o += 4;
-        out[i] = decodeRows(buf, options, o, len);
-        o += len;
+    const count = dv.getUint32(0, true);
+    const out: DecodedRows[] = new Array(count);
+    let offset = 4;
+    for (let index = 0; index < count; index++) {
+        const len = dv.getUint32(offset, true);
+        offset += 4;
+        out[index] = decodeRows(buf, options, offset, len);
+        offset += len;
     }
     return out;
 }

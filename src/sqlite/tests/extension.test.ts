@@ -38,19 +38,19 @@ describe('extensions', { skip: skip && 'no SQLite with extension loading on this
 
     it('is per connection', async () => {
         const file = tmpDb();
-        const a = open(file, { engine: ENGINE });
-        const b = open(file, { engine: ENGINE });
-        await a.loadExtension(EXT);
-        assert.equal((await a.getArray('SELECT ns_double(1)'))[0], 2);
-        await assert.rejects(b.get('SELECT ns_double(1)'), (e: SqliteError) => /no such function/.test(e.message));
-        await a.close();
-        await b.close();
+        const first = open(file, { engine: ENGINE });
+        const second = open(file, { engine: ENGINE });
+        await first.loadExtension(EXT);
+        assert.equal((await first.getArray('SELECT ns_double(1)'))[0], 2);
+        await assert.rejects(second.get('SELECT ns_double(1)'), (error: SqliteError) => /no such function/.test(error.message));
+        await first.close();
+        await second.close();
     });
 
     it('loads while other requests are queued and from inside a transaction', async () => {
         const db = open(':memory:', { engine: ENGINE });
         await db.execute('CREATE TABLE t(x)');
-        const pending = Promise.all([1, 2, 3].map((i) => db.execute('INSERT INTO t VALUES (?)', [i])));
+        const pending = Promise.all([1, 2, 3].map((index) => db.execute('INSERT INTO t VALUES (?)', [index])));
         const loaded = db.loadExtension(EXT);
         await Promise.all([pending, loaded]);
         const sum = await db.transaction(async (_cancel, tx) => (await tx.getArray('SELECT ns_sumsq(x) FROM t'))[0]);
@@ -60,8 +60,8 @@ describe('extensions', { skip: skip && 'no SQLite with extension loading on this
 
     it('rejects a missing library and a wrong entry point with a SqliteError', async () => {
         const db = open(':memory:', { engine: ENGINE });
-        await assert.rejects(db.loadExtension('/nope/libnope.so'), (e: SqliteError) => e instanceof SqliteError && e.message.length > 0);
-        await assert.rejects(db.loadExtension(EXT, 'sqlite3_nothing_init'), (e: SqliteError) => e instanceof SqliteError);
+        await assert.rejects(db.loadExtension('/nope/libnope.so'), (error: SqliteError) => error instanceof SqliteError && error.message.length > 0);
+        await assert.rejects(db.loadExtension(EXT, 'sqlite3_nothing_init'), (error: SqliteError) => error instanceof SqliteError);
         // the database still works
         assert.equal((await db.getArray('SELECT 1'))[0], 1);
         await db.close();
@@ -78,7 +78,7 @@ describe('engine without extension loading', () => {
         if (process.platform !== 'darwin') {
             return; // distribution SQLite can usually load them
         }
-        await assert.rejects(db.loadExtension('/x/libx.dylib'), (e: SqliteError) => e instanceof SqliteError && /extension/i.test(e.message));
+        await assert.rejects(db.loadExtension('/x/libx.dylib'), (error: SqliteError) => error instanceof SqliteError && /extension/i.test(error.message));
         await db.close();
     });
 });

@@ -2,9 +2,10 @@
 import { File, knownFolders } from '@nativescript/core';
 import '@nativescript-community/sqlite-default-engine';
 import { SqliteError, configure, openOrCreate } from '@nativescript-community/sqlite-core';
+import { messageOf } from './util';
 
 declare const __ANDROID__: boolean;
-const log = (...a: any[]) => console.log('[LEAN]', ...a);
+const log = (...args: any[]) => console.log('[LEAN]', ...args);
 
 export async function runLeanTests() {
     let passed = 0;
@@ -13,14 +14,14 @@ export async function runLeanTests() {
         try {
             await fn();
             passed++;
-        } catch (e) {
+        } catch (error) {
             failed++;
-            log('FAIL', name, String((e && (e as any).message) || e));
+            log('FAIL', name, messageOf(error));
         }
     };
     await check('default engine and options come from the package', async () => {
         const file = `${knownFolders.documents().path}/lean.db`;
-        for (const s of ['', '-wal', '-shm']) if (File.exists(file + s)) File.fromPath(file + s).removeSync();
+        for (const suffix of ['', '-wal', '-shm']) if (File.exists(file + suffix)) File.fromPath(file + suffix).removeSync();
         const db = openOrCreate(file);
         await db.ready;
         log('SQLite', db.getSqliteVersion());
@@ -35,8 +36,8 @@ export async function runLeanTests() {
         configure({ backend: 'bridge' });
         try {
             openOrCreate(':memory:');
-        } catch (e) {
-            if (!/bridge is not available.*sqlite-bridge/.test(String((e as any).message))) throw e;
+        } catch (error) {
+            if (!/bridge is not available.*sqlite-bridge/.test(messageOf(error))) throw error;
             return;
         } finally {
             configure({ backend: 'napi' });
@@ -48,8 +49,8 @@ export async function runLeanTests() {
         let err: any;
         try {
             await db.execute('NOPE');
-        } catch (e) {
-            err = e;
+        } catch (error) {
+            err = error;
         }
         if (!(err instanceof SqliteError)) throw new Error('not a SqliteError');
         await db.close();

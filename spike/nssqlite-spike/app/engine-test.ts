@@ -4,11 +4,12 @@
  * iOS: whatever the app linked as the process SQLite: system (no extension loading), a static custom build, SQLCipher. */
 import { File, knownFolders } from '@nativescript/core';
 import { SqliteError, configure, openOrCreate } from '@nativescript-community/sqlite';
+import { BackendName, messageOf } from './util';
 
 declare const __ANDROID__: boolean;
 declare const NSBundle: any;
 
-const log = (...a: any[]) => console.log('[ENGINE]', ...a);
+const log = (...args: any[]) => console.log('[ENGINE]', ...args);
 
 let passed = 0;
 let failed = 0;
@@ -17,26 +18,26 @@ async function check(name: string, fn: () => Promise<void> | void) {
     try {
         await fn();
         passed++;
-    } catch (e) {
+    } catch (error) {
         failed++;
-        log('FAIL', name, String((e && (e as any).message) || e));
+        log('FAIL', name, messageOf(error));
     }
 }
 
 function eq(actual: any, expected: any, what = '') {
-    const a = JSON.stringify(actual);
-    const b = JSON.stringify(expected);
-    if (a !== b) {
-        throw new Error(`${what} expected ${b} got ${a}`);
+    const actualJson = JSON.stringify(actual);
+    const expectedJson = JSON.stringify(expected);
+    if (actualJson !== expectedJson) {
+        throw new Error(`${what} expected ${expectedJson} got ${actualJson}`);
     }
 }
 
-async function rejects(p: Promise<any>, test: (e: any) => boolean, what: string) {
+async function rejects(promise: Promise<any>, test: (error: any) => boolean, what: string) {
     try {
-        await p;
-    } catch (e) {
-        if (!test(e)) {
-            throw new Error(`${what}: unexpected error ${e}`);
+        await promise;
+    } catch (error) {
+        if (!test(error)) {
+            throw new Error(`${what}: unexpected error ${error}`);
         }
         return;
     }
@@ -44,10 +45,10 @@ async function rejects(p: Promise<any>, test: (e: any) => boolean, what: string)
 }
 
 function removeDb(file: string) {
-    for (const s of ['', '-wal', '-shm', '-journal']) {
+    for (const suffix of ['', '-wal', '-shm', '-journal']) {
         try {
-            if (File.exists(file + s)) File.fromPath(file + s).removeSync();
-        } catch (e) {
+            if (File.exists(file + suffix)) File.fromPath(file + suffix).removeSync();
+        } catch (error) {
             // ignore
         }
     }
@@ -78,17 +79,17 @@ async function cipherTests(tag: string, engine: string | null) {
     });
     await check(tag + ' cipher: no key / wrong key fail with NOTADB', async () => {
         const nokey = openOrCreate(file, opts);
-        await rejects(nokey.select('SELECT * FROM secrets'), (e) => e instanceof SqliteError && e.code === 26, 'no key');
+        await rejects(nokey.select('SELECT * FROM secrets'), (error) => error instanceof SqliteError && error.code === 26, 'no key');
         await nokey.close();
         const wrong = openOrCreate(file, { ...opts, initSql: "PRAGMA key = 'nope'" });
-        await rejects(wrong.select('SELECT * FROM secrets'), (e) => e instanceof SqliteError && e.code === 26, 'wrong key');
+        await rejects(wrong.select('SELECT * FROM secrets'), (error) => error instanceof SqliteError && error.code === 26, 'wrong key');
         await wrong.close();
     });
     await check(tag + ' cipher: right key reads, WAL works', async () => {
         const db = openOrCreate(file, { ...opts, initSql: "PRAGMA key = 'secret'", wal: true });
         eq(await db.select('SELECT id, v FROM secrets'), [{ id: 1, v: 'top secret' }]);
         await db.transaction(async (_c, tx) => {
-            for (let i = 0; i < 100; i++) await tx.execute('INSERT INTO secrets(v) VALUES (?)', ['row ' + i]);
+            for (let index = 0; index < 100; index++) await tx.execute('INSERT INTO secrets(v) VALUES (?)', ['row ' + index]);
         });
         eq((await db.getArray('SELECT count(*) FROM secrets'))[0], 101);
         eq((await db.getArray('PRAGMA journal_mode'))[0], 'wal');
@@ -104,7 +105,7 @@ async function extensionTests(tag: string, engine: string | null, extPath: strin
         if (staticExt) {
             eq((await db.getArray('SELECT ns_double(21), ns_hello(?), ns_ext_version()', 'é€')), [42, 'hello é€', 'ns_ext 1.0']);
         } else {
-            await rejects(db.get('SELECT ns_double(21)'), (e) => /no such function/.test(e.message), 'before load');
+            await rejects(db.get('SELECT ns_double(21)'), (error) => /no such function/.test(error.message), 'before load');
         }
         await db.close();
     });
@@ -120,23 +121,23 @@ async function extensionTests(tag: string, engine: string | null, extPath: strin
             // other connection of the same engine did not get it
             const other = openOrCreate(':memory:', opts);
             if (!staticExt) {
-                await rejects(other.get('SELECT ns_double(1)'), (e) => /no such function/.test(e.message), 'other connection');
+                await rejects(other.get('SELECT ns_double(1)'), (error) => /no such function/.test(error.message), 'other connection');
             }
             await other.close();
             await db.close();
         });
         await check(tag + ' extension: errors', async () => {
             const db = openOrCreate(':memory:', opts);
-            await rejects(db.loadExtension('/nope/libnope.so'), (e) => e instanceof SqliteError && e.message.length > 0, 'missing');
-            await rejects(db.loadExtension(extPath, 'sqlite3_nothing_init'), (e) => e instanceof SqliteError, 'entry point');
+            await rejects(db.loadExtension('/nope/libnope.so'), (error) => error instanceof SqliteError && error.message.length > 0, 'missing');
+            await rejects(db.loadExtension(extPath, 'sqlite3_nothing_init'), (error) => error instanceof SqliteError, 'entry point');
             eq((await db.getArray('SELECT 1'))[0], 1);
             await db.close();
         });
     }
 }
 
-async function androidSuite(backend: string) {
-    configure({ backend: backend as any });
+async function androidSuite(backend: BackendName) {
+    configure({ backend });
     const tag = backend;
     let versions: Record<string, string> = {};
     await check(tag + ' engines report their version', async () => {
@@ -154,9 +155,9 @@ async function androidSuite(backend: string) {
     });
     await check(tag + ' custom build: compile options, FTS5, JSON, RTREE', async () => {
         const db = openOrCreate(':memory:', { engine: CUSTOM });
-        const opts = (await db.selectArray('PRAGMA compile_options')).map((r) => r[0]);
-        for (const o of ['ENABLE_FTS5', 'DQS=0', 'TEMP_STORE=3', 'DEFAULT_MEMSTATUS=0']) {
-            if (opts.indexOf(o) < 0) throw new Error('missing compile option ' + o + ' in ' + opts.join(','));
+        const opts = (await db.selectArray('PRAGMA compile_options')).map((row) => row[0]);
+        for (const option of ['ENABLE_FTS5', 'DQS=0', 'TEMP_STORE=3', 'DEFAULT_MEMSTATUS=0']) {
+            if (opts.indexOf(option) < 0) throw new Error('missing compile option ' + option + ' in ' + opts.join(','));
         }
         await db.execute('CREATE VIRTUAL TABLE docs USING fts5(title, body)');
         await db.execute("INSERT INTO docs VALUES ('native threads', 'sqlite on a worker'), ('other', 'nothing here')");
@@ -166,7 +167,7 @@ async function androidSuite(backend: string) {
         await db.execute('INSERT INTO idx VALUES (1, 0, 10), (2, 20, 30)');
         eq((await db.select('SELECT id FROM idx WHERE x0 >= 15')), [{ id: 2 }]);
         // DQS=0: double quoted string literals are an error
-        await rejects(db.select('SELECT "not a column"'), (e) => e instanceof SqliteError, 'DQS=0');
+        await rejects(db.select('SELECT "not a column"'), (error) => error instanceof SqliteError, 'DQS=0');
         await db.close();
     });
     await extensionTests(tag + ' custom', CUSTOM, EXT, true);
@@ -187,29 +188,29 @@ async function androidSuite(backend: string) {
         let err: any;
         try {
             openOrCreate(':memory:', { engine: 'libnope_sqlite.so' });
-        } catch (e) {
-            err = e;
+        } catch (error) {
+            err = error;
         }
         if (!err || String(err.message).indexOf('libnope_sqlite.so') < 0) throw new Error('unexpected: ' + err);
     });
     await check(tag + ' three engines at once, in parallel', async () => {
         const dir = knownFolders.documents().path;
         const engines = [ANDROIDX, CUSTOM, CIPHER];
-        const files = engines.map((_e, i) => `${dir}/engine-multi-${tag}-${i}.db`);
+        const files = engines.map((_e, index) => `${dir}/engine-multi-${tag}-${index}.db`);
         files.forEach(removeDb);
-        const dbs = engines.map((engine, i) => openOrCreate(files[i], { engine, initSql: engine === CIPHER ? "PRAGMA key = 'k'" : undefined, wal: true }));
-        await Promise.all(dbs.map((d) => d.execute('CREATE TABLE t(i INTEGER, v TEXT)')));
+        const dbs = engines.map((engine, index) => openOrCreate(files[index], { engine, initSql: engine === CIPHER ? "PRAGMA key = 'k'" : undefined, wal: true }));
+        await Promise.all(dbs.map((database) => database.execute('CREATE TABLE t(i INTEGER, v TEXT)')));
         await Promise.all(
-            dbs.map(async (d) => {
-                await d.transaction(async (_c, tx) => {
-                    for (let i = 0; i < 300; i++) await tx.execute('INSERT INTO t VALUES (?, ?)', [i, 'v' + i]);
+            dbs.map(async (database) => {
+                await database.transaction(async (_c, tx) => {
+                    for (let index = 0; index < 300; index++) await tx.execute('INSERT INTO t VALUES (?, ?)', [index, 'v' + index]);
                 });
             })
         );
-        const counts = await Promise.all(dbs.map((d) => d.getArray('SELECT count(*), sum(i), sqlite_version() FROM t')));
-        counts.forEach((c) => eq([c[0], c[1]], [300, 44850]));
-        eq(new Set(counts.map((c) => c[2])).size >= 2, true, 'engine versions differ');
-        await Promise.all(dbs.map((d) => d.close()));
+        const counts = await Promise.all(dbs.map((database) => database.getArray('SELECT count(*), sum(i), sqlite_version() FROM t')));
+        counts.forEach((row) => eq([row[0], row[1]], [300, 44850]));
+        eq(new Set(counts.map((row) => row[2])).size >= 2, true, 'engine versions differ');
+        await Promise.all(dbs.map((database) => database.close()));
         files.forEach(removeDb);
     });
 }
@@ -221,8 +222,8 @@ const IOS_SYSTEM = '/usr/lib/libsqlite3.dylib';
 const IOS_STATIC = '@static';
 const IOS_CUSTOM = '@rpath/NSCustomSqlite.framework/NSCustomSqlite';
 
-async function iosSuite(backend: string) {
-    configure({ backend: backend as any });
+async function iosSuite(backend: BackendName) {
+    configure({ backend });
     const tag = backend;
     const probe = openOrCreate(':memory:', { engine: null });
     await probe.ready;
@@ -232,13 +233,13 @@ async function iosSuite(backend: string) {
     try {
         await probe.get('SELECT ns_ext_version()');
         hasExt = true;
-    } catch (e) {
+    } catch (error) {
         // not the custom build
     }
     try {
-        const r = await probe.getArray('PRAGMA cipher_version');
-        isCipher = !!(r && r[0]);
-    } catch (e) {
+        const values = await probe.getArray('PRAGMA cipher_version');
+        isCipher = !!(values && values[0]);
+    } catch (error) {
         // no
     }
     const canLoad = probe.canLoadExtensions();
@@ -249,7 +250,7 @@ async function iosSuite(backend: string) {
         await check(tag + ' system SQLite: no extension loading, clear error', async () => {
             const db = openOrCreate(':memory:');
             eq(db.canLoadExtensions(), false);
-            await rejects(db.loadExtension('/x/libx.dylib'), (e) => e instanceof SqliteError && /extension/i.test(e.message), 'loadExtension');
+            await rejects(db.loadExtension('/x/libx.dylib'), (error) => error instanceof SqliteError && /extension/i.test(error.message), 'loadExtension');
             eq((await db.getArray('SELECT 1'))[0], 1);
             await db.close();
         });
@@ -275,18 +276,18 @@ async function iosSuite(backend: string) {
         { label: 'framework', engine: IOS_CUSTOM, ext: NSBundle.mainBundle.privateFrameworksPath + '/NSSampleExt.framework/NSSampleExt' },
         { label: 'static', engine: IOS_STATIC, ext: null }
     ];
-    for (const c of candidates) {
+    for (const candidate of candidates) {
         let available = false;
         try {
-            const d = openOrCreate(':memory:', { engine: c.engine });
-            await d.ready;
+            const database = openOrCreate(':memory:', { engine: candidate.engine });
+            await database.ready;
             available = true;
-            await d.close();
-        } catch (e) {
-            log(tag, 'no', c.label, 'engine in this app:', String(e).slice(0, 100));
+            await database.close();
+        } catch (error) {
+            log(tag, 'no', candidate.label, 'engine in this app:', String(error).slice(0, 100));
         }
         if (available) {
-            await customEngineTests(tag + ' ' + c.label, c.engine, c.ext);
+            await customEngineTests(tag + ' ' + candidate.label, candidate.engine, candidate.ext);
         }
     }
 }
@@ -295,9 +296,9 @@ async function customEngineTests(tag: string, engine: string, ext: string | null
     await check(tag + ' engine: version, compile options, FTS5/JSON/RTREE', async () => {
         const db = openOrCreate(':memory:', { engine });
         eq(db.getSqliteVersion(), '3.53.4');
-        const opts = (await db.selectArray('PRAGMA compile_options')).map((r) => r[0]);
-        for (const o of ['ENABLE_FTS5', 'DQS=0', 'DEFAULT_MEMSTATUS=0']) {
-            if (opts.indexOf(o) < 0) throw new Error('missing compile option ' + o);
+        const opts = (await db.selectArray('PRAGMA compile_options')).map((row) => row[0]);
+        for (const option of ['ENABLE_FTS5', 'DQS=0', 'DEFAULT_MEMSTATUS=0']) {
+            if (opts.indexOf(option) < 0) throw new Error('missing compile option ' + option);
         }
         await db.execute('CREATE VIRTUAL TABLE docs USING fts5(title, body)');
         await db.execute("INSERT INTO docs VALUES ('native threads', 'sqlite on a worker')");
@@ -308,39 +309,39 @@ async function customEngineTests(tag: string, engine: string, ext: string | null
     await extensionTests(tag, engine, ext, true, 'sqlite3_nsext_init');
     await check(tag + ' engine + system SQLite at once, in parallel', async () => {
         const dir = knownFolders.documents().path;
-        const files = [0, 1].map((i) => `${dir}/engine-ios-multi-${tag.replace(/\W/g, '')}-${i}.db`);
+        const files = [0, 1].map((index) => `${dir}/engine-ios-multi-${tag.replace(/\W/g, '')}-${index}.db`);
         files.forEach(removeDb);
-        const a = openOrCreate(files[0], { engine, wal: true });
-        const b = openOrCreate(files[1], { engine: IOS_SYSTEM, wal: true });
-        await Promise.all([a, b].map((d) => d.execute('CREATE TABLE t(i INTEGER)')));
+        const first = openOrCreate(files[0], { engine, wal: true });
+        const second = openOrCreate(files[1], { engine: IOS_SYSTEM, wal: true });
+        await Promise.all([first, second].map((database) => database.execute('CREATE TABLE t(i INTEGER)')));
         await Promise.all(
-            [a, b].map((d) =>
-                d.transaction(async (_c, tx) => {
-                    for (let i = 0; i < 300; i++) await tx.execute('INSERT INTO t VALUES (?)', [i]);
+            [first, second].map((database) =>
+                database.transaction(async (_c, tx) => {
+                    for (let index = 0; index < 300; index++) await tx.execute('INSERT INTO t VALUES (?)', [index]);
                 })
             )
         );
-        const r = await Promise.all([a, b].map((d) => d.getArray('SELECT sum(i), sqlite_version() FROM t')));
-        eq(r[0][0], 44850);
-        eq(r[1][0], 44850);
-        if (r[0][1] !== '3.53.4') throw new Error('engine is not the custom build: ' + r[0][1]);
-        if (r[1][1] === '3.53.4') throw new Error('system engine is the custom build');
-        eq(b.canLoadExtensions(), false);
-        await Promise.all([a.close(), b.close()]);
+        const versions = await Promise.all([first, second].map((database) => database.getArray('SELECT sum(i), sqlite_version() FROM t')));
+        eq(versions[0][0], 44850);
+        eq(versions[1][0], 44850);
+        if (versions[0][1] !== '3.53.4') throw new Error('engine is not the custom build: ' + versions[0][1]);
+        if (versions[1][1] === '3.53.4') throw new Error('system engine is the custom build');
+        eq(second.canLoadExtensions(), false);
+        await Promise.all([first.close(), second.close()]);
         files.forEach(removeDb);
     });
 }
 
-export async function runEngineTests(backends: string[]) {
+export async function runEngineTests(backends: BackendName[]) {
     passed = 0;
     failed = 0;
     for (const backend of backends) {
         try {
             if (__ANDROID__) await androidSuite(backend);
             else await iosSuite(backend);
-        } catch (e) {
+        } catch (error) {
             failed++;
-            log('SUITE ERROR', backend, String(e));
+            log('SUITE ERROR', backend, String(error));
         }
     }
     log(`done passed=${passed} failed=${failed}`);

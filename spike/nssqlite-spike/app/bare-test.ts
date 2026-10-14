@@ -1,10 +1,11 @@
 /* The bare package (@nativescript-community/sqlite-core): no SQLite, no dependency, the app chooses.
  * Run with an app that depends on sqlite-core only (see spike/README.md). */
 import { SqliteError, configure, openOrCreate } from '@nativescript-community/sqlite-core';
+import { messageOf } from './util';
 
 declare const __ANDROID__: boolean;
 
-const log = (...a: any[]) => console.log('[BARE]', ...a);
+const log = (...args: any[]) => console.log('[BARE]', ...args);
 
 /** which bindings the app installed: 'napi' (sqlite-napi only), 'bridge' (sqlite-bridge only), 'none' (sqlite-core only) */
 export async function runBareTests(installed: 'napi' | 'bridge' | 'none') {
@@ -14,16 +15,16 @@ export async function runBareTests(installed: 'napi' | 'bridge' | 'none') {
         try {
             await fn();
             passed++;
-        } catch (e) {
+        } catch (error) {
             failed++;
-            log('FAIL', name, String((e && (e as any).message) || e));
+            log('FAIL', name, messageOf(error));
         }
     };
     const throws = (fn: () => any, re: RegExp) => {
         try {
             fn();
-        } catch (e) {
-            if (!re.test(String((e as any).message))) throw new Error('unexpected error: ' + e);
+        } catch (error) {
+            if (!re.test(messageOf(error))) throw new Error('unexpected error: ' + error);
             return;
         }
         throw new Error('did not throw');
@@ -51,9 +52,9 @@ export async function runBareTests(installed: 'napi' | 'bridge' | 'none') {
         const db = openOrCreate(':memory:');
         await db.execute('CREATE TABLE t(a)');
         await db.batch([['INSERT INTO t VALUES (?)', [1]], ['INSERT INTO t VALUES (?)', [2]]]);
-        const r = await db.getArray('SELECT sum(a), sqlite_version() FROM t');
-        log('engine version', r[1]);
-        if (r[0] !== 3) throw new Error('bad sum ' + r[0]);
+        const values = await db.getArray('SELECT sum(a), sqlite_version() FROM t');
+        log('engine version', values[1]);
+        if (values[0] !== 3) throw new Error('bad sum ' + values[0]);
         await db.close();
     });
     await check('errors are SqliteError', async () => {
@@ -61,8 +62,8 @@ export async function runBareTests(installed: 'napi' | 'bridge' | 'none') {
         let err: any;
         try {
             await db.execute('NOPE');
-        } catch (e) {
-            err = e;
+        } catch (error) {
+            err = error;
         }
         if (!(err instanceof SqliteError)) throw new Error('not a SqliteError');
         await db.close();

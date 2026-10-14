@@ -3,16 +3,18 @@ import { HelloWorldModel } from './main-view-model';
 import { runApiTests } from './api-test';
 import { runOrmTests } from './orm-test';
 import { runEngineTests } from './engine-test';
+import { backendsToTest } from './util';
 
 declare const __non_webpack_require__: any;
 
 export function navigatingTo(args: EventData) {
-    const page = <Page>args.object;
-    page.bindingContext = new HelloWorldModel();
+    if (args.object instanceof Page) {
+        args.object.bindingContext = new HelloWorldModel();
+    }
     // the Node-API binding only exists on NativeScript >= 9.1 runtimes
     setTimeout(async () => {
-        await runApiTests((globalThis as any).__NS_BACKENDS__ || ['napi', 'bridge']);
+        await runApiTests(backendsToTest());
         await runOrmTests();
-        await runEngineTests((globalThis as any).__NS_BACKENDS__ || ['napi', 'bridge']);
+        await runEngineTests(backendsToTest());
     }, 300);
 }

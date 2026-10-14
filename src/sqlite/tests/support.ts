@@ -1,6 +1,6 @@
 import { createNapiBackend } from '../backend.napi';
 import { Database } from '../database';
-import { DatabaseOptions } from '../sqlite.common';
+import { DatabaseOptions, SqliteParam } from '../sqlite.common';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -14,9 +14,9 @@ export function loadAddon() {
         if (!file) {
             throw new Error('NSSQLITE_NODE_ADDON is not set: run native/test-ts.sh');
         }
-        const m: any = { exports: {} };
-        process.dlopen(m, file);
-        addon = m.exports;
+        const fakeModule: any = { exports: {} };
+        process.dlopen(fakeModule, file);
+        addon = fakeModule.exports;
     }
     return addon;
 }
@@ -32,21 +32,26 @@ export function open(file = ':memory:', options: DatabaseOptions = {}) {
 let counter = 0;
 const created: string[] = [];
 export function tmpDb() {
-    const f = path.join(os.tmpdir(), `nssqlite-ts-${process.pid}-${counter++}.db`);
-    created.push(f);
-    return f;
+    const file = path.join(os.tmpdir(), `nssqlite-ts-${process.pid}-${counter++}.db`);
+    created.push(file);
+    return file;
 }
 
 process.on('exit', () => {
-    for (const f of created) {
-        for (const s of ['', '-wal', '-shm', '-journal']) {
+    for (const file of created) {
+        for (const suffix of ['', '-wal', '-shm', '-journal']) {
             try {
-                fs.unlinkSync(f + s);
-            } catch (e) {
+                fs.unlinkSync(file + suffix);
+            } catch (error) {
                 // ignore
             }
         }
     }
 });
+
+/** A statement with its parameters, in the shape batch() takes. */
+export function statement(sql: string, ...params: SqliteParam[]): [string, SqliteParam[]] {
+    return [sql, params];
+}
 
 export const engine = ENGINE;

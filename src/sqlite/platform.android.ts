@@ -10,46 +10,47 @@ declare const java: any;
 // no default: the app (or @nativescript-community/sqlite, which adds androidx sqlite-bundled) chooses the SQLite
 const DEFAULT_ENGINES: Array<string | null> = [];
 
+/** NativeScript adds ArrayBuffer.from(javaByteBuffer): the bytes of a direct ByteBuffer without a copy. */
+function arrayBufferFrom(javaBuffer: unknown): ArrayBuffer {
+    if ('from' in ArrayBuffer && typeof ArrayBuffer.from === 'function') {
+        return ArrayBuffer.from(javaBuffer);
+    }
+    throw new Error('ArrayBuffer.from is not available in this runtime');
+}
+
 function loadAddon() {
     // The module registers itself process wide when its library loads: the bare name works afterwards (also in
     // Workers, where requiring the path again fails), the first load goes through the path.
     try {
         return nativeRequire('nssqlite');
-    } catch (e) {
+    } catch (error) {
         return nativeRequire('system_lib://libnssqlite_napi.so');
     }
 }
 
 /**
- * JNI bridge (NativeSqlite.java), for runtimes without Node-API.
- *
- * Only numbers cross the boundary per request: the NativeScript runtime pins a global reference for every Java object
- * or JS buffer it converts, and aborts the process at 51200 alive references, which thousands of queries between two
- * garbage collections reach. The SQL and parameters are written into a request arena (one direct ByteBuffer created
- * once, wrapped as an ArrayBuffer), results come back as numbers with their bytes in a result arena that is copied
- * right away. Requests are numbered; one Java callback object serves all of them.
+ * JNI bridge (NativeSqlite.java), for runtimes without Node-API. Only numbers cross the boundary per request (the runtime aborts
+ * at 51200 alive global references): SQL and parameters go through one request arena, results through a result arena.
  */
 function createJniBackend(): Backend {
-    let N: any;
+    let NativeSqlite: any;
     try {
-        N = com.akylas.sqlite.NativeSqlite;
-    } catch (e) {
-        // the class is not there
+        NativeSqlite = com.akylas.sqlite.NativeSqlite;
+    } catch (error) {
     }
-    if (!N) {
+    if (!NativeSqlite) {
         throw new Error('com.akylas.sqlite.NativeSqlite not found');
     }
     const pending = new Map<number, ResultCallback>();
     let nextId = 1;
     let registered = false;
 
-    // arenas, wrapped once
     let requestU8: Uint8Array;
     let resultAB: ArrayBuffer;
 
     const ensureRequest = (size: number) => {
         if (!requestU8 || requestU8.length < size) {
-            requestU8 = new Uint8Array((ArrayBuffer as any).from(N.requestArena(size)));
+            requestU8 = new Uint8Array(arrayBufferFrom(NativeSqlite.requestArena(size)));
         }
     };
 
@@ -58,10 +59,10 @@ function createJniBackend(): Backend {
             return;
         }
         registered = true;
-        resultAB = (ArrayBuffer as any).from(N.resultArena());
+        resultAB = arrayBufferFrom(NativeSqlite.resultArena());
         ensureRequest(1);
-        N.setCallback(
-            new N.Callback({
+        NativeSqlite.setCallback(
+            new NativeSqlite.Callback({
                 onResult(id: number, status: number, done: boolean, dataLen: number, changes: number, lastInsertRowId: number) {
                     const callback = pending.get(Number(id));
                     if (done) {
@@ -75,9 +76,9 @@ function createJniBackend(): Backend {
                         data = resultAB.slice(0, dataLen);
                     } else if (dataLen === -2) {
                         // too large for the arena: a copy, then the Java side frees the native memory
-                        data = (ArrayBuffer as any).from(N.takeBigData()).slice(0);
+                        data = arrayBufferFrom(NativeSqlite.takeBigData()).slice(0);
                     }
-                    callback({ status, done, data, message: status !== 0 ? N.takeMessage() : null, changes: Number(changes), lastInsertRowId: Number(lastInsertRowId) });
+                    callback({ status, done, data, message: status !== 0 ? NativeSqlite.takeMessage() : null, changes: Number(changes), lastInsertRowId: Number(lastInsertRowId) });
                 }
             })
         );
@@ -85,20 +86,20 @@ function createJniBackend(): Backend {
 
     /** writes `sql` (UTF-8) at the start of the request arena, returns its length in bytes */
     const writeSql = (sql: string, reserve: number): number => {
-        const n = sql.length;
-        ensureRequest(n * 3 + reserve);
+        const sqlLength = sql.length;
+        ensureRequest(sqlLength * 3 + reserve);
         const u8 = requestU8;
-        for (let i = 0; i < n; i++) {
-            const c = sql.charCodeAt(i);
-            if (c > 127) {
+        for (let index = 0; index < sqlLength; index++) {
+            const code = sql.charCodeAt(index);
+            if (code > 127) {
                 const bytes = encodeUtf8(sql);
                 ensureRequest(bytes.length + reserve);
                 requestU8.set(bytes, 0);
                 return bytes.length;
             }
-            u8[i] = c;
+            u8[index] = code;
         }
-        return n;
+        return sqlLength;
     };
 
     /** runs `submit(id)` and forgets the callback when the core refused the request */
@@ -109,9 +110,9 @@ function createJniBackend(): Backend {
         let rc: number;
         try {
             rc = submit(id);
-        } catch (e) {
+        } catch (error) {
             pending.delete(id);
-            throw e;
+            throw error;
         }
         if (!accepted(rc)) {
             pending.delete(id);
@@ -122,18 +123,18 @@ function createJniBackend(): Backend {
     return {
         kind: 'bridge',
         defaultEngines: DEFAULT_ENGINES,
-        engine: (library) => N.engine(library),
-        engineVersion: (e) => N.engineVersion(e),
-        engineCanLoadExtensions: (e) => N.engineCanLoadExtensions(e),
-        open: (engine, path, p: OpenParams, callback) => {
+        engine: (library) => NativeSqlite.engine(library),
+        engineVersion: (engine) => NativeSqlite.engineVersion(engine),
+        engineCanLoadExtensions: (engine) => NativeSqlite.engineCanLoadExtensions(engine),
+        open: (engine, path, params: OpenParams, callback) => {
             register();
             const id = nextId++;
             pending.set(id, callback);
             try {
-                return N.open(engine, path, p.flags, p.busyTimeoutMs, p.wal, p.initSql, id);
-            } catch (e) {
+                return NativeSqlite.open(engine, path, params.flags, params.busyTimeoutMs, params.wal, params.initSql, id);
+            } catch (error) {
                 pending.delete(id);
-                throw e;
+                throw error;
             }
         },
         exec: (db, tx, sql, params, flags, chunkRows, callback) =>
@@ -143,19 +144,19 @@ function createJniBackend(): Backend {
                 if (paramsLen) {
                     requestU8.set(new Uint8Array(params), sqlLen);
                 }
-                return N.exec(db, tx, sqlLen, paramsLen, flags, chunkRows, id);
+                return NativeSqlite.exec(db, tx, sqlLen, paramsLen, flags, chunkRows, id);
             }),
         batch: (db, tx, req, flags, callback) =>
             request(callback, (id) => {
                 ensureRequest(req.byteLength);
                 requestU8.set(new Uint8Array(req), 0);
-                return N.batch(db, tx, req.byteLength, flags, id);
+                return NativeSqlite.batch(db, tx, req.byteLength, flags, id);
             }),
-        txBegin: (db, mode, callback) => request(callback, (id) => N.txBegin(db, mode, id), (tx) => tx !== 0),
-        txEnd: (db, tx, commit, callback) => request(callback, (id) => N.txEnd(db, tx, commit, id)),
-        loadExtension: (db, path, entry, callback) => request(callback, (id) => N.loadExtension(db, path, entry, id)),
-        close: (db, callback) => request(callback, (id) => N.close(db, id)),
-        release: (db) => N.release(db)
+        txBegin: (db, mode, callback) => request(callback, (id) => NativeSqlite.txBegin(db, mode, id), (tx) => tx !== 0),
+        txEnd: (db, tx, commit, callback) => request(callback, (id) => NativeSqlite.txEnd(db, tx, commit, id)),
+        loadExtension: (db, path, entry, callback) => request(callback, (id) => NativeSqlite.loadExtension(db, path, entry, id)),
+        close: (db, callback) => request(callback, (id) => NativeSqlite.close(db, id)),
+        release: (db) => NativeSqlite.release(db)
     };
 }
 

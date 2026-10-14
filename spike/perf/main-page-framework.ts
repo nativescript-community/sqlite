@@ -1,10 +1,9 @@
-import { EventData, Page } from '@nativescript/core';
+import { EventData } from '@nativescript/core';
 import { configure } from '@nativescript-community/sqlite';
 import { FRAMEWORK_ENGINE, loadFrameworkEngine } from '@nativescript-community/sqlite-android-framework';
 import { runPerf } from './perf';
 
 export function navigatingTo(args: EventData) {
-    const page = <Page>args.object;
     setTimeout(async () => {
         // this branch with androidx sqlite-bundled (the default engine): Node-API, then the JNI bridge
         configure({ backend: 'napi' });

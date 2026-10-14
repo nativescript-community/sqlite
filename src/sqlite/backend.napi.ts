@@ -1,15 +1,13 @@
 import { Backend, OpenParams, RawResult, ResultCallback } from './backend';
 import { setNativeUtf8 } from './codec';
+import { messageOf } from './core';
 
 declare function setTimeout(callback: () => void, ms?: number): any;
 
 /** microseconds a lone request is waited for right after it is submitted (polling mode only) */
 const POLL_SPIN_US = 150;
 
-/**
- * Node-API binding (binding/napi/nssqlite_napi.c), used directly. `addon` is the module's exports. The addon
- * invokes the callbacks as (status, done, data, message, changes, lastInsertRowId) on the calling thread.
- */
+/** Node-API binding (binding/napi/nssqlite_napi.c): `addon` is the module's exports, callbacks run on the calling thread. */
 export function createNapiBackend(addon: any, defaultEngines: Array<string | null>): Backend {
     if (!addon || typeof addon.engine !== 'function') {
         // a runtime that lacks a Node-API function loads the module without its functions: the module says which one
@@ -20,8 +18,8 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
         setNativeUtf8({ decode: addon.decodeUtf8, encode: addon.encodeUtf8 });
     }
     const wrap = (cb: ResultCallback) => (status: number, done: boolean, data: ArrayBuffer | null, message: string | null, changes: number, lastInsertRowId: number) => {
-        const r: RawResult = { status, done, data, message, changes, lastInsertRowId };
-        cb(r);
+        const result: RawResult = { status, done, data, message, changes, lastInsertRowId };
+        cb(result);
     };
     // Runtimes without threadsafe functions (the NativeScript QuickJS runtime) cannot wake the JS thread from a database
     // thread: `threadsafe` is false and results wait in a queue until `poll()` runs, here from a timer while requests are
@@ -34,7 +32,7 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
         try {
             pending = addon.poll();
         } finally {
-            // also when a callback threw (the exception still reaches the caller): results left in the queue must not be stranded
+            // a throwing callback must not strand the results left in the queue
             if (pending > 0) {
                 schedule();
             }
@@ -46,16 +44,15 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
             setTimeout(pump, 0);
         }
     };
-    /** runs a submit call, then makes sure its result will be picked up */
     const submit = <T>(fn: () => T): T => {
-        const r = fn();
+        const result = fn();
         if (polling) {
             // a request that is alone usually finishes while we wait for it a moment: no timer round trip then
             if (addon.poll(POLL_SPIN_US) > 0) {
                 schedule();
             }
         }
-        return r;
+        return result;
     };
     return {
         kind: 'napi',
@@ -63,15 +60,13 @@ export function createNapiBackend(addon: any, defaultEngines: Array<string | nul
         engine: (library) => {
             try {
                 return addon.engine(library);
-            } catch (e) {
-                // a runtime-specific failure of the native call itself (a SQLite failure carries its own message)
-                const m = (e && (e as any).message) || String(e);
-                throw new Error(`${m} (addon.engine is ${typeof addon.engine}, exports: ${Object.keys(addon).join(',')}, thrown: ${(e && (e as any).name) || typeof e})`);
+            } catch (error) {
+                        throw new Error(`${messageOf(error)} (addon.engine is ${typeof addon.engine}, exports: ${Object.keys(addon).join(',')}, thrown: ${error instanceof Error ? error.name : typeof error})`);
             }
         },
-        engineVersion: (e) => addon.engineVersion(e),
-        engineCanLoadExtensions: (e) => addon.engineCanLoadExtensions(e),
-        open: (engine, path, p: OpenParams, cb) => submit(() => addon.open(engine, path, p.flags, p.busyTimeoutMs, p.wal, p.initSql, wrap(cb))),
+        engineVersion: (engine) => addon.engineVersion(engine),
+        engineCanLoadExtensions: (engine) => addon.engineCanLoadExtensions(engine),
+        open: (engine, path, params: OpenParams, cb) => submit(() => addon.open(engine, path, params.flags, params.busyTimeoutMs, params.wal, params.initSql, wrap(cb))),
         exec: (db, tx, sql, params, flags, chunkRows, cb) => submit(() => addon.exec(db, tx, sql, params, flags, chunkRows, wrap(cb))),
         execSync: (db, tx, sql, params, flags) => {
             const [status, data, message, changes, lastInsertRowId] = addon.execSync(db, tx, sql, params, flags);

@@ -66,7 +66,7 @@ const driverModule = { openOrCreate: (file: string, extra: any) => open(file, ex
 
 function dataSource(file = ':memory:', extra: any = {}) {
     return new DataSource({
-        type: 'nativescript' as any,
+        type: 'nativescript',
         database: file,
         driver: driverModule,
         entities: [UserSchema, PostSchema, TagSchema],
@@ -88,7 +88,7 @@ async function withDs<T>(fn: (ds: DataSource) => Promise<T>, file?: string) {
 describe('typeorm: schema', () => {
     it('creates tables, indexes and foreign keys from the entities', () =>
         withDs(async (ds) => {
-            const tables = (await ds.query("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")).map((r: any) => r.name);
+            const tables = (await ds.query("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")).map((row: any) => row.name);
             assert.ok(tables.includes('user') && tables.includes('post') && tables.includes('tag') && tables.includes('post_tags_tag'), tables.join());
             const fks = await ds.query('PRAGMA foreign_keys');
             assert.equal(fks[0].foreign_keys, 1);
@@ -103,13 +103,13 @@ describe('typeorm: schema', () => {
         const v2 = new EntitySchema<User>({
             name: 'User',
             tableName: 'user',
-            columns: { ...UserSchema.options.columns, nickname: { type: 'varchar', nullable: true } } as any,
+            columns: { ...UserSchema.options.columns, nickname: { type: 'varchar', nullable: true } },
             uniques: UserSchema.options.uniques
         });
-        const ds = new DataSource({ type: 'nativescript' as any, database: file, driver: driverModule, entities: [v2, PostSchema, TagSchema], synchronize: true } as any);
+        const ds = new DataSource({ type: 'nativescript', database: file, driver: driverModule, entities: [v2, PostSchema, TagSchema], synchronize: true });
         await ds.initialize();
         try {
-            const cols = (await ds.query('PRAGMA table_info(user)')).map((c: any) => c.name);
+            const cols = (await ds.query('PRAGMA table_info(user)')).map((column: any) => column.name);
             assert.ok(cols.includes('nickname'));
             assert.equal((await ds.getRepository('User').find()).length, 1); // data survived the table rebuild
         } finally {
@@ -153,11 +153,11 @@ describe('typeorm: repositories', () => {
     it('finds with where, order, pagination and counts', () =>
         withDs(async (ds) => {
             const repo = ds.getRepository<User>('User');
-            await repo.save(Array.from({ length: 50 }, (_, i) => ({ name: 'u' + String(i).padStart(2, '0'), age: i % 10, active: i % 2 === 0 })));
+            await repo.save(Array.from({ length: 50 }, (_, index) => ({ name: 'u' + String(index).padStart(2, '0'), age: index % 10, active: index % 2 === 0 })));
             assert.equal(await repo.count(), 50);
             assert.equal(await repo.countBy({ active: true }), 25);
             const page = await repo.find({ where: { age: 3 }, order: { name: 'DESC' }, take: 3, skip: 1 });
-            assert.deepEqual(page.map((u) => u.name), ['u33', 'u23', 'u13']);
+            assert.deepEqual(page.map((user) => user.name), ['u33', 'u23', 'u13']);
             const [rows, total] = await repo.findAndCount({ where: { active: false }, take: 5 });
             assert.equal(rows.length, 5);
             assert.equal(total, 25);
@@ -186,9 +186,9 @@ describe('typeorm: repositories', () => {
         withDs(async (ds) => {
             const repo = ds.getRepository<User>('User');
             await repo.save({ name: 'dup', age: 1, active: true });
-            await assert.rejects(repo.save({ name: 'dup', age: 2, active: true }), (e: any) => {
-                assert.ok(e instanceof QueryFailedError);
-                assert.match(e.message, /UNIQUE constraint failed/);
+            await assert.rejects(repo.save({ name: 'dup', age: 2, active: true }), (error: any) => {
+                assert.ok(error instanceof QueryFailedError);
+                assert.match(error.message, /UNIQUE constraint failed/);
                 return true;
             });
             assert.equal(await repo.count(), 1);
@@ -204,8 +204,8 @@ describe('typeorm: relations', () => {
             await posts.save({ title: 'p1', author: ann, tags: [{ label: 't1' }, { label: 't2' }] });
             await posts.save({ title: 'p2', author: ann, tags: [] });
             const loaded = await users.findOne({ where: { id: ann.id }, relations: { posts: { tags: true } }, order: { posts: { id: 'ASC' } } });
-            assert.deepEqual(loaded.posts.map((p) => p.title), ['p1', 'p2']);
-            assert.deepEqual(loaded.posts[0].tags.map((t) => t.label).sort(), ['t1', 't2']);
+            assert.deepEqual(loaded.posts.map((entry) => entry.title), ['p1', 'p2']);
+            assert.deepEqual(loaded.posts[0].tags.map((tag) => tag.label).sort(), ['t1', 't2']);
             const post = await posts.findOne({ where: { title: 'p1' }, relations: { author: true } });
             assert.equal(post.author.name, 'ann');
         }));
@@ -227,11 +227,11 @@ describe('typeorm: query builder and raw queries', () => {
     it('selects, aggregates and filters with named parameters', () =>
         withDs(async (ds) => {
             const repo = ds.getRepository<User>('User');
-            await repo.save(Array.from({ length: 20 }, (_, i) => ({ name: 'q' + i, age: i, active: i % 2 === 0 })));
+            await repo.save(Array.from({ length: 20 }, (_, index) => ({ name: 'q' + index, age: index, active: index % 2 === 0 })));
             const rows = await repo.createQueryBuilder('u').where('u.age >= :min AND u.age < :max', { min: 5, max: 8 }).orderBy('u.age', 'ASC').getMany();
-            assert.deepEqual(rows.map((r) => r.age), [5, 6, 7]);
+            assert.deepEqual(rows.map((row) => row.age), [5, 6, 7]);
             const raw = await repo.createQueryBuilder('u').select('u.active', 'active').addSelect('COUNT(*)', 'n').addSelect('SUM(u.age)', 'sum').groupBy('u.active').orderBy('u.active').getRawMany();
-            assert.deepEqual(raw.map((r) => [r.active, r.n, r.sum]), [[0, 10, 100], [1, 10, 90]]);
+            assert.deepEqual(raw.map((row) => [row.active, row.n, row.sum]), [[0, 10, 100], [1, 10, 90]]);
             const upd = await repo.createQueryBuilder().update().set({ age: 0 }).where('age < :a', { a: 3 }).execute();
             assert.equal(upd.affected, 3);
             const del = await repo.createQueryBuilder().delete().where('age = 0').execute();
@@ -301,9 +301,9 @@ describe('typeorm: lifecycle and load', () => {
     it('handles many concurrent saves and a big read', () =>
         withDs(async (ds) => {
             const repo = ds.getRepository<User>('User');
-            await Promise.all(Array.from({ length: 200 }, (_, i) => repo.save({ name: 'c' + i, age: i, active: true })));
+            await Promise.all(Array.from({ length: 200 }, (_, index) => repo.save({ name: 'c' + index, age: index, active: true })));
             assert.equal(await repo.count(), 200);
-            await repo.save(Array.from({ length: 5000 }, (_, i) => ({ name: 'b' + i, age: i, active: false })), { chunk: 500 });
+            await repo.save(Array.from({ length: 5000 }, (_, index) => ({ name: 'b' + index, age: index, active: false })), { chunk: 500 });
             assert.equal((await repo.find()).length, 5200);
         }));
 

@@ -1,6 +1,6 @@
 import { NativeScriptConfig } from '@nativescript/core';
 
-export default {
+const config: NativeScriptConfig = {
   id: 'org.nativescript.nssqlitespike',
   appPath: 'app',
   appResourcesPath: 'App_Resources',
@@ -8,4 +8,6 @@ export default {
     v8Flags: '--expose_gc',
     markingMode: 'none'
   }
-} as NativeScriptConfig;
+};
+
+export default config;

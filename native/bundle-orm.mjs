@@ -11,8 +11,8 @@ const out = process.argv[2];
 
 const alias = {
     name: 'typeorm-browser-deep-imports',
-    setup(b) {
-        b.onResolve({ filter: /^typeorm\/browser(\/.*)?$/ }, (args) => {
+    setup(build) {
+        build.onResolve({ filter: /^typeorm\/browser(\/.*)?$/ }, (args) => {
             const rest = args.path.slice('typeorm/browser'.length);
             return { path: join(typeorm, 'browser', rest ? rest + '.js' : 'index.js') };
         });

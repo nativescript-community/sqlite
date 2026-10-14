@@ -13,9 +13,7 @@ export type Int64Mode =
     | 'bigint';
 
 export interface SqliteRequestOptions {
-    /**
-     * BLOB values: a Uint8Array (default) or, with `false`, an ArrayBuffer.
-     */
+    /** BLOB values: a Uint8Array (default) or, with `false`, an ArrayBuffer. */
     transformBlobs?: boolean;
     int64?: Int64Mode;
     /** @deprecated Android cursor windows do not exist anymore. */
@@ -31,9 +29,8 @@ export interface DatabaseOptions extends SqliteRequestOptions {
     /** sqlite3_open_v2 flags. Default: READWRITE | CREATE. */
     flags?: number;
     /**
-     * The SQLite library to use: a library name the platform can dlopen (`libsqliteJni.so` is androidx
-     * sqlite-bundled, `libsqlcipher.so`...), or `null` for the SQLite already in the process (iOS system SQLite).
-     * Default: the `engine` given to `configure`, else its `defaultEngine`; without any this package cannot open a database.
+     * The SQLite library: a name the platform can dlopen (`libsqliteJni.so` is androidx sqlite-bundled, `libsqlcipher.so`...), or `null`
+     * for the SQLite of the process (iOS). Default: `configure`'s `engine`, else its `defaultEngine`; without any, no database opens.
      */
     engine?: string | null;
     /** milliseconds, default 5000, negative to disable */
@@ -47,15 +44,9 @@ export interface DatabaseOptions extends SqliteRequestOptions {
 export interface GlobalConfig {
     /** default `engine` of databases */
     engine?: string | null;
-    /**
-     * Used when neither `engine` nor the database option is set. For packages that provide a SQLite
-     * (@nativescript-community/sqlite sets androidx sqlite-bundled on Android, the SQLite of the process on iOS).
-     */
+    /** Used when neither `engine` nor the database option is set; provider packages set it (sqlite sets androidx sqlite-bundled on Android). */
     defaultEngine?: string | null;
-    /**
-     * Options every database starts from; the options given to `openOrCreate` win (`{ wal: false }` undoes a default
-     * `wal: true`). For provider packages: @nativescript-community/sqlite sets `{ wal: true }` on Android.
-     */
+    /** Options every database starts from; those given to `openOrCreate` win (`{ wal: false }` undoes `wal: true`). */
     defaultOptions?: DatabaseOptions;
     /** force a binding: 'napi' (NativeScript >= 9.1) or 'bridge' (JNI / Objective-C). Default: napi when available. */
     backend?: 'auto' | 'napi' | 'bridge';
@@ -113,10 +104,8 @@ export interface SQLiteQueryApi {
     batch(statements: Array<BatchStatement | string | [string, SqliteParams?]>, options?: BatchOptions): Promise<BatchResult[]>;
 
     /**
-     * Blocking variants: they wait for the database thread on the calling thread, which saves the event loop round
-     * trip of the asynchronous calls (a few tens of microseconds on iOS, ~0.4 ms on Android) and blocks the thread for
-     * the duration of the statement. For small, fast statements in a loop; use the asynchronous methods for anything
-     * that can take long. Only available with the Node-API binding (NativeScript >= 9.1).
+     * Blocking variants: they wait for the database thread on the calling thread, saving the event loop round trip for small
+     * statements in a loop, and block it for the whole statement. Node-API binding only (NativeScript >= 9.1).
      */
     executeSync(query: string, params?: SqliteParams): ExecResult;
     selectSync(query: string, params?: SqliteParams, options?: SqliteRequestOptions): SqliteRow[];
@@ -138,15 +127,13 @@ export interface SQLiteDatabase extends SQLiteQueryApi {
     getVersion(): Promise<number>;
     setVersion(version: number): Promise<void>;
     /**
-     * Runs `action` in a transaction on the connection: BEGIN, then COMMIT when it resolves, ROLLBACK when it
-     * throws or `cancel()` was called. While it runs, other calls made on this database join the transaction;
-     * use the `tx` argument to be explicit. Requests of other parts of the app wait for the end.
+     * Runs `action` in a transaction: COMMIT when it resolves, ROLLBACK when it throws or `cancel()` was called. Other calls made
+     * on this database meanwhile join it (use `tx` to be explicit); requests of other parts of the app wait for the end.
      */
     transaction<T = any>(action: (cancel: () => void, tx: SQLiteTransaction) => Promise<T> | T, options?: TransactionOptions): Promise<T>;
     /**
-     * Loads a SQLite extension (shared library) into this connection. Needs an engine that allows it: androidx
-     * sqlite-bundled and SQLCipher on Android do, Apple's system SQLite does not (see `canLoadExtensions`).
-     * `entryPoint` defaults to the one SQLite derives from the file name (`libfoo.so` -> `sqlite3_foo_init`).
+     * Loads a SQLite extension into this connection; needs an engine that allows it (see `canLoadExtensions`). `entryPoint`
+     * defaults to the one SQLite derives from the file name (`libfoo.so` -> `sqlite3_foo_init`).
      */
     loadExtension(path: string, entryPoint?: string): Promise<void>;
     /** false when the engine in use cannot load extensions (`loadExtension` would reject) */

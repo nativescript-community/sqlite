@@ -13,7 +13,6 @@ const variants: Array<[string, any]> = [
 ];
 
 export function navigatingTo(args: EventData) {
-    const page = <Page>args.object;
     setTimeout(async () => {
         loadFrameworkEngine();
         for (const [label, options] of variants) {
@@ -22,17 +21,17 @@ export function navigatingTo(args: EventData) {
             let sync = '';
             for (let run = 0; run < 4; run++) {
                 const file = `${knownFolders.documents().path}/autocommit.db`;
-                for (const s of ['', '-wal', '-shm', '-journal']) if (File.exists(file + s)) File.fromPath(file + s).removeSync();
+                for (const suffix of ['', '-wal', '-shm', '-journal']) if (File.exists(file + suffix)) File.fromPath(file + suffix).removeSync();
                 const db = openOrCreate(file, options);
                 await db.execute('CREATE TABLE ins(id INTEGER PRIMARY KEY, a TEXT, b REAL)');
                 mode = (await db.getArray('PRAGMA journal_mode'))[0];
                 sync = (await db.getArray('PRAGMA synchronous'))[0];
                 const t0 = performance.now();
-                for (let i = 0; i < 500; i++) await db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5]);
+                for (let index = 0; index < 500; index++) await db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + index, index * 0.5]);
                 if (run) times.push(performance.now() - t0);
                 await db.close();
             }
-            times.sort((a, b) => a - b);
+            times.sort((left, right) => left - right);
             console.log('[PERF] autocommit', label, `journal=${mode} synchronous=${sync}`, JSON.stringify({ ms: +times[1].toFixed(0), min: +times[0].toFixed(0) }));
         }
         console.log('[PERF] done');

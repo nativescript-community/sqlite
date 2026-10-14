@@ -2,8 +2,9 @@
 import { File, knownFolders } from '@nativescript/core';
 import { SqliteError, configure, openOrCreate } from '@nativescript-community/sqlite';
 import { FRAMEWORK_ENGINE, loadFrameworkEngine } from '@nativescript-community/sqlite-android-framework';
+import { messageOf, statement } from './util';
 
-const log = (...a: any[]) => console.log('[FW]', ...a);
+const log = (...args: any[]) => console.log('[FW]', ...args);
 let passed = 0;
 let failed = 0;
 
@@ -11,33 +12,33 @@ async function check(name: string, fn: () => Promise<void> | void) {
     try {
         await fn();
         passed++;
-    } catch (e) {
+    } catch (error) {
         failed++;
-        log('FAIL', name, String((e && (e as any).message) || e));
+        log('FAIL', name, messageOf(error));
     }
 }
 
 function eq(actual: any, expected: any, what = '') {
-    const a = JSON.stringify(actual, (_k, v) => (typeof v === 'bigint' ? v.toString() + 'n' : v instanceof Uint8Array ? Array.from(v) : v));
-    const b = JSON.stringify(expected, (_k, v) => (typeof v === 'bigint' ? v.toString() + 'n' : v instanceof Uint8Array ? Array.from(v) : v));
-    if (a !== b) throw new Error(`${what} expected ${b} got ${a}`);
+    const actualJson = JSON.stringify(actual, (_k, value) => (typeof value === 'bigint' ? value.toString() + 'n' : value instanceof Uint8Array ? Array.from(value) : value));
+    const expectedJson = JSON.stringify(expected, (_k, value) => (typeof value === 'bigint' ? value.toString() + 'n' : value instanceof Uint8Array ? Array.from(value) : value));
+    if (actualJson !== expectedJson) throw new Error(`${what} expected ${expectedJson} got ${actualJson}`);
 }
 
-async function rejects(p: Promise<any>, test: (e: any) => boolean, what: string) {
+async function rejects(promise: Promise<any>, test: (error: any) => boolean, what: string) {
     try {
-        await p;
-    } catch (e) {
-        if (!test(e)) throw new Error(`${what}: unexpected error ${e}`);
+        await promise;
+    } catch (error) {
+        if (!test(error)) throw new Error(`${what}: unexpected error ${error}`);
         return;
     }
     throw new Error(`${what}: did not reject`);
 }
 
 function removeDb(file: string) {
-    for (const s of ['', '-wal', '-shm', '-journal']) {
+    for (const suffix of ['', '-wal', '-shm', '-journal']) {
         try {
-            if (File.exists(file + s)) File.fromPath(file + s).removeSync();
-        } catch (e) {
+            if (File.exists(file + suffix)) File.fromPath(file + suffix).removeSync();
+        } catch (error) {
             // ignore
         }
     }
@@ -64,7 +65,7 @@ async function runSuite(withPerf: boolean) {
         await db.ready;
         log('platform SQLite', db.getSqliteVersion());
         eq(db.canLoadExtensions(), false);
-        await rejects(db.loadExtension('/x/libx.so'), (e) => e instanceof SqliteError, 'loadExtension');
+        await rejects(db.loadExtension('/x/libx.so'), (error) => error instanceof SqliteError, 'loadExtension');
         await db.close();
     });
     await check('types', async () => {
@@ -92,16 +93,16 @@ async function runSuite(withPerf: boolean) {
         const db = mem();
         await db.execute('CREATE TABLE t(id INTEGER PRIMARY KEY, u TEXT UNIQUE)');
         await db.execute("INSERT INTO t(u) VALUES ('a')");
-        await rejects(db.execute("INSERT INTO t(u) VALUES ('a')"), (e) => e instanceof SqliteError && e.code === 19 && e.extendedCode === 2067, 'unique');
-        await rejects(db.select('SELECT * FROM nope'), (e) => e instanceof SqliteError && /no such table/.test(e.message), 'no table');
-        await rejects(db.execute('NOT SQL'), (e) => e instanceof SqliteError && e.code === 1, 'syntax');
+        await rejects(db.execute("INSERT INTO t(u) VALUES ('a')"), (error) => error instanceof SqliteError && error.code === 19 && error.extendedCode === 2067, 'unique');
+        await rejects(db.select('SELECT * FROM nope'), (error) => error instanceof SqliteError && /no such table/.test(error.message), 'no table');
+        await rejects(db.execute('NOT SQL'), (error) => error instanceof SqliteError && error.code === 1, 'syntax');
         eq((await db.getArray('SELECT count(*) FROM t'))[0], 1);
         await db.close();
     });
     await check('blob, empty and unicode text, many columns', async () => {
         const db = mem();
         await db.execute('CREATE TABLE t(a, b, c)');
-        const big = new Uint8Array(100000).map((_v, i) => i % 251);
+        const big = new Uint8Array(100000).map((_v, index) => index % 251);
         await db.execute('INSERT INTO t VALUES (?, ?, ?)', [big, '', 'x'.repeat(50000) + '😀']);
         const row = await db.get('SELECT * FROM t');
         eq(row.a.length, 100000);
@@ -121,7 +122,7 @@ async function runSuite(withPerf: boolean) {
         eq((await db.get('SELECT a FROM t')).a === big, true, 'default window');
         // a window smaller than the row: a clear error
         loadFrameworkEngine({ cursorWindowSize: 1 << 20 });
-        await rejects(db.get('SELECT a FROM t'), (e) => /cursorWindowSize/.test(String(e.message)), 'small window');
+        await rejects(db.get('SELECT a FROM t'), (error) => /cursorWindowSize/.test(String(error.message)), 'small window');
         loadFrameworkEngine({ cursorWindowSize: 8 << 20 });
         eq((await db.get('SELECT length(a) AS n FROM t')).n, big.length);
         eq((await db.get('SELECT a FROM t')).a === big, true, '8 MB window');
@@ -132,10 +133,10 @@ async function runSuite(withPerf: boolean) {
     await check('batch is atomic, non atomic keeps going', async () => {
         const db = mem();
         await db.execute('CREATE TABLE t(id INTEGER PRIMARY KEY)');
-        await rejects(db.batch(['INSERT INTO t VALUES (1)', 'INSERT INTO t VALUES (1)']), (e) => e instanceof SqliteError, 'atomic');
+        await rejects(db.batch(['INSERT INTO t VALUES (1)', 'INSERT INTO t VALUES (1)']), (error) => error instanceof SqliteError, 'atomic');
         eq((await db.getArray('SELECT count(*) FROM t'))[0], 0);
-        const r = await db.batch([['INSERT INTO t VALUES (?)', [5]], 'SELECT id FROM t'], { atomic: true });
-        eq(r[1].rows, [{ id: 5 }]);
+        const results = await db.batch([['INSERT INTO t VALUES (?)', [5]], 'SELECT id FROM t'], { atomic: true });
+        eq(results[1].rows, [{ id: 5 }]);
         await db.close();
     });
     await check('transactions: commit, rollback, cancel, savepoint inside', async () => {
@@ -144,7 +145,7 @@ async function runSuite(withPerf: boolean) {
         await db.transaction(async (_c, tx) => {
             await tx.execute('INSERT INTO t VALUES (1)');
             // a batch inside a transaction uses a savepoint
-            await rejects(tx.batch(['INSERT INTO t VALUES (2)', 'INSERT INTO t VALUES (1)']), (e) => e instanceof SqliteError, 'inner batch');
+            await rejects(tx.batch(['INSERT INTO t VALUES (2)', 'INSERT INTO t VALUES (1)']), (error) => error instanceof SqliteError, 'inner batch');
             await tx.execute('INSERT INTO t VALUES (3)');
         });
         eq(await db.selectArray('SELECT id FROM t ORDER BY id'), [[1], [3]]);
@@ -153,7 +154,7 @@ async function runSuite(withPerf: boolean) {
                 await tx.execute('INSERT INTO t VALUES (9)');
                 throw new Error('boom');
             }),
-            (e) => /boom/.test(e.message),
+            (error) => /boom/.test(error.message),
             'rollback'
         );
         await db.transaction(async (cancel, tx) => {
@@ -167,13 +168,13 @@ async function runSuite(withPerf: boolean) {
         const db = mem();
         await db.execute('CREATE TABLE t(id INTEGER PRIMARY KEY, name TEXT, score REAL)');
         await db.execute(`WITH RECURSIVE c(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM c WHERE x < 20000) INSERT INTO t SELECT x, 'name_' || x, x * 0.25 FROM c`);
-        let n = 0;
+        let rowCount = 0;
         let sum = 0;
         const count = await db.each('SELECT * FROM t', [], (_e, row) => {
-            n++;
+            rowCount++;
             sum += row.id;
         });
-        eq([count, n, sum], [20000, 20000, 200010000]);
+        eq([count, rowCount, sum], [20000, 20000, 200010000]);
         const rows = await db.select('SELECT * FROM t');
         eq(rows.length, 20000);
         eq(rows[19999], { id: 20000, name: 'name_20000', score: 5000 });
@@ -187,7 +188,7 @@ async function runSuite(withPerf: boolean) {
             INSERT INTO a VALUES (1); -- comment; with semicolon
             INSERT INTO a VALUES (';');`);
         eq((await db.getArray('SELECT count(*) FROM log'))[0], 4);
-        await rejects(db.execute('INSERT INTO a VALUES (2); INSERT INTO a VALUES (3)'), (e) => /multiple statements/.test(e.message), 'multi');
+        await rejects(db.execute('INSERT INTO a VALUES (2); INSERT INTO a VALUES (3)'), (error) => /multiple statements/.test(error.message), 'multi');
         await db.close();
     });
     await check('files: wal, reopen, user_version, parallel databases', async () => {
@@ -204,16 +205,16 @@ async function runSuite(withPerf: boolean) {
         await again.close();
         const ro = openOrCreate(file, { engine: FRAMEWORK_ENGINE, readOnly: true });
         eq((await ro.getArray('SELECT count(*) FROM t'))[0], 1);
-        await rejects(ro.execute('INSERT INTO t VALUES (1)'), (e) => e instanceof SqliteError, 'readonly');
+        await rejects(ro.execute('INSERT INTO t VALUES (1)'), (error) => error instanceof SqliteError, 'readonly');
         await ro.close();
         removeDb(file);
-        const dbs = [0, 1, 2, 3].map((i) => openOrCreate(`${dir}/fw-par-${i}.db`, { engine: FRAMEWORK_ENGINE }));
-        await Promise.all(dbs.map((d) => d.execute('CREATE TABLE t(i)')));
-        await Promise.all(dbs.map((d) => Promise.all(Array.from({ length: 200 }, (_x, i) => d.execute('INSERT INTO t VALUES (?)', [i])))));
-        const counts = await Promise.all(dbs.map((d) => d.getArray('SELECT count(*), sum(i) FROM t')));
-        counts.forEach((c) => eq(c, [200, 19900]));
-        await Promise.all(dbs.map((d) => d.close()));
-        [0, 1, 2, 3].forEach((i) => removeDb(`${dir}/fw-par-${i}.db`));
+        const dbs = [0, 1, 2, 3].map((index) => openOrCreate(`${dir}/fw-par-${index}.db`, { engine: FRAMEWORK_ENGINE }));
+        await Promise.all(dbs.map((database) => database.execute('CREATE TABLE t(i)')));
+        await Promise.all(dbs.map((database) => Promise.all(Array.from({ length: 200 }, (_x, index) => database.execute('INSERT INTO t VALUES (?)', [index])))));
+        const counts = await Promise.all(dbs.map((database) => database.getArray('SELECT count(*), sum(i) FROM t')));
+        counts.forEach((row) => eq(row, [200, 19900]));
+        await Promise.all(dbs.map((database) => database.close()));
+        [0, 1, 2, 3].forEach((index) => removeDb(`${dir}/fw-par-${index}.db`));
     });
     await check('RETURNING when the platform SQLite has it', async () => {
         const db = mem();
@@ -246,27 +247,27 @@ async function perf() {
             await db.execute('DROP TABLE IF EXISTS ins');
             await db.execute('CREATE TABLE ins(id INTEGER PRIMARY KEY, a TEXT, b REAL)');
             const med = async (fn: () => Promise<any>, runs = 5) => {
-                const t: number[] = [];
-                for (let i = 0; i < runs + 1; i++) {
+                const times: number[] = [];
+                for (let index = 0; index < runs + 1; index++) {
                     const t0 = now();
                     await fn();
-                    if (i) t.push(now() - t0);
+                    if (index) times.push(now() - t0);
                 }
-                return +t.sort((a, b) => a - b)[Math.floor(t.length / 2)].toFixed(1);
+                return +times.sort((left, right) => left - right)[Math.floor(times.length / 2)].toFixed(1);
             };
             const out: Record<string, number> = {};
             out['select 20000x3'] = await med(() => db.select('SELECT * FROM narrow'));
             out['1000 point lookups awaited'] = await med(async () => {
-                for (let i = 1; i <= 1000; i++) await db.get('SELECT * FROM narrow WHERE id = ?', [i]);
+                for (let index = 1; index <= 1000; index++) await db.get('SELECT * FROM narrow WHERE id = ?', [index]);
             });
             const clear = () => db.execute('DELETE FROM ins');
             out['5000 inserts tx, all at once'] = await med(async () => {
                 await clear();
                 await db.transaction(async () => {
-                    await Promise.all(Array.from({ length: 5000 }, (_x, i) => db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5])));
+                    await Promise.all(Array.from({ length: 5000 }, (_x, index) => db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + index, index * 0.5])));
                 });
             });
-            const items = Array.from({ length: 5000 }, (_x, i) => ['INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5]]) as any;
+            const items = Array.from({ length: 5000 }, (_x, index) => statement('INSERT INTO ins(a, b) VALUES (?, ?)', 'row ' + index, index * 0.5));
             out['5000 inserts batch()'] = await med(async () => {
                 await clear();
                 await db.batch(items);
@@ -274,8 +275,8 @@ async function perf() {
             log('PERF', label, JSON.stringify(out));
             await db.close();
             removeDb(`${knownFolders.documents().path}/fw-perf-${label.replace(' ', '')}.db`);
-        } catch (e) {
-            log('PERF', label, 'unavailable:', String(e).slice(0, 100));
+        } catch (error) {
+            log('PERF', label, 'unavailable:', String(error).slice(0, 100));
         }
     }
 }

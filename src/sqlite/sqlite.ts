@@ -10,10 +10,8 @@ const config: GlobalConfig = {};
 let backend: Backend | undefined;
 
 /**
- * Global settings. `engine` is the SQLite library databases use unless their `engine` option says otherwise: a library
- * name the platform can dlopen (`libsqlcipher.so`), or `null` for the SQLite of the process (iOS). This package ships
- * none; `defaultEngine` is what a provider package (@nativescript-community/sqlite) sets. `backend` forces a binding for
- * the databases opened afterwards.
+ * Global settings. `engine` is the SQLite library of the databases that do not set their own: a library name the platform can
+ * dlopen, or `null` for the process SQLite (iOS). `defaultEngine` is what a provider package sets; `backend` forces a binding.
  */
 export function configure(options: GlobalConfig) {
     if (options.backend && options.backend !== config.backend) {
@@ -27,15 +25,12 @@ function getBackend() {
     return backend || (backend = loadBackend(config.backend || 'auto'));
 }
 
-/**
- * Opens (or creates) a database. The call returns at once: the database opens on its own thread, requests wait
- * for it, and an open error is reported by `db.ready` and by the first request.
- */
+/** Opens (or creates) a database and returns at once: an open error is reported by `db.ready` and by the first request. */
 export function openOrCreate(filePath: string, options: DatabaseOptions = {}): SQLiteDatabase {
-    const b = getBackend();
+    const binding = getBackend();
     const engine = config.engine !== undefined ? config.engine : config.defaultEngine;
     options = translateAndroidFlags(options);
-    return new Database(b, resolveDatabasePath(filePath), config.defaultOptions ? { ...config.defaultOptions, ...options } : options, engine !== undefined ? [engine] : undefined);
+    return new Database(binding, resolveDatabasePath(filePath), config.defaultOptions ? { ...config.defaultOptions, ...options } : options, engine !== undefined ? [engine] : undefined);
 }
 
 /** Like `openOrCreate`, resolves once the database is open and rejects with the open error. */

@@ -20,32 +20,32 @@ function createObjcBackend(): Backend {
     if (typeof NSSqliteBridge === 'undefined') {
         throw new Error('NSSqliteBridge not found');
     }
-    const B = NSSqliteBridge;
+    const bridge = NSSqliteBridge;
     const cb = (callback: ResultCallback) => (status: number, done: boolean, data: any, message: string | null, changes: number, lastInsertRowId: number) => {
         const raw: RawResult = { status, done, data: data ? interop.bufferFromData(data) : null, message, changes: Number(changes), lastInsertRowId: Number(lastInsertRowId) };
         callback(raw);
     };
-    const toData = (b: ArrayBuffer | null) => (b ? NSData.dataWithData(b) : null);
+    const toData = (buffer: ArrayBuffer | null) => (buffer ? NSData.dataWithData(buffer) : null);
     return {
         kind: 'bridge',
         defaultEngines: DEFAULT_ENGINES,
         engine: (library) => {
-            const e = B.engineError(library);
-            if (!e) {
+            const error = bridge.engineError(library);
+            if (!error) {
                 throw new Error(`cannot load SQLite library ${library}`);
             }
-            return e;
+            return error;
         },
-        engineVersion: (e) => B.engineVersion(e),
-        engineCanLoadExtensions: (e) => B.engineCanLoadExtensions(e),
-        open: (engine, path, p: OpenParams, callback) => B.openPathFlagsBusyMsWalInitSqlCallback(engine, path, p.flags, p.busyTimeoutMs, p.wal, p.initSql, cb(callback)),
-        exec: (db, tx, sql, params, flags, chunkRows, callback) => B.execTxSqlParamsFlagsChunkRowsCallback(db, tx, sql, toData(params), flags, chunkRows, cb(callback)),
-        batch: (db, tx, request, flags, callback) => B.batchTxRequestFlagsCallback(db, tx, NSData.dataWithData(request), flags, cb(callback)),
-        txBegin: (db, mode, callback) => B.txBeginModeCallback(db, mode, cb(callback)),
-        txEnd: (db, tx, commit, callback) => B.txEndTxCommitCallback(db, tx, commit, cb(callback)),
-        loadExtension: (db, path, entry, callback) => B.loadExtensionPathEntryCallback(db, path, entry, cb(callback)),
-        close: (db, callback) => B.closeCallback(db, cb(callback)),
-        release: (db) => B.releaseDb(db)
+        engineVersion: (engine) => bridge.engineVersion(engine),
+        engineCanLoadExtensions: (engine) => bridge.engineCanLoadExtensions(engine),
+        open: (engine, path, params: OpenParams, callback) => bridge.openPathFlagsBusyMsWalInitSqlCallback(engine, path, params.flags, params.busyTimeoutMs, params.wal, params.initSql, cb(callback)),
+        exec: (db, tx, sql, params, flags, chunkRows, callback) => bridge.execTxSqlParamsFlagsChunkRowsCallback(db, tx, sql, toData(params), flags, chunkRows, cb(callback)),
+        batch: (db, tx, request, flags, callback) => bridge.batchTxRequestFlagsCallback(db, tx, NSData.dataWithData(request), flags, cb(callback)),
+        txBegin: (db, mode, callback) => bridge.txBeginModeCallback(db, mode, cb(callback)),
+        txEnd: (db, tx, commit, callback) => bridge.txEndTxCommitCallback(db, tx, commit, cb(callback)),
+        loadExtension: (db, path, entry, callback) => bridge.loadExtensionPathEntryCallback(db, path, entry, cb(callback)),
+        close: (db, callback) => bridge.closeCallback(db, cb(callback)),
+        release: (db) => bridge.releaseDb(db)
     };
 }
 
@@ -66,7 +66,7 @@ export function resolveDatabasePath(path: string) {
     if (dir && !fm.fileExistsAtPath(dir)) {
         try {
             fm.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(dir, true, null);
-        } catch (e) {
+        } catch (error) {
             // the open reports the real problem
         }
     }
@@ -82,7 +82,7 @@ export function deleteDatabaseFiles(path: string) {
             existed = existed || suffix === '';
             try {
                 fm.removeItemAtPathError(path + suffix);
-            } catch (e) {
+            } catch (error) {
                 // best effort
             }
         }

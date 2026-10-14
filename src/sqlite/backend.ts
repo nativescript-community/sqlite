@@ -1,8 +1,6 @@
 /**
- * What a binding (Node-API, JNI, Objective-C) must provide. It mirrors the C core API (core/nssqlite.h): every call
- * hands bytes to the core and results come back through callbacks on the calling thread.
- *
- * `submit` style calls return 0 when queued or a negative core error (the callback is then not called).
+ * What a binding (Node-API, JNI, Objective-C) provides, mirroring core/nssqlite.h. Results come back through callbacks on the
+ * calling thread; submit calls return 0 when queued or a negative core error (the callback is then not called).
  */
 export interface RawResult {
     /** 0 = ok, > 0 SQLite (extended) result code, < 0 core error */
@@ -59,7 +57,7 @@ export const TX_DEFERRED = 0;
 export const TX_IMMEDIATE = 1;
 export const TX_EXCLUSIVE = 2;
 
-// SQLITE_OPEN_*
+// SQLITE_OPEN_* values
 export const OPEN_READONLY = 0x1;
 export const OPEN_READWRITE = 0x2;
 export const OPEN_CREATE = 0x4;

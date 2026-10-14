@@ -1,10 +1,10 @@
 import { strict as assert } from 'assert';
-import { after, describe, it } from 'node:test';
+import { describe, it } from 'node:test';
 import { SqliteError } from '../sqlite.common';
 import { createNapiBackend } from '../backend.napi';
 import { Database } from '../database';
 import { translateAndroidFlags } from '../platform.common';
-import { loadAddon, open, tmpDb } from './support';
+import { loadAddon, open, statement, tmpDb } from './support';
 
 async function withDb<T>(fn: (db: ReturnType<typeof open>) => Promise<T>, file = ':memory:', options = {}) {
     const db = open(file, options);
@@ -34,28 +34,28 @@ describe('values', () => {
     it('binds booleans, dates, bigint, array buffers, typed arrays, byte arrays, undefined', () =>
         withDb(async (db) => {
             const date = new Date('2026-10-13T10:00:00.000Z');
-            const r = await db.getArray('SELECT ?, ?, ?, ?, ?, ?, ?, ?', [true, false, date, 12345678901234567n, new Uint8Array([1, 2]).buffer, new Uint16Array([1, 2]), [9, 8, 7], undefined]);
-            assert.equal(r[0], 1);
-            assert.equal(r[1], 0);
-            assert.equal(r[2], '2026-10-13T10:00:00.000Z');
-            assert.equal(r[3], 12345678901234567); // number by default
-            assert.deepEqual(Array.from(r[4]), [1, 2]);
-            assert.deepEqual(Array.from(r[5]), [1, 0, 2, 0]);
-            assert.deepEqual(Array.from(r[6]), [9, 8, 7]);
-            assert.equal(r[7], null);
+            const values = await db.getArray('SELECT ?, ?, ?, ?, ?, ?, ?, ?', [true, false, date, 12345678901234567n, new Uint8Array([1, 2]).buffer, new Uint16Array([1, 2]), [9, 8, 7], undefined]);
+            assert.equal(values[0], 1);
+            assert.equal(values[1], 0);
+            assert.equal(values[2], '2026-10-13T10:00:00.000Z');
+            assert.equal(values[3], 12345678901234567); // number by default
+            assert.deepEqual(Array.from(values[4]), [1, 2]);
+            assert.deepEqual(Array.from(values[5]), [1, 0, 2, 0]);
+            assert.deepEqual(Array.from(values[6]), [9, 8, 7]);
+            assert.equal(values[7], null);
         }));
 
     it('keeps 64 bit integers exact with int64 modes', () =>
         withDb(async (db) => {
             const big = 9007199254740993n;
-            const q = 'SELECT ? AS big, 5 AS small, 3000000000 AS mid';
-            const num = await db.get(q, big);
+            const query = 'SELECT ? AS big, 5 AS small, 3000000000 AS mid';
+            const num = await db.get(query, big);
             assert.equal(num.big, 9007199254740992); // beyond 2^53 a number cannot hold it
-            const auto = await db.get(q, big, { int64: 'auto' });
+            const auto = await db.get(query, big, { int64: 'auto' });
             assert.equal(auto.big, big);
             assert.equal(auto.mid, 3000000000);
             assert.equal(auto.small, 5);
-            const all = await db.get(q, big, { int64: 'bigint' });
+            const all = await db.get(query, big, { int64: 'bigint' });
             assert.equal(all.big, big);
             assert.equal(all.mid, 3000000000n);
             assert.equal(all.small, 5); // INT32 values stay numbers
@@ -75,15 +75,18 @@ describe('values', () => {
             const long = 'x'.repeat(5000);
             const mixed = 'a'.repeat(100) + 'é' + 'b'.repeat(100);
             const emoji = '😀'.repeat(50);
-            const r = await db.getArray('SELECT ?, ?, ?, ?, ?', ['', long, mixed, emoji, 'quote " \\ \n \u0000 end']);
-            assert.deepEqual(r, ['', long, mixed, emoji, 'quote " \\ \n \u0000 end']);
+            const values = await db.getArray('SELECT ?, ?, ?, ?, ?', ['', long, mixed, emoji, 'quote " \\ \n \u0000 end']);
+            assert.deepEqual(values, ['', long, mixed, emoji, 'quote " \\ \n \u0000 end']);
         }));
 
     it('rejects unsupported parameters', () =>
         withDb(async (db) => {
-            await assert.rejects(db.get('SELECT ?', { a: 1 } as any), TypeError);
-            await assert.rejects(db.get('SELECT ?', (() => 1) as any), TypeError);
-            await assert.rejects(db.get('SELECT ?', Symbol('x') as any), TypeError);
+            // @ts-expect-error unsupported on purpose
+            await assert.rejects(db.get('SELECT ?', { a: 1 }), TypeError);
+            // @ts-expect-error unsupported on purpose
+            await assert.rejects(db.get('SELECT ?', () => 1), TypeError);
+            // @ts-expect-error unsupported on purpose
+            await assert.rejects(db.get('SELECT ?', Symbol('x')), TypeError);
             assert.equal((await db.get('SELECT 1 AS one')).one, 1); // still usable
         }));
 
@@ -110,29 +113,29 @@ describe('values', () => {
 describe('errors', () => {
     it('reports SQLite errors with codes and the statement', () =>
         withDb(async (db) => {
-            await assert.rejects(db.execute('SELEKT 1'), (e: SqliteError) => {
-                assert.ok(e instanceof SqliteError);
-                assert.equal(e.code, 1);
-                assert.match(e.message, /syntax error/);
-                assert.equal(e.sql, 'SELEKT 1');
+            await assert.rejects(db.execute('SELEKT 1'), (error: SqliteError) => {
+                assert.ok(error instanceof SqliteError);
+                assert.equal(error.code, 1);
+                assert.match(error.message, /syntax error/);
+                assert.equal(error.sql, 'SELEKT 1');
                 return true;
             });
             await db.execute('CREATE TABLE t(a PRIMARY KEY, b NOT NULL)');
             await db.execute('INSERT INTO t VALUES (1, 2)');
-            await assert.rejects(db.execute('INSERT INTO t VALUES (1, 3)'), (e: SqliteError) => e.code === 19 && e.extendedCode === 1555);
-            await assert.rejects(db.execute('INSERT INTO t VALUES (2, NULL)'), (e: SqliteError) => e.code === 19 && e.extendedCode === 1299);
+            await assert.rejects(db.execute('INSERT INTO t VALUES (1, 3)'), (error: SqliteError) => error.code === 19 && error.extendedCode === 1555);
+            await assert.rejects(db.execute('INSERT INTO t VALUES (2, NULL)'), (error: SqliteError) => error.code === 19 && error.extendedCode === 1299);
             assert.deepEqual(await db.select('SELECT * FROM t'), [{ a: 1, b: 2 }]);
         }));
 
     it('checks the parameter count', () =>
         withDb(async (db) => {
-            await assert.rejects(db.get('SELECT ?, ?', [1]), (e: SqliteError) => e.code === -2 && /expected 2/.test(e.message));
-            await assert.rejects(db.get('SELECT 1', [1]), (e: SqliteError) => e.code === -2);
+            await assert.rejects(db.get('SELECT ?, ?', [1]), (error: SqliteError) => error.code === -2 && /expected 2/.test(error.message));
+            await assert.rejects(db.get('SELECT 1', [1]), (error: SqliteError) => error.code === -2);
         }));
 
     it('refuses several statements outside of scripts', () =>
         withDb(async (db) => {
-            await assert.rejects(db.execute('SELECT 1; SELECT 2'), (e: SqliteError) => e.code === -2);
+            await assert.rejects(db.execute('SELECT 1; SELECT 2'), (error: SqliteError) => error.code === -2);
             await db.executeScript('CREATE TABLE a(x); INSERT INTO a VALUES (1); INSERT INTO a VALUES (2);');
             assert.equal((await db.get('SELECT COUNT(*) AS n FROM a')).n, 2);
             await assert.rejects(db.executeScript('CREATE TABLE a(x)'), SqliteError);
@@ -140,9 +143,9 @@ describe('errors', () => {
 
     it('fails the open and the first request with the same error', async () => {
         const db = open('/nonexistent-dir/x/y.db');
-        await assert.rejects(db.ready, (e: SqliteError) => e.code === 14);
+        await assert.rejects(db.ready, (error: SqliteError) => error.code === 14);
         assert.equal(db.isOpen, false);
-        await assert.rejects(db.get('SELECT 1'), (e: SqliteError) => /unable to open/.test(e.message));
+        await assert.rejects(db.get('SELECT 1'), (error: SqliteError) => /unable to open/.test(error.message));
         await db.close();
     });
 
@@ -152,7 +155,7 @@ describe('errors', () => {
         await withDb(async (db) => {
             await db.ready;
             assert.deepEqual(await db.select('SELECT * FROM t'), []);
-            await assert.rejects(db.execute('INSERT INTO t VALUES (1)'), (e: SqliteError) => e.code === 8);
+            await assert.rejects(db.execute('INSERT INTO t VALUES (1)'), (error: SqliteError) => error.code === 8);
         }, file, { readOnly: true });
     });
 
@@ -190,7 +193,7 @@ describe('close', () => {
         await db.execute('CREATE TABLE t(a)');
         await db.close();
         assert.equal(db.isOpen, false);
-        await assert.rejects(db.execute('SELECT 1'), (e: SqliteError) => e.code === -1);
+        await assert.rejects(db.execute('SELECT 1'), (error: SqliteError) => error.code === -1);
         await db.close();
     });
 
@@ -198,8 +201,8 @@ describe('close', () => {
         const db = open();
         await db.execute('CREATE TABLE t(a)');
         const inserts = [];
-        for (let i = 0; i < 50; i++) {
-            inserts.push(db.execute('INSERT INTO t VALUES (?)', i));
+        for (let index = 0; index < 50; index++) {
+            inserts.push(db.execute('INSERT INTO t VALUES (?)', index));
         }
         const closing = db.close();
         await Promise.all(inserts);
@@ -209,7 +212,7 @@ describe('close', () => {
     it('reports the SQLite library version and extension support', () =>
         withDb(async (db) => {
             assert.match(db.getSqliteVersion(), /^3\.\d+\.\d+/);
-            await assert.rejects(db.loadExtension('/nope.so'), (e: SqliteError) => e.code === -5 || e.code > 0);
+            await assert.rejects(db.loadExtension('/nope.so'), (error: SqliteError) => error.code === -5 || error.code > 0);
         }));
 });
 
@@ -217,7 +220,7 @@ describe('each', () => {
     it('streams all rows in order', () =>
         withDb(async (db) => {
             await db.execute('CREATE TABLE t(a)');
-            await db.batch(Array.from({ length: 1000 }, (_, i) => ['INSERT INTO t VALUES (?)', [i]] as [string, any[]]));
+            await db.batch(Array.from({ length: 1000 }, (_, index) => statement('INSERT INTO t VALUES (?)', index)));
             const seen: number[] = [];
             let completed = -1;
             const count = await db.each(
@@ -227,20 +230,20 @@ describe('each', () => {
                     assert.equal(err, null);
                     seen.push(row.a);
                 },
-                (err, n) => {
+                (err, eachCount) => {
                     assert.equal(err, null);
-                    completed = n;
+                    completed = eachCount;
                 }
             );
             assert.equal(count, 1000);
             assert.equal(completed, 1000);
-            assert.deepEqual(seen, Array.from({ length: 1000 }, (_, i) => i));
+            assert.deepEqual(seen, Array.from({ length: 1000 }, (_, index) => index));
         }));
 
     it('works with an exact multiple of the chunk size and with no rows', () =>
         withDb(async (db) => {
             await db.execute('CREATE TABLE t(a)');
-            await db.batch(Array.from({ length: 512 }, (_, i) => ['INSERT INTO t VALUES (?)', [i]] as [string, any[]]));
+            await db.batch(Array.from({ length: 512 }, (_, index) => statement('INSERT INTO t VALUES (?)', index)));
             assert.equal(await db.each('SELECT a FROM t', [], () => {}), 512);
             assert.equal(await db.each('SELECT a FROM t WHERE a < 0', [], () => {}), 0);
         }));
@@ -250,20 +253,20 @@ describe('each', () => {
             let cbError: Error = null;
             let completeError: Error = null;
             await assert.rejects(
-                db.each('SELECT * FROM nope', [], (e) => (cbError = e), (e) => (completeError = e)),
+                db.each('SELECT * FROM nope', [], (error) => (cbError = error), (error) => (completeError = error)),
                 SqliteError
             );
             assert.equal(cbError, null);
             assert.ok(completeError instanceof SqliteError);
             // without complete the callback gets the error
-            await assert.rejects(db.each('SELECT * FROM nope', [], (e) => (cbError = e)), SqliteError);
+            await assert.rejects(db.each('SELECT * FROM nope', [], (error) => (cbError = error)), SqliteError);
             assert.ok(cbError instanceof SqliteError);
         }));
 
     it('stops and rejects when the callback throws', () =>
         withDb(async (db) => {
             await db.execute('CREATE TABLE t(a)');
-            await db.batch(Array.from({ length: 600 }, (_, i) => ['INSERT INTO t VALUES (?)', [i]] as [string, any[]]));
+            await db.batch(Array.from({ length: 600 }, (_, index) => statement('INSERT INTO t VALUES (?)', index)));
             let calls = 0;
             await assert.rejects(
                 db.each('SELECT a FROM t', [], () => {
@@ -295,7 +298,7 @@ describe('batch', () => {
     it('rolls everything back when one statement fails', () =>
         withDb(async (db) => {
             await db.execute('CREATE TABLE t(a INTEGER PRIMARY KEY)');
-            await assert.rejects(db.batch([['INSERT INTO t VALUES (?)', [1]], ['INSERT INTO t VALUES (?)', [1]]]), (e: SqliteError) => e.code === 19);
+            await assert.rejects(db.batch([['INSERT INTO t VALUES (?)', [1]], ['INSERT INTO t VALUES (?)', [1]]]), (error: SqliteError) => error.code === 19);
             assert.equal((await db.get('SELECT COUNT(*) AS n FROM t')).n, 0);
             await db.execute('BEGIN'); // the connection is not left inside a transaction
             await db.execute('ROLLBACK');
@@ -312,10 +315,10 @@ describe('batch', () => {
         withDb(async (db) => {
             assert.deepEqual(await db.batch([]), []);
             await db.execute('CREATE TABLE t(a, b)');
-            const n = 20000;
-            const res = await db.batch(Array.from({ length: n }, (_, i) => ['INSERT INTO t VALUES (?, ?)', [i, 'row ' + i]] as [string, any[]]));
-            assert.equal(res.length, n);
-            assert.equal((await db.get('SELECT COUNT(*) AS n, MAX(a) AS m FROM t')).m, n - 1);
+            const rowCount = 20000;
+            const res = await db.batch(Array.from({ length: rowCount }, (_, index) => statement('INSERT INTO t VALUES (?, ?)', index, 'row ' + index)));
+            assert.equal(res.length, rowCount);
+            assert.equal((await db.get('SELECT COUNT(*) AS n, MAX(a) AS m FROM t')).m, rowCount - 1);
         }));
 });
 
@@ -382,13 +385,13 @@ describe('transactions', () => {
             await db.execute('CREATE TABLE t(a)');
             const order: string[] = [];
             const before = db.execute('INSERT INTO t VALUES (0)');
-            const tx = db.transaction(async (cancel, t) => {
+            const tx = db.transaction(async (cancel, transaction) => {
                 order.push('begin');
-                await t.execute('INSERT INTO t VALUES (1)');
-                await new Promise((r) => setTimeout(r, 50));
+                await transaction.execute('INSERT INTO t VALUES (1)');
+                await new Promise((resolve) => setTimeout(resolve, 50));
                 order.push('end');
             });
-            await new Promise((r) => setTimeout(r, 10)); // the transaction is open, activeTx is set: this would join
+            await new Promise((resolve) => setTimeout(resolve, 10)); // the transaction is open, activeTx is set: this would join
             await Promise.all([before, tx]);
             // the order the database ran them in (independent of how many promise hops each result takes to reach JS)
             assert.deepEqual(await db.selectArray('SELECT a FROM t ORDER BY rowid'), [[0], [1]]);
@@ -404,20 +407,20 @@ describe('transactions', () => {
 
     it('two connections to a file: the second waits on the busy timeout', async () => {
         const file = tmpDb();
-        const a = open(file, { wal: true });
-        const b = open(file, { busyTimeout: 20 });
+        const first = open(file, { wal: true });
+        const second = open(file, { busyTimeout: 20 });
         try {
-            await a.execute('CREATE TABLE t(a)');
-            await b.ready;
-            await a.transaction(async (cancel, tx) => {
+            await first.execute('CREATE TABLE t(a)');
+            await second.ready;
+            await first.transaction(async (cancel, tx) => {
                 await tx.execute('INSERT INTO t VALUES (1)');
-                await assert.rejects(b.execute('INSERT INTO t VALUES (2)'), (e: SqliteError) => e.code === 5); // SQLITE_BUSY
+                await assert.rejects(second.execute('INSERT INTO t VALUES (2)'), (error: SqliteError) => error.code === 5); // SQLITE_BUSY
             });
-            await b.execute('INSERT INTO t VALUES (3)');
-            assert.equal((await a.get('SELECT COUNT(*) AS n FROM t')).n, 2);
+            await second.execute('INSERT INTO t VALUES (3)');
+            assert.equal((await first.get('SELECT COUNT(*) AS n FROM t')).n, 2);
         } finally {
-            await a.close();
-            await b.close();
+            await first.close();
+            await second.close();
         }
     });
 });
@@ -427,26 +430,26 @@ describe('concurrency', () => {
         withDb(async (db) => {
             await db.execute('CREATE TABLE t(a)');
             const jobs = [];
-            for (let i = 0; i < 500; i++) {
-                jobs.push(db.execute('INSERT INTO t VALUES (?)', i));
+            for (let index = 0; index < 500; index++) {
+                jobs.push(db.execute('INSERT INTO t VALUES (?)', index));
             }
             await Promise.all(jobs);
             const rows = await db.selectArray('SELECT a FROM t ORDER BY rowid');
-            assert.deepEqual(rows.map((r) => r[0]), Array.from({ length: 500 }, (_, i) => i));
+            assert.deepEqual(rows.map((row) => row[0]), Array.from({ length: 500 }, (_, index) => index));
         }));
 
     it('serves several databases in parallel', async () => {
         const dbs = [open(tmpDb()), open(tmpDb()), open(tmpDb())];
         try {
             await Promise.all(
-                dbs.map(async (db, k) => {
+                dbs.map(async (db, dbIndex) => {
                     await db.execute('CREATE TABLE t(a)');
-                    await db.batch(Array.from({ length: 2000 }, (_, i) => ['INSERT INTO t VALUES (?)', [i * (k + 1)]] as [string, any[]]));
+                    await db.batch(Array.from({ length: 2000 }, (_, index) => statement('INSERT INTO t VALUES (?)', index * (dbIndex + 1))));
                     return db.get('SELECT SUM(a) AS s FROM t');
                 })
-            ).then((res) => assert.deepEqual(res.map((r) => r.s), [0, 1, 2].map((k) => (1999 * 2000 / 2) * (k + 1))));
+            ).then((res) => assert.deepEqual(res.map((row) => row.s), [0, 1, 2].map((dbIndex) => (1999 * 2000 / 2) * (dbIndex + 1))));
         } finally {
-            await Promise.all(dbs.map((d) => d.close()));
+            await Promise.all(dbs.map((database) => database.close()));
         }
     });
 
@@ -460,10 +463,6 @@ describe('concurrency', () => {
             assert.equal(rows[49999][1].length, 100);
             assert.equal(rows[0][2].length, 16);
         }));
-});
-
-after(() => {
-    // all databases are closed by the tests: nothing left to do, this only makes the intent explicit
 });
 
 describe('blocking calls', () => {
@@ -485,8 +484,8 @@ describe('blocking calls', () => {
 
     it('throw SqliteError', () =>
         withDb(async (db) => {
-            assert.throws(() => db.selectSync('SELEKT 1'), (e: SqliteError) => e instanceof SqliteError && e.code === 1 && e.sql === 'SELEKT 1');
-            assert.throws(() => db.getSync('SELECT ?, ?', [1]), (e: SqliteError) => e.code === -2);
+            assert.throws(() => db.selectSync('SELEKT 1'), (error: SqliteError) => error instanceof SqliteError && error.code === 1 && error.sql === 'SELEKT 1');
+            assert.throws(() => db.getSync('SELECT ?, ?', [1]), (error: SqliteError) => error.code === -2);
             assert.equal(db.getSync('SELECT 1 AS one').one, 1);
         }));
 
@@ -505,7 +504,7 @@ describe('blocking calls', () => {
     it('fail on a closed database', async () => {
         const db = open();
         await db.close();
-        assert.throws(() => db.getSync('SELECT 1'), (e: SqliteError) => e.code === -1);
+        assert.throws(() => db.getSync('SELECT 1'), (error: SqliteError) => error.code === -1);
     });
 });
 

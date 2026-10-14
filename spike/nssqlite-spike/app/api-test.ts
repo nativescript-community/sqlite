@@ -1,9 +1,10 @@
 /* Exercises the plugin through its public TypeScript API on a device: every binding available on the runtime. */
 import { SqliteError, configure, openOrCreate, openOrCreateAsync, deleteDatabase } from '@nativescript-community/sqlite';
+import { BackendName, messageOf, stackOf, statement } from './util';
 
 declare const __ANDROID__: boolean;
 
-const log = (...a: any[]) => console.log('[API]', ...a);
+const log = (...args: any[]) => console.log('[API]', ...args);
 
 let passed = 0;
 let failed = 0;
@@ -12,35 +13,34 @@ async function check(name: string, fn: () => Promise<void> | void) {
     try {
         await fn();
         passed++;
-    } catch (e) {
+    } catch (error) {
         failed++;
-        log('FAIL', name, String((e && (e as any).message) || e));
+        log('FAIL', name, messageOf(error));
     }
 }
 
 function eq(actual: any, expected: any, what = '') {
-    const a = JSON.stringify(actual, (_k, v) => (typeof v === 'bigint' ? v.toString() + 'n' : v instanceof Uint8Array ? Array.from(v) : v));
-    const b = JSON.stringify(expected, (_k, v) => (typeof v === 'bigint' ? v.toString() + 'n' : v instanceof Uint8Array ? Array.from(v) : v));
-    if (a !== b) {
-        throw new Error(`${what} expected ${b} got ${a}`);
+    const actualJson = JSON.stringify(actual, (_k, value) => (typeof value === 'bigint' ? value.toString() + 'n' : value instanceof Uint8Array ? Array.from(value) : value));
+    const expectedJson = JSON.stringify(expected, (_k, value) => (typeof value === 'bigint' ? value.toString() + 'n' : value instanceof Uint8Array ? Array.from(value) : value));
+    if (actualJson !== expectedJson) {
+        throw new Error(`${what} expected ${expectedJson} got ${actualJson}`);
     }
 }
 
-async function rejects(p: Promise<any>, test: (e: any) => boolean, what: string) {
+async function rejects(promise: Promise<any>, test: (error: any) => boolean, what: string) {
     try {
-        await p;
-    } catch (e) {
-        if (!test(e)) {
-            throw new Error(`${what}: unexpected error ${e}`);
+        await promise;
+    } catch (error) {
+        if (!test(error)) {
+            throw new Error(`${what}: unexpected error ${error}`);
         }
         return;
     }
     throw new Error(`${what}: did not reject`);
 }
 
-type Backends = 'auto' | 'napi' | 'bridge';
 
-async function suite(backend: Backends) {
+async function suite(backend: BackendName) {
     configure({ backend });
     const db = openOrCreate(':memory:');
     await db.ready;
@@ -63,23 +63,23 @@ async function suite(backend: Backends) {
         eq(await db.getArray('SELECT ?, ?, ?', ['', long, 'a'.repeat(50) + 'é' + 'b'.repeat(50)]), ['', long, 'a'.repeat(50) + 'é' + 'b'.repeat(50)]);
     });
     await check(backend + ' errors', async () => {
-        await rejects(db.execute('SELEKT 1'), (e) => e instanceof SqliteError && e.code === 1 && /syntax/.test(e.message), 'syntax');
-        await rejects(db.get('SELECT ?, ?', [1]), (e) => e instanceof SqliteError && e.code === -2, 'param count');
+        await rejects(db.execute('SELEKT 1'), (error) => error instanceof SqliteError && error.code === 1 && /syntax/.test(error.message), 'syntax');
+        await rejects(db.get('SELECT ?, ?', [1]), (error) => error instanceof SqliteError && error.code === -2, 'param count');
         eq((await db.get('SELECT 1 AS one')).one, 1);
     });
     await check(backend + ' batch', async () => {
         await db.execute('CREATE TABLE b(a INTEGER PRIMARY KEY, v)');
         const res = await db.batch([['INSERT INTO b VALUES (?, ?)', [1, 'one']], ['INSERT INTO b VALUES (?, ?)', [2, 'two']], 'SELECT a, v FROM b ORDER BY a']);
         eq(res[2].rows, [{ a: 1, v: 'one' }, { a: 2, v: 'two' }]);
-        await rejects(db.batch([['INSERT INTO b VALUES (?, ?)', [3, 'x']], ['INSERT INTO b VALUES (?, ?)', [1, 'dup']]]), (e) => e.code === 19, 'atomic');
+        await rejects(db.batch([['INSERT INTO b VALUES (?, ?)', [3, 'x']], ['INSERT INTO b VALUES (?, ?)', [1, 'dup']]]), (error) => error.code === 19, 'atomic');
         eq((await db.get('SELECT COUNT(*) AS n FROM b')).n, 2);
     });
     await check(backend + ' each', async () => {
         await db.execute('CREATE TABLE e(a)');
-        await db.batch(Array.from({ length: 1000 }, (_, i) => ['INSERT INTO e VALUES (?)', [i]] as [string, any[]]));
+        await db.batch(Array.from({ length: 1000 }, (_, index) => statement('INSERT INTO e VALUES (?)', index)));
         let sum = 0;
-        const n = await db.each('SELECT a FROM e', [], (_err, row) => (sum += row.a));
-        eq([n, sum], [1000, 499500]);
+        const count = await db.each('SELECT a FROM e', [], (_err, row) => (sum += row.a));
+        eq([count, sum], [1000, 499500]);
     });
     await check(backend + ' transactions', async () => {
         await db.execute('CREATE TABLE x(a)');
@@ -95,14 +95,14 @@ async function suite(backend: Backends) {
                 await db.execute('INSERT INTO x VALUES (3)');
                 throw new Error('boom');
             }),
-            (e) => /boom/.test(e.message),
+            (error) => /boom/.test(error.message),
             'rollback on throw'
         );
-        eq((await db.selectArray('SELECT a FROM x')).map((r) => r[0]), [1]);
+        eq((await db.selectArray('SELECT a FROM x')).map((row) => row[0]), [1]);
     });
     await check(backend + ' concurrency', async () => {
         await db.execute('CREATE TABLE c(a)');
-        await Promise.all(Array.from({ length: 300 }, (_, i) => db.execute('INSERT INTO c VALUES (?)', i)));
+        await Promise.all(Array.from({ length: 300 }, (_, index) => db.execute('INSERT INTO c VALUES (?)', index)));
         eq((await db.get('SELECT COUNT(*) AS n, SUM(a) AS s FROM c')), { n: 300, s: 44850 });
     });
     await check(backend + ' version', async () => {
@@ -112,32 +112,32 @@ async function suite(backend: Backends) {
     await check(backend + ' file database', async () => {
         const name = 'api-test-' + backend + '.db';
         deleteDatabase(name);
-        const f = await openOrCreateAsync(name, { wal: true });
-        await f.execute('CREATE TABLE t(a)');
-        await f.execute('INSERT INTO t VALUES (1)');
-        eq(f.filePath.indexOf('/') === 0, true);
-        await f.close();
-        const g = openOrCreate(name);
-        eq((await g.get('SELECT COUNT(*) AS n FROM t')).n, 1);
-        await g.close();
+        const created = await openOrCreateAsync(name, { wal: true });
+        await created.execute('CREATE TABLE t(a)');
+        await created.execute('INSERT INTO t VALUES (1)');
+        eq(created.filePath.indexOf('/') === 0, true);
+        await created.close();
+        const reopened = openOrCreate(name);
+        eq((await reopened.get('SELECT COUNT(*) AS n FROM t')).n, 1);
+        await reopened.close();
         eq(deleteDatabase(name), true);
     });
     await check(backend + ' journal mode default: WAL on Android, SQLite default on iOS; options win', async () => {
         const name = 'api-test-journal-' + backend + '.db';
         deleteDatabase(name);
         const mode = async (options?: any) => {
-            const d = openOrCreate(name, options);
-            const m = (await d.getArray('PRAGMA journal_mode'))[0];
-            await d.close();
-            return m;
+            const database = openOrCreate(name, options);
+            const journalMode = (await database.getArray('PRAGMA journal_mode'))[0];
+            await database.close();
+            return journalMode;
         };
         eq(await mode(), __ANDROID__ ? 'wal' : 'delete', 'default');
         deleteDatabase(name);
         eq(await mode({ wal: false }), 'delete', 'wal: false');
         deleteDatabase(name);
-        const d = openOrCreate(name);
-        await d.execute('CREATE TABLE t(a)');
-        await d.close();
+        const database = openOrCreate(name);
+        await database.execute('CREATE TABLE t(a)');
+        await database.close();
         const ro = openOrCreate(name, { readOnly: true });
         eq((await ro.getArray('SELECT count(*) FROM t'))[0], 0, 'read-only with the default');
         await ro.close();
@@ -148,31 +148,31 @@ async function suite(backend: Backends) {
     });
     await check(backend + ' open failure', async () => {
         const bad = openOrCreate('/nonexistent-dir-xyz/a/b.db', { flags: 0x2 }); // no CREATE: the folder cannot be created either
-        await rejects(bad.ready, (e) => e instanceof SqliteError, 'ready');
+        await rejects(bad.ready, (error) => error instanceof SqliteError, 'ready');
         await bad.close();
     });
     await check(backend + ' closed', async () => {
         await db.close();
-        await rejects(db.get('SELECT 1'), (e) => e instanceof SqliteError && e.code === -1, 'closed');
+        await rejects(db.get('SELECT 1'), (error) => error instanceof SqliteError && error.code === -1, 'closed');
     });
 }
 
-export async function runApiTests(backends: Backends[]) {
+export async function runApiTests(backends: BackendName[]) {
     try {
-        for (const b of backends) {
+        for (const backend of backends) {
             passed = 0;
             failed = 0;
             const t0 = Date.now();
             try {
-                await suite(b);
-            } catch (e) {
+                await suite(backend);
+            } catch (error) {
                 failed++;
-                log(b, 'SUITE ERROR', String(e), (e as any) && (e as any).stack ? String((e as any).stack).split('\n').slice(0, 4).join(' | ') : '');
+                log(backend, 'SUITE ERROR', messageOf(error), stackOf(error, 4));
             }
-            log(b, 'RESULT passed', passed, 'failed', failed, 'in', Date.now() - t0, 'ms');
+            log(backend, 'RESULT passed', passed, 'failed', failed, 'in', Date.now() - t0, 'ms');
         }
         log('done');
-    } catch (e) {
-        log('ERROR', String(e));
+    } catch (error) {
+        log('ERROR', String(error));
     }
 }

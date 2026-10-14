@@ -1,8 +1,15 @@
 import { strict as assert } from 'assert';
 import { describe, it } from 'node:test';
 import { decodeBatch, decodeRows, encodeBatch, encodeParams, utf8DecodeJs, utf8EncodeJs } from '../codec';
+import { SqliteParams } from '../sqlite.common';
 
-const u32 = (v: number) => new Uint8Array(new Uint32Array([v]).buffer);
+function encodedParams(params: SqliteParams) {
+    const encoded = encodeParams(params);
+    assert.ok(encoded);
+    return encoded;
+}
+
+const u32 = (value: number) => new Uint8Array(new Uint32Array([value]).buffer);
 
 describe('encodeParams', () => {
     it('returns null without parameters', () => {
@@ -12,17 +19,17 @@ describe('encodeParams', () => {
     });
 
     it('writes count and typed values', () => {
-        const b = new Uint8Array(encodeParams([1, 'a', null, 1.5])!);
-        assert.deepEqual(Array.from(b.subarray(0, 4)), [4, 0, 0, 0]);
-        assert.deepEqual(Array.from(b.subarray(4, 9)), [1, 1, 0, 0, 0]); // INT32 1
-        assert.deepEqual(Array.from(b.subarray(9, 15)), [4, 1, 0, 0, 0, 97]); // TEXT "a"
-        assert.equal(b[15], 0); // NULL
-        assert.equal(b[16], 3); // DOUBLE
-        assert.equal(b.length, 4 + 5 + 6 + 1 + 9);
+        const bytes = new Uint8Array(encodedParams([1, 'a', null, 1.5]));
+        assert.deepEqual(Array.from(bytes.subarray(0, 4)), [4, 0, 0, 0]);
+        assert.deepEqual(Array.from(bytes.subarray(4, 9)), [1, 1, 0, 0, 0]); // INT32 1
+        assert.deepEqual(Array.from(bytes.subarray(9, 15)), [4, 1, 0, 0, 0, 97]); // TEXT "a"
+        assert.equal(bytes[15], 0); // NULL
+        assert.equal(bytes[16], 3); // DOUBLE
+        assert.equal(bytes.length, 4 + 5 + 6 + 1 + 9);
     });
 
     it('uses 64 bit integers beyond 32 bits and keeps the sign', () => {
-        const dv = new DataView(encodeParams([-3000000000, 2 ** 40])!);
+        const dv = new DataView(encodedParams([-3000000000, 2 ** 40]));
         assert.equal(dv.getUint8(4), 2);
         assert.equal(dv.getUint32(5, true) + dv.getInt32(9, true) * 4294967296, -3000000000);
         assert.equal(dv.getUint8(13), 2);
@@ -31,7 +38,7 @@ describe('encodeParams', () => {
 
     it('grows past its scratch buffer without corrupting the data', () => {
         const long = 'é'.repeat(3000);
-        const buf = encodeParams([long, new Uint8Array(5000).fill(7)])!;
+        const buf = encodedParams([long, new Uint8Array(5000).fill(7)]);
         const dv = new DataView(buf);
         assert.equal(dv.getUint8(4), 4);
         assert.equal(dv.getUint32(5, true), 6000);
@@ -42,10 +49,10 @@ describe('encodeParams', () => {
     });
 
     it('does not share memory between calls', () => {
-        const a = encodeParams(['first'])!;
-        const copy = new Uint8Array(a).slice();
+        const encoded = encodedParams(['first']);
+        const copy = new Uint8Array(encoded).slice();
         encodeParams(['second value that is different']);
-        assert.deepEqual(new Uint8Array(a), copy);
+        assert.deepEqual(new Uint8Array(encoded), copy);
     });
 });
 
@@ -65,28 +72,28 @@ describe('encodeBatch', () => {
 
 describe('decodeRows', () => {
     const header = (ncols: number, nrows: number, heapOffset: number) => {
-        const h = new Uint8Array(32);
-        const dv = new DataView(h.buffer);
+        const headerBytes = new Uint8Array(32);
+        const dv = new DataView(headerBytes.buffer);
         dv.setUint32(0, 0x3152534e, true);
         dv.setUint32(4, ncols, true);
         dv.setUint32(8, nrows, true);
         dv.setUint32(28, heapOffset, true);
-        return h;
+        return headerBytes;
     };
     const concat = (...parts: Uint8Array[]) => {
-        const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
-        let o = 0;
-        for (const p of parts) {
-            out.set(p, o);
-            o += p.length;
+        const out = new Uint8Array(parts.reduce((total, part) => total + part.length, 0));
+        let offset = 0;
+        for (const part of parts) {
+            out.set(part, offset);
+            offset += part.length;
         }
         return out.buffer;
     };
 
     it('decodes a minimal block', () => {
         const buf = concat(header(1, 1, 32 + 5 + 5), u32(1), new Uint8Array([97]), new Uint8Array([1, 9, 0, 0, 0]));
-        const r = decodeRows(buf, { objects: true });
-        assert.deepEqual(r.rows, [{ a: 9 }]);
+        const result = decodeRows(buf, { objects: true });
+        assert.deepEqual(result.rows, [{ a: 9 }]);
     });
 
     it('rejects malformed blocks', () => {
@@ -109,9 +116,9 @@ describe('decodeRows', () => {
     it('decodes batch results', () => {
         const block = new Uint8Array(concat(header(1, 1, 32 + 5 + 5), u32(1), new Uint8Array([97]), new Uint8Array([1, 5, 0, 0, 0])));
         const buf = concat(u32(2), u32(block.length), block, u32(block.length), block);
-        const r = decodeBatch(buf, { objects: true });
-        assert.equal(r.length, 2);
-        assert.deepEqual(r[1].rows, [{ a: 5 }]);
+        const results = decodeBatch(buf, { objects: true });
+        assert.equal(results.length, 2);
+        assert.deepEqual(results[1].rows, [{ a: 5 }]);
     });
 });
 
@@ -120,37 +127,37 @@ describe('utf-8 without TextDecoder / TextEncoder', () => {
 
     it('encodes like TextEncoder', () => {
         const native = new TextEncoder();
-        for (const s of samples.concat(['lone \ud800 high', 'lone \udc00 low', '\ud800', 'a\udbff'])) {
-            assert.deepEqual(Array.from(utf8EncodeJs(s)), Array.from(native.encode(s)));
+        for (const sample of samples.concat(['lone \ud800 high', 'lone \udc00 low', '\ud800', 'a\udbff'])) {
+            assert.deepEqual(Array.from(utf8EncodeJs(sample)), Array.from(native.encode(sample)));
         }
     });
 
     it('decodes like TextDecoder', () => {
         const native = new TextDecoder();
-        for (const s of samples) {
-            const b = new TextEncoder().encode(s);
-            assert.equal(utf8DecodeJs(b, 0, b.length), native.decode(b));
+        for (const sample of samples) {
+            const bytes = new TextEncoder().encode(sample);
+            assert.equal(utf8DecodeJs(bytes, 0, bytes.length), native.decode(bytes));
         }
         // invalid input (never produced by SQLite for text): both give U+FFFD, the number of replacements may differ
         for (const bad of [[0x80], [0xc3], [0xe2, 0x82], [0xf0, 0x9f, 0x98], [0xc0, 0x80], [0xed, 0xa0, 0x80], [0xf4, 0x90, 0x80, 0x80], [0xff, 0x41], [0xe2, 0x28, 0xa1]]) {
-            const b = new Uint8Array(bad);
-            const js = utf8DecodeJs(b, 0, b.length);
+            const bytes = new Uint8Array(bad);
+            const js = utf8DecodeJs(bytes, 0, bytes.length);
             assert.ok(js.includes('\ufffd'), bad.join(','));
-            assert.ok(native.decode(b).includes('\ufffd'));
+            assert.ok(native.decode(bytes).includes('\ufffd'));
         }
     });
 
     it('decodes a range of a bigger buffer', () => {
-        const b = new TextEncoder().encode('xxhéllo 😀yy');
-        assert.equal(utf8DecodeJs(b, 2, b.length - 2), 'héllo 😀');
+        const bytes = new TextEncoder().encode('xxhéllo 😀yy');
+        assert.equal(utf8DecodeJs(bytes, 2, bytes.length - 2), 'héllo 😀');
     });
 
     it('round trips rows through the codec without the globals', () => {
-        const g: any = globalThis;
-        const saved = [g.TextDecoder, g.TextEncoder];
+        const globals: any = globalThis;
+        const saved = [globals.TextDecoder, globals.TextEncoder];
         // a fresh module instance that has not seen the globals yet
-        g.TextDecoder = undefined;
-        g.TextEncoder = undefined;
+        globals.TextDecoder = undefined;
+        globals.TextEncoder = undefined;
         try {
             for (const key of Object.keys(require.cache)) {
                 if (/[\\/]codec\.js$/.test(key)) {
@@ -165,8 +172,8 @@ describe('utf-8 without TextDecoder / TextEncoder', () => {
             assert.ok(batch.byteLength > 0);
             assert.equal(Array.from(new Uint8Array(batch)).length, batch.byteLength);
         } finally {
-            g.TextDecoder = saved[0];
-            g.TextEncoder = saved[1];
+            globals.TextDecoder = saved[0];
+            globals.TextEncoder = saved[1];
         }
     });
 });
@@ -187,8 +194,8 @@ describe('native utf-8 (Node-API module)', () => {
 
     it('encodes like the JS encoder', () => {
         const addon = loadAddon();
-        const s = sample.repeat(50) + '\ud800 lone surrogate';
-        assert.deepEqual(Array.from(new Uint8Array(addon.encodeUtf8(s))), Array.from(utf8EncodeJs(s)));
+        const text = sample.repeat(50) + '\ud800 lone surrogate';
+        assert.deepEqual(Array.from(new Uint8Array(addon.encodeUtf8(text))), Array.from(utf8EncodeJs(text)));
     });
 
     it('rejects a range outside the buffer and a non ArrayBuffer', () => {

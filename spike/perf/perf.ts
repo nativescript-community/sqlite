@@ -5,40 +5,48 @@ import { openOrCreate } from '@nativescript-community/sqlite';
 
 declare const __ANDROID__: boolean;
 
-const log = (...a: any[]) => console.log('[PERF]', ...a);
+function messageOf(error: unknown): string {
+    return typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string' ? error.message : String(error);
+}
+
+function stackOf(error: unknown, lines: number): string {
+    return typeof error === 'object' && error !== null && 'stack' in error && typeof error.stack === 'string' ? error.stack.split('\n').slice(0, lines).join(' | ') : '';
+}
+
+const log = (...args: any[]) => console.log('[PERF]', ...args);
 const now = (): number => performance.now();
 
 function median(xs: number[]) {
-    const s = xs.slice().sort((a, b) => a - b);
-    return s[Math.floor(s.length / 2)];
+    const sorted = xs.slice().sort((left, right) => left - right);
+    return sorted[Math.floor(sorted.length / 2)];
 }
 
 interface Result { ms: number; min: number; info?: any }
 
 async function measure(fn: () => Promise<any>, runs: number, prepare?: () => Promise<any>, warmup = 1): Promise<Result> {
-    const t: number[] = [];
+    const times: number[] = [];
     let info: any;
-    for (let i = 0; i < warmup + runs; i++) {
+    for (let index = 0; index < warmup + runs; index++) {
         if (prepare) await prepare();
         const t0 = now();
         info = await fn();
         const dt = now() - t0;
-        if (i >= warmup) t.push(dt);
+        if (index >= warmup) times.push(dt);
     }
-    return { ms: +median(t).toFixed(1), min: +Math.min(...t).toFixed(1), info };
+    return { ms: +median(times).toFixed(1), min: +Math.min(...times).toFixed(1), info };
 }
 
 function removeDb(file: string) {
-    for (const s of ['', '-wal', '-shm', '-journal']) {
+    for (const suffix of ['', '-wal', '-shm', '-journal']) {
         try {
-            if (File.exists(file + s)) File.fromPath(file + s).removeSync();
-        } catch (e) {
+            if (File.exists(file + suffix)) File.fromPath(file + suffix).removeSync();
+        } catch (error) {
             // ignore
         }
     }
 }
 
-const CTE = (n: number) => `WITH RECURSIVE c(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM c WHERE x < ${n})`;
+const CTE = (limit: number) => `WITH RECURSIVE c(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM c WHERE x < ${limit})`;
 
 export interface Variant {
     label: string;
@@ -58,9 +66,9 @@ async function jank(fn: () => Promise<any>) {
     let last = now();
     let max = 0;
     const timer = setInterval(() => {
-        const t = now();
-        max = Math.max(max, t - last);
-        last = t;
+        const time = now();
+        max = Math.max(max, time - last);
+        last = time;
     }, 4);
     const t0 = now();
     last = t0;
@@ -78,9 +86,9 @@ export async function runPerf(variant: Variant) {
     variant.setup && variant.setup();
     const db: any = openOrCreate(file, variant.options || {});
     const out: Record<string, Result | any> = {};
-    const report = (key: string, r: any) => {
-        out[key] = r;
-        log(name, key, JSON.stringify(r));
+    const report = (key: string, result: any) => {
+        out[key] = result;
+        log(name, key, JSON.stringify(result));
     };
     try {
         await db.execute('CREATE TABLE narrow(id INTEGER PRIMARY KEY, name TEXT, score REAL)');
@@ -102,14 +110,14 @@ export async function runPerf(variant: Variant) {
         report(
             'insert 500 rows, one awaited execute each, autocommit',
             await measure(async () => {
-                for (let i = 0; i < 500; i++) await db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5]);
+                for (let index = 0; index < 500; index++) await db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + index, index * 0.5]);
             }, 3, clearIns)
         );
         if (!variant.skipTransactions) report(
             'insert 5000 rows in a transaction, awaited one by one',
             await measure(async () => {
                 await db.transaction(async () => {
-                    for (let i = 0; i < 5000; i++) await db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5]);
+                    for (let index = 0; index < 5000; index++) await db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + index, index * 0.5]);
                 });
             }, 5, clearIns)
         );
@@ -117,12 +125,12 @@ export async function runPerf(variant: Variant) {
             'insert 5000 rows in a transaction, all started at once',
             await measure(async () => {
                 await db.transaction(async () => {
-                    await Promise.all(Array.from({ length: 5000 }, (_, i) => db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5])));
+                    await Promise.all(Array.from({ length: 5000 }, (_, index) => db.execute('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + index, index * 0.5])));
                 });
             }, 5, clearIns)
         );
         if (typeof db.batch === 'function') {
-            const items = Array.from({ length: 5000 }, (_, i) => ['INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5]]);
+            const items = Array.from({ length: 5000 }, (_, index) => ['INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + index, index * 0.5]]);
             report('insert 5000 rows with batch() (new API only)', await measure(() => db.batch(items), 5, clearIns));
         }
 
@@ -130,7 +138,7 @@ export async function runPerf(variant: Variant) {
         let hasSync = false;
         try {
             hasSync = typeof db.getSync === 'function' && !!db.getSync('SELECT 1 AS one');
-        } catch (e) {
+        } catch (error) {
             hasSync = false;
         }
         if (hasSync) {
@@ -138,7 +146,7 @@ export async function runPerf(variant: Variant) {
                 'insert 5000 rows in a transaction, blocking executeSync (new API only)',
                 await measure(async () => {
                     await db.transaction(async () => {
-                        for (let i = 0; i < 5000; i++) db.executeSync('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + i, i * 0.5]);
+                        for (let index = 0; index < 5000; index++) db.executeSync('INSERT INTO ins(a, b) VALUES (?, ?)', ['row ' + index, index * 0.5]);
                     });
                 }, 5, clearIns)
             );
@@ -153,7 +161,7 @@ export async function runPerf(variant: Variant) {
         report(
             '500 small selects (100 rows), one after the other',
             await measure(async () => {
-                for (let i = 0; i < 500; i++) await db.select('SELECT id, name FROM narrow WHERE id <= 100');
+                for (let index = 0; index < 500; index++) await db.select('SELECT id, name FROM narrow WHERE id <= 100');
             }, 5)
         );
         const point = variant.pointViaSelect
@@ -162,32 +170,32 @@ export async function runPerf(variant: Variant) {
         report(
             '1000 get by primary key, one after the other',
             await measure(async () => {
-                for (let i = 1; i <= 1000; i++) await point(i);
+                for (let index = 1; index <= 1000; index++) await point(index);
             }, 5)
         );
-        report('1000 get by primary key, all started at once', await measure(async () => (await Promise.all(Array.from({ length: 1000 }, (_, i) => point(i + 1)))).length, 5));
+        report('1000 get by primary key, all started at once', await measure(async () => (await Promise.all(Array.from({ length: 1000 }, (_, index) => point(index + 1)))).length, 5));
         if (hasSync) {
             report(
                 '1000 get by primary key, blocking getSync (new API only)',
                 await measure(async () => {
-                    for (let i = 1; i <= 1000; i++) db.getSync('SELECT * FROM narrow WHERE id = ?', [i]);
+                    for (let index = 1; index <= 1000; index++) db.getSync('SELECT * FROM narrow WHERE id = ?', [index]);
                 }, 5)
             );
             report(
                 '500 small selects (100 rows), blocking selectSync (new API only)',
                 await measure(async () => {
-                    for (let i = 0; i < 500; i++) db.selectSync('SELECT id, name FROM narrow WHERE id <= 100');
+                    for (let index = 0; index < 500; index++) db.selectSync('SELECT id, name FROM narrow WHERE id <= 100');
                 }, 5)
             );
         }
         report(
             'each over 20000 rows',
             await measure(async () => {
-                let n = 0;
+                let count = 0;
                 await db.each('SELECT * FROM narrow', [], () => {
-                    n++;
+                    count++;
                 }, () => {});
-                return n;
+                return count;
             }, 5)
         );
 
@@ -195,26 +203,26 @@ export async function runPerf(variant: Variant) {
         const big = 'SELECT a.id, a.name, a.score, k.k FROM narrow a, (SELECT 1 AS k UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) k';
         if (!variant.skipBigSelect) {
             const gaps: any[] = [];
-            for (let i = 0; i < 4; i++) {
-                const g = await jank(async () => (await db.select(big)).length);
-                if (i > 0) gaps.push(g);
+            for (let index = 0; index < 4; index++) {
+                const gap = await jank(async () => (await db.select(big)).length);
+                if (index > 0) gaps.push(gap);
             }
-            report('jank during select of 100000 rows x 4', { maxGapMs: median(gaps.map((g) => g.maxGapMs)), totalMs: median(gaps.map((g) => g.totalMs)) });
+            report('jank during select of 100000 rows x 4', { maxGapMs: median(gaps.map((gap) => gap.maxGapMs)), totalMs: median(gaps.map((gap) => gap.totalMs)) });
         }
         const gaps2: any[] = [];
-        for (let i = 0; i < 4; i++) {
-            const g = await jank(async () => {
-                for (let k = 0; k < 20; k++) await db.select('SELECT * FROM narrow LIMIT 2000');
+        for (let index = 0; index < 4; index++) {
+            const gap = await jank(async () => {
+                for (let iteration = 0; iteration < 20; iteration++) await db.select('SELECT * FROM narrow LIMIT 2000');
             });
-            if (i > 0) gaps2.push(g);
+            if (index > 0) gaps2.push(gap);
         }
-        report('jank during 20 selects of 2000 rows', { maxGapMs: median(gaps2.map((g) => g.maxGapMs)), totalMs: median(gaps2.map((g) => g.totalMs)) });
-    } catch (e) {
-        log(name, 'ERROR', String(e), e && (e as any).stack ? String((e as any).stack).split('\n').slice(0, 3).join(' | ') : '');
+        report('jank during 20 selects of 2000 rows', { maxGapMs: median(gaps2.map((gap) => gap.maxGapMs)), totalMs: median(gaps2.map((gap) => gap.totalMs)) });
+    } catch (error) {
+        log(name, 'ERROR', messageOf(error), stackOf(error, 3));
     }
     try {
         await db.close();
-    } catch (e) {
+    } catch (error) {
         // ignore
     }
     removeDb(file);

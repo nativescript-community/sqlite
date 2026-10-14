@@ -6,10 +6,7 @@ export function toError(raw: RawResult, sql?: string) {
     return new SqliteError(raw.message || `SQLite error ${raw.status}`, raw.status, sql);
 }
 
-/**
- * Submits a request and resolves with its (only) result, rejects with a SqliteError. `submit` receives the
- * callback and returns the core submit status.
- */
+/** Submits a request and resolves with its only result, rejects with a SqliteError. `submit` returns the core submit status. */
 export function request(submit: (cb: ResultCallback) => number, sql?: string): Promise<RawResult> {
     return new Promise((resolve, reject) => {
         const rc = submit((raw) => {
@@ -28,8 +25,8 @@ export function request(submit: (cb: ResultCallback) => number, sql?: string): P
 }
 
 /**
- * Same for streamed requests: `onChunk` is called for every chunk (done = false) and the promise resolves with the
- * final result. When `onChunk` throws, remaining chunks are released and the promise rejects once the stream ended.
+ * Same for streamed requests: `onChunk` gets every chunk (done = false), the promise resolves with the final result. When
+ * `onChunk` throws, the remaining chunks are released and the promise rejects once the stream ended.
  */
 export function stream(submit: (cb: ResultCallback) => number, onChunk: (raw: RawResult) => void, sql?: string): Promise<RawResult> {
     return new Promise((resolve, reject) => {
@@ -45,8 +42,8 @@ export function stream(submit: (cb: ResultCallback) => number, onChunk: (raw: Ra
                 if (!failure) {
                     try {
                         onChunk(raw);
-                    } catch (e) {
-                        failure = e;
+                    } catch (error) {
+                        failure = error;
                     }
                 }
                 raw.release && raw.release();
@@ -65,6 +62,18 @@ export function stream(submit: (cb: ResultCallback) => number, onChunk: (raw: Ra
     });
 }
 
+/** The message of anything that was thrown (runtimes throw their own error types). */
+export function messageOf(error: unknown): string {
+    if (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string') {
+        return error.message;
+    }
+    return String(error);
+}
+
+export function asError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(messageOf(error));
+}
+
 const engines = new Map<any, any>();
 
 /** Loads (and caches) the first SQLite library of the candidates that works. */
@@ -76,11 +85,11 @@ export function loadEngine(backend: Backend, candidates: Array<string | null>): 
             return engines.get(key);
         }
         try {
-            const e = backend.engine(lib);
-            engines.set(key, e);
-            return e;
-        } catch (e) {
-            errors.push(`${lib === null ? '(sqlite3 symbols of the process)' : lib}: ${(e && (e as any).message) || e}`);
+            const handle = backend.engine(lib);
+            engines.set(key, handle);
+            return handle;
+        } catch (error) {
+            errors.push(`${lib === null ? '(sqlite3 symbols of the process)' : lib}: ${messageOf(error)}`);
         }
     }
     if (candidates.length === 0) {

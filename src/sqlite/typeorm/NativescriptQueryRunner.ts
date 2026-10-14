@@ -57,7 +57,11 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner implement
             }
 
             if (useStructuredResult) {
-                return { records: kind ? [] : result, raw: result, affected } as QueryResult;
+                const queryResult = new QueryResult();
+                queryResult.records = kind ? [] : result;
+                queryResult.raw = result;
+                queryResult.affected = affected;
+                return queryResult;
             } else {
                 return result;
             }
