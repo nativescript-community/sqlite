@@ -18,7 +18,8 @@
         "test.android.verbose": "pnpm run build  && cd ./demo && tns build android && tns test android",
         "test.ios.verbose": "pnpm run build  && cd ./demo && tns build ios && tns test ios",
         "commitmsg": "commitlint -e $GIT_PARAMS",
-        "build.all": "npm run build",
+        "build.native": "sh native/build-all.sh",
+        "build.all": "npm run build && npm run build.native",
         "fullclean": "npm run clean && rimraf -g 'packages/**/node_modules' 'demo-*/hooks' 'demo-*/node_modules' 'package-lock.json' 'pnpm-lock.yaml' 'node_modules'",
         "demo.vue.android": "cd ./demo-vue && ns run android --no-hmr --env.watchNodeModules",
         "demo.vue.clean": "cd ./demo-vue && ns clean",
@@ -64,7 +65,8 @@
     "ntl": {
         "descriptions": {
             "build": "Build the plugin",
-            "build.all": "Build the plugin for all platforms",
+            "build.all": "Build the plugin and the native libraries for all platforms",
+            "build.native": "Build the native libraries (Android, and iOS on macOS)",
             "clean": "Clean the local environment.",
             "demo.vue.android": "Runs the Vue demo on Android.",
             "demo.vue.ios": "Runs the Vue demo on iOS.",

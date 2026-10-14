@@ -15,8 +15,7 @@ on:
 
 jobs:
   release:
-    # macOS: the iOS xcframeworks need Xcode, and the runner image has the Android SDK / NDK and cmake for the Android libraries
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,7 +42,7 @@ jobs:
           email: dev@akylas.fr
       
       - name: install jq
-        run: command -v jq > /dev/null || brew install jq
+        run: sudo apt install jq
       
       - name: Enable CorePack
         run: |
@@ -87,12 +86,6 @@ jobs:
       - name: run setup 
         run: |
           npm run setup
-
-      # the prebuilt libraries are not in git: the packages are published with the ones built here
-      - name: Build the native libraries (Android, iOS)
-        run: |
-          native/build-android.sh
-          native/build-ios.sh
       
       - name: "NPM Identity"
         env:
