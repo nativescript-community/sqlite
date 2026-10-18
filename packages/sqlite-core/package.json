@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/sqlite-core",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "description": "SQLite for NativeScript: the API and the native core, without a SQLite library and without a binding. Add @nativescript-community/sqlite-napi (NativeScript 9.1+) and/or sqlite-bridge, and a SQLite engine; or use @nativescript-community/sqlite for all of it.",
     "main": "sqlite",
     "typings": "sqlite.d.ts",
