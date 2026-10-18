@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "../../src/sqlite-shared-engine",
+        "outDir": "./",
+        "baseUrl": ".",
+        "paths": {
+            "@nativescript-community/sqlite-core": ["../sqlite-core/sqlite"]
+        }
+    },
+    "include": ["../../src/sqlite-shared-engine/**/*", "../../references.d.ts", "../../tools/references.d.ts", "../../src/references.d.ts"]
+}

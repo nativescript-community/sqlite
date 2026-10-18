@@ -1,0 +1,53 @@
+{
+    "name": "@nativescript-community/sqlite-shared-engine",
+    "version": "4.0.1",
+    "description": "A SQLite shipped as libsqlite.so for @nativescript-community/sqlite-core: other libraries of the app that ship a libsqlite.so (a map SDK...) share this one SQLite. WAL by default on Android, the SQLite of the process on iOS.",
+    "main": "index",
+    "typings": "index.d.ts",
+    "sideEffects": true,
+    "scripts": {
+        "build": "npm run tsc && npm run readme",
+        "build.all": "npm run build",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
+        "tsc": "tsc --build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
+    },
+    "nativescript": {
+        "platforms": {
+            "android": "8.0.0",
+            "ios": "8.0.0"
+        }
+    },
+    "keywords": [
+        "NativeScript",
+        "SQLite",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/nativescript-community/sqlite/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/nativescript-community/sqlite",
+    "repository": "nativescript-community/sqlite",
+    "readmeFilename": "README.md",
+    "devDependencies": {
+        "@nativescript-community/sqlite-core": "4.0.0"
+    },
+    "peerDependencies": {
+        "@nativescript-community/sqlite-core": "^4.0.0",
+        "@nativescript/core": "*"
+    },
+    "files": [
+        "platforms",
+        "**/*.js",
+        "**/*.d.ts"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
+}

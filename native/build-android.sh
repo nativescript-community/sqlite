@@ -3,6 +3,7 @@
 #   sqlite-core    libnssqlite_core.so  the C core (loads the SQLite the app chooses)
 #   sqlite-napi    libnssqlite_napi.so  Node-API binding (NativeScript >= 9.1), links the core
 #   sqlite-bridge  libnssqlite_jni.so   JNI bridge (any runtime, needed by NativeScript <= 8), links the core
+#   sqlite-shared-engine  libsqlite.so  the SQLite pinned in native/sqlite-version.sh (see native/build-sqlite.sh)
 # Usage: native/build-android.sh [abi...]      (default: all four)
 # Needs ANDROID_HOME (NDK is picked from there, or set ANDROID_NDK_HOME) and cmake.
 set -e
@@ -23,3 +24,4 @@ for abi in $ABIS; do
   done
 done
 ls -l "$ROOT"/packages/sqlite-*/platforms/android/jniLibs/*/
+"$ROOT/native/build-sqlite.sh" $ABIS

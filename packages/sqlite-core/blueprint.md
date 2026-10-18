@@ -15,6 +15,7 @@ The plugin is several small packages, so an app only carries what it uses:
 | [`sqlite-napi`](../sqlite-napi) | the **Node-API** binding, for NativeScript 9.1+ (needs `sqlite-core`) | 23 KB / 29 KB |
 | [`sqlite-bridge`](../sqlite-bridge) | the **JNI** and **Objective-C** bridges, for any NativeScript version and required by NativeScript 8 (needs `sqlite-core`) | 10 KB / 17 KB |
 | [`sqlite-default-engine`](../sqlite-default-engine) | the **default SQLite**: androidx sqlite-bundled on Android (gradle dependency, WAL by default), the SQLite of the process on iOS. Import it once | + the androidx library |
+| [`sqlite-shared-engine`](../sqlite-shared-engine) | a SQLite built as **`libsqlite.so`** (WAL by default on Android, the process SQLite on iOS), instead of `sqlite-default-engine`: libraries of your app that link `libsqlite.so` share it. Import it once | + `libsqlite.so` (~1.6 MB per ABI) |
 | [`sqlite`](../sqlite) | everything: core + napi + bridge + default engine | all of the above |
 | [`sqlite-android-framework`](../sqlite-android-framework) | the SQLite of Android itself (`android.database.sqlite`) as an engine, no SQLite library in the app (prototype) | 24 KB |
 
