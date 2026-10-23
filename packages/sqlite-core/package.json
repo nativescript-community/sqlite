@@ -6,6 +6,7 @@
     "typings": "sqlite.d.ts",
     "sideEffects": false,
     "scripts": {
+        "prepack": "test -d platforms/ios/NSSqliteCore.xcframework || (echo 'prepack: NSSqliteCore.xcframework missing, run native/build-ios.sh (macOS) before publishing' >&2; exit 1)",
         "build": "npm run tsc && npm run readme",
         "build.all": "npm run build",
         "readme": "readme generate -c ../../tools/readme/blueprint.json",
