@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/sqlite-napi",
-    "version": "4.1.0",
+    "version": "4.1.1",
     "description": "Node-API binding of @nativescript-community/sqlite-core for NativeScript 9.1+ (native part only: no JNI / Objective-C bridge code).",
     "sideEffects": false,
     "scripts": {
@@ -32,7 +32,7 @@
     "repository": "nativescript-community/sqlite",
     "readmeFilename": "README.md",
     "dependencies": {
-        "@nativescript-community/sqlite-core": "^4.1.0"
+        "@nativescript-community/sqlite-core": "^4.1.1"
     },
     "files": [
         "platforms"

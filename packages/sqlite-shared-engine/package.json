@@ -1,6 +1,6 @@
 {
     "name": "@nativescript-community/sqlite-shared-engine",
-    "version": "4.1.0",
+    "version": "4.1.1",
     "description": "A SQLite shipped as libsqlite.so for @nativescript-community/sqlite-core: other libraries of the app that ship a libsqlite.so (a map SDK...) share this one SQLite. WAL by default on Android, the SQLite of the process on iOS.",
     "main": "index",
     "typings": "index.d.ts",
@@ -36,7 +36,7 @@
     "repository": "nativescript-community/sqlite",
     "readmeFilename": "README.md",
     "devDependencies": {
-        "@nativescript-community/sqlite-core": "^4.1.0"
+        "@nativescript-community/sqlite-core": "^4.1.1"
     },
     "peerDependencies": {
         "@nativescript-community/sqlite-core": "^4.0.0",

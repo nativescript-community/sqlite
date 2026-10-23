@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1](https://github.com/nativescript-community/sqlite/compare/v4.1.0...v4.1.1) (2026-10-23)
+
+### Bug Fixes
+
+* **release:** refuse to publish without the iOS xcframeworks ([b42aaf9](https://github.com/nativescript-community/sqlite/commit/b42aaf9e6de5344905b4f1271b77286b313de98e))
+
 ## [4.1.0](https://github.com/nativescript-community/sqlite/compare/v4.0.1...v4.1.0) (2026-10-18)
 
 **Note:** Version bump only for package @nativescript-community/sqlite-bridge
