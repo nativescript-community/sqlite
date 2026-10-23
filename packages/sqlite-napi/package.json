@@ -4,6 +4,7 @@
     "description": "Node-API binding of @nativescript-community/sqlite-core for NativeScript 9.1+ (native part only: no JNI / Objective-C bridge code).",
     "sideEffects": false,
     "scripts": {
+        "prepack": "test -d platforms/ios/NSSqliteNapi.xcframework || (echo 'prepack: NSSqliteNapi.xcframework missing, run native/build-ios.sh (macOS) before publishing' >&2; exit 1)",
         "build": "npm run readme",
         "readme": "readme generate -c ../../tools/readme/blueprint.json"
     },

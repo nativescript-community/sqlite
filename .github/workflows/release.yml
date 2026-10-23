@@ -15,7 +15,8 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    # macOS: the iOS xcframeworks can only be built there, and prepack refuses to publish without them
+    runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,9 +41,6 @@ jobs:
           token: '${{ secrets.GITHUB_TOKEN }}'
           name: Martin Guillon
           email: dev@akylas.fr
-      
-      - name: install jq
-        run: sudo apt install jq
       
       - name: Enable CorePack
         run: |
