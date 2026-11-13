@@ -48,7 +48,7 @@
 * [Migrating from 3.x](#migrating-from-3x)
 * [Usage](#usage)
 	* [Async and sync](#async-and-sync)
-	* [WAL by default on Android](#wal-by-default-on-android)
+	* [WAL (write-ahead logging)](#wal-write-ahead-logging)
 	* [Extensions](#extensions)
 	* [Another SQLite for some or all databases](#another-sqlite-for-some-or-all-databases)
 	* [TypeORM](#typeorm)
@@ -81,7 +81,7 @@ Everything of `sqlite-core` is re-exported, and so are its `/typeorm` and `/nano
 
 ## Migrating from 3.x
 
-4.0 keeps the API names and shapes, but a few things changed on purpose (`close()` and `getVersion()` return promises, parameters are bound with their real types, WAL is on by default on Android, the native database objects are gone). See the [migration guide](https://github.com/nativescript-community/sqlite/blob/master/MIGRATION.md).
+4.0 keeps the API names and shapes, but a few things changed on purpose (`close()` and `getVersion()` return promises, parameters are bound with their real types, WAL is opt-in (`wal: true`), the native database objects are gone). See the [migration guide](https://github.com/nativescript-community/sqlite/blob/master/MIGRATION.md).
 
 
 [](#usage)
@@ -129,9 +129,9 @@ const row = db.getSync('SELECT * FROM names WHERE id = ?', [5]);
 
 `executeSync`, `selectSync`, `selectArraySync`, `getSync` and `getArraySync` throw on NativeScript 8, which uses the bridge. See *Async and sync* in the core documentation for when each pays off.
 
-### WAL by default on Android
+### WAL (write-ahead logging)
 
-**Android databases open in WAL mode by default** (`wal: true`): with SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). It adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). Opt out per database with `{ wal: false }`, or for all with `configure({ defaultOptions: { wal: false } })`. In-memory and read-only databases ignore it. iOS keeps SQLite's default.
+**WAL is off by default**: databases keep SQLite's default journal, so databases created before the `wal` option existed open exactly as they did. Opt in with `{ wal: true }` per database, or for all with `configure({ defaultOptions: { wal: true } })`. With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL), so it is worth enabling for new databases. WAL adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them), and switching an existing database to WAL persists in the file. In-memory and read-only databases ignore the option.
 
 ### Extensions
 
@@ -530,8 +530,8 @@ The plugin is several small packages, so an app only carries what it uses:
 | **`@nativescript-community/sqlite-core`** (this one) | the TypeScript API and the C core. No SQLite, no binding, no dependency | 28 KB / 32 KB |
 | [`sqlite-napi`](../sqlite-napi) | the **Node-API** binding, for NativeScript 9.1+ (needs `sqlite-core`) | 23 KB / 29 KB |
 | [`sqlite-bridge`](../sqlite-bridge) | the **JNI** and **Objective-C** bridges, for any NativeScript version and required by NativeScript 8 (needs `sqlite-core`) | 10 KB / 17 KB |
-| [`sqlite-default-engine`](../sqlite-default-engine) | the **default SQLite**: androidx sqlite-bundled on Android (gradle dependency, WAL by default), the SQLite of the process on iOS. Import it once | + the androidx library |
-| [`sqlite-shared-engine`](../sqlite-shared-engine) | a SQLite built as **`libsqlite.so`** (WAL by default on Android, the process SQLite on iOS), instead of `sqlite-default-engine`: libraries of your app that link `libsqlite.so` share it. Import it once | + `libsqlite.so` (~1.6 MB per ABI) |
+| [`sqlite-default-engine`](../sqlite-default-engine) | the **default SQLite**: androidx sqlite-bundled on Android (gradle dependency), the SQLite of the process on iOS. Import it once | + the androidx library |
+| [`sqlite-shared-engine`](../sqlite-shared-engine) | a SQLite built as **`libsqlite.so`** (the process SQLite on iOS), instead of `sqlite-default-engine`: libraries of your app that link `libsqlite.so` share it. Import it once | + `libsqlite.so` (~1.6 MB per ABI) |
 | [`sqlite`](../sqlite) | everything: core + napi + bridge + default engine | all of the above |
 | [`sqlite-android-framework`](../sqlite-android-framework) | the SQLite of Android itself (`android.database.sqlite`) as an engine, no SQLite library in the app (prototype) | 24 KB |
 
@@ -765,7 +765,7 @@ The complete list, with examples, is in the [migration guide](https://github.com
 	</p>
 
 <p align="center">
-  <b>The default SQLite for @nativescript-community/sqlite-core: androidx sqlite-bundled on Android (WAL by default), the SQLite of the process on iOS.</b></br>
+  <b>The default SQLite for @nativescript-community/sqlite-core: androidx sqlite-bundled on Android, the SQLite of the process on iOS.</b></br>
   <sub><sub>
 </p>
 
@@ -782,7 +782,7 @@ The complete list, with examples, is in the [migration guide](https://github.com
 
 * [What it is](#what-it-is)
 * [Installation](#installation)
-	* [WAL by default on Android](#wal-by-default-on-android)
+	* [WAL (write-ahead logging)](#wal-write-ahead-logging)
 	* [Extensions](#extensions)
 
 
@@ -797,7 +797,7 @@ The SQLite that [`@nativescript-community/sqlite`](../sqlite) uses by default, a
 
 * **Android**: androidx `sqlite-bundled` (a recent SQLite with FTS5, JSON, RTREE, math functions, ~0.65 MB per ABI), added to your app by this package's `include.gradle`. Engine `libsqliteJni.so`.
 * **iOS**: the SQLite of the process: the system SQLite, or the one your app links (e.g. a CocoaPods `SQLCipher`).
-* **WAL on Android**: databases open with `wal: true` (see below).
+* **WAL**: off by default, `wal: true` opts in (see below).
 
 It contains no native code of its own. Do not install it when you bring your own SQLite (SQLCipher, a custom build): then nothing from androidx is in your app.
 
@@ -823,9 +823,9 @@ await db.execute('CREATE TABLE names (id INTEGER PRIMARY KEY, name TEXT)');
 
 Without the import the core has no engine and throws "No SQLite engine chosen". It only sets `defaultEngine` and `defaultOptions`: `configure({ engine })` or the `engine` option of a database still pick another SQLite.
 
-### WAL by default on Android
+### WAL (write-ahead logging)
 
-With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). The package sets `defaultOptions: { wal: true }` on Android: it adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). Opt out per database with `{ wal: false }`, or for all with `configure({ defaultOptions: { wal: false } })`. In-memory and read-only databases ignore it. iOS keeps SQLite's default.
+WAL is **off by default**, so existing databases open as before. Opt in with `{ wal: true }` per database, or for all with `configure({ defaultOptions: { wal: true } })`. With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). WAL adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). In-memory and read-only databases ignore it.
 
 ### Extensions
 
@@ -1037,7 +1037,7 @@ Other exports: `batch(db, tx, request, flags, cb)`, `txBegin(db, mode, cb)` (ret
 	</p>
 
 <p align="center">
-  <b>A SQLite shipped as libsqlite.so for @nativescript-community/sqlite-core: other libraries of the app that ship a libsqlite.so (a map SDK...) share this one SQLite. WAL by default on Android, the SQLite of the process on iOS.</b></br>
+  <b>A SQLite shipped as libsqlite.so for @nativescript-community/sqlite-core: other libraries of the app that ship a libsqlite.so (a map SDK...) share this one SQLite. The SQLite of the process on iOS.</b></br>
   <sub><sub>
 </p>
 
@@ -1056,7 +1056,7 @@ Other exports: `batch(db, tx, request, flags, cb)`, `txBegin(db, mode, cb)` (ret
 * [Installation](#installation)
 	* [Sharing it with another library](#sharing-it-with-another-library)
 	* [Updating SQLite](#updating-sqlite)
-	* [WAL by default on Android](#wal-by-default-on-android)
+	* [WAL (write-ahead logging)](#wal-write-ahead-logging)
 	* [Extensions](#extensions)
 
 
@@ -1071,7 +1071,7 @@ A SQLite shipped as its own library, **`libsqlite.so`**, with the same package l
 
 * **Android**: a vanilla SQLite (FTS3/4/5, RTREE, math functions, STAT4, column metadata, `dbstat`; ~1.6 MB per ABI) built by this repo from the sqlite.org amalgamation, with soname `libsqlite.so`. Engine `libsqlite.so`.
 * **iOS**: the SQLite of the process, like `sqlite-default-engine`.
-* **WAL on Android**: databases open with `wal: true`, like `sqlite-default-engine`.
+* **WAL**: off by default, `wal: true` opts in, like `sqlite-default-engine`.
 
 Why not `sqlite-default-engine`? Its androidx library is named `libsqliteJni.so` and carries androidx's JNI glue. Another library of your app that embeds its own SQLite (a map SDK, a document scanner...) cannot share it. With a library named `libsqlite.so` on both sides, the app ships **one** SQLite: the library only has to link `libsqlite.so` instead of compiling SQLite in, and neither side knows about the other.
 
@@ -1131,9 +1131,9 @@ native/build-sqlite.sh           # rebuilds libsqlite.so for the four ABIs into 
 
 The compile options are in `native/build-sqlite.sh` (`SQLITE_OPTIONS` overrides them for one build). The library is rebuilt by `native/build-android.sh` (so by `build.native` / `build.all`) too: published packages contain the pinned version.
 
-### WAL by default on Android
+### WAL (write-ahead logging)
 
-With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). The package sets `defaultOptions: { wal: true }` on Android: it adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). Opt out per database with `{ wal: false }`, or for all with `configure({ defaultOptions: { wal: false } })`. In-memory and read-only databases ignore it. iOS keeps SQLite's default.
+WAL is **off by default**, so existing databases open as before. Opt in with `{ wal: true }` per database, or for all with `configure({ defaultOptions: { wal: true } })`. With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). WAL adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). In-memory and read-only databases ignore it.
 
 ### Extensions
 
