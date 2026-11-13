@@ -11,7 +11,7 @@ The SQLite that [`@nativescript-community/sqlite`](../sqlite) uses by default, a
 
 * **Android**: androidx `sqlite-bundled` (a recent SQLite with FTS5, JSON, RTREE, math functions, ~0.65 MB per ABI), added to your app by this package's `include.gradle`. Engine `libsqliteJni.so`.
 * **iOS**: the SQLite of the process: the system SQLite, or the one your app links (e.g. a CocoaPods `SQLCipher`).
-* **WAL on Android**: databases open with `wal: true` (see below).
+* **WAL**: off by default, `wal: true` opts in (see below).
 
 It contains no native code of its own. Do not install it when you bring your own SQLite (SQLCipher, a custom build): then nothing from androidx is in your app.
 
@@ -31,9 +31,9 @@ await db.execute('CREATE TABLE names (id INTEGER PRIMARY KEY, name TEXT)');
 
 Without the import the core has no engine and throws "No SQLite engine chosen". It only sets `defaultEngine` and `defaultOptions`: `configure({ engine })` or the `engine` option of a database still pick another SQLite.
 
-### WAL by default on Android
+### WAL (write-ahead logging)
 
-With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). The package sets `defaultOptions: { wal: true }` on Android: it adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). Opt out per database with `{ wal: false }`, or for all with `configure({ defaultOptions: { wal: false } })`. In-memory and read-only databases ignore it. iOS keeps SQLite's default.
+WAL is **off by default**, so existing databases open as before. Opt in with `{ wal: true }` per database, or for all with `configure({ defaultOptions: { wal: true } })`. With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). WAL adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). In-memory and read-only databases ignore it.
 
 ### Extensions
 

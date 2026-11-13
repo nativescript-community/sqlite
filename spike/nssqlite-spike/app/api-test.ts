@@ -122,7 +122,7 @@ async function suite(backend: BackendName) {
         await reopened.close();
         eq(deleteDatabase(name), true);
     });
-    await check(backend + ' journal mode default: WAL on Android, SQLite default on iOS; options win', async () => {
+    await check(backend + ' journal mode default: SQLite default (no WAL); options win', async () => {
         const name = 'api-test-journal-' + backend + '.db';
         deleteDatabase(name);
         const mode = async (options?: any) => {
@@ -131,7 +131,9 @@ async function suite(backend: BackendName) {
             await database.close();
             return journalMode;
         };
-        eq(await mode(), __ANDROID__ ? 'wal' : 'delete', 'default');
+        eq(await mode(), 'delete', 'default');
+        deleteDatabase(name);
+        eq(await mode({ wal: true }), 'wal', 'wal: true');
         deleteDatabase(name);
         eq(await mode({ wal: false }), 'delete', 'wal: false');
         deleteDatabase(name);

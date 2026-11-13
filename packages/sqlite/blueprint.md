@@ -19,7 +19,7 @@ Everything of `sqlite-core` is re-exported, and so are its `/typeorm` and `/nano
 
 ## Migrating from 3.x
 
-4.0 keeps the API names and shapes, but a few things changed on purpose (`close()` and `getVersion()` return promises, parameters are bound with their real types, WAL is on by default on Android, the native database objects are gone). See the [migration guide](https://github.com/nativescript-community/sqlite/blob/master/MIGRATION.md).
+4.0 keeps the API names and shapes, but a few things changed on purpose (`close()` and `getVersion()` return promises, parameters are bound with their real types, WAL is opt-in (`wal: true`), the native database objects are gone). See the [migration guide](https://github.com/nativescript-community/sqlite/blob/master/MIGRATION.md).
 
 ## Usage
 
@@ -61,9 +61,9 @@ const row = db.getSync('SELECT * FROM names WHERE id = ?', [5]);
 
 `executeSync`, `selectSync`, `selectArraySync`, `getSync` and `getArraySync` throw on NativeScript 8, which uses the bridge. See *Async and sync* in the core documentation for when each pays off.
 
-### WAL by default on Android
+### WAL (write-ahead logging)
 
-**Android databases open in WAL mode by default** (`wal: true`): with SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). It adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). Opt out per database with `{ wal: false }`, or for all with `configure({ defaultOptions: { wal: false } })`. In-memory and read-only databases ignore it. iOS keeps SQLite's default.
+**WAL is off by default**: databases keep SQLite's default journal, so databases created before the `wal` option existed open exactly as they did. Opt in with `{ wal: true }` per database, or for all with `configure({ defaultOptions: { wal: true } })`. With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL), so it is worth enabling for new databases. WAL adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them), and switching an existing database to WAL persists in the file. In-memory and read-only databases ignore the option.
 
 ### Extensions
 
