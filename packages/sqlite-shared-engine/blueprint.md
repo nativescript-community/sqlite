@@ -11,7 +11,7 @@ A SQLite shipped as its own library, **`libsqlite.so`**, with the same package l
 
 * **Android**: a vanilla SQLite (FTS3/4/5, RTREE, math functions, STAT4, column metadata, `dbstat`; ~1.6 MB per ABI) built by this repo from the sqlite.org amalgamation, with soname `libsqlite.so`. Engine `libsqlite.so`.
 * **iOS**: the SQLite of the process, like `sqlite-default-engine`.
-* **WAL on Android**: databases open with `wal: true`, like `sqlite-default-engine`.
+* **WAL**: off by default, `wal: true` opts in, like `sqlite-default-engine`.
 
 Why not `sqlite-default-engine`? Its androidx library is named `libsqliteJni.so` and carries androidx's JNI glue. Another library of your app that embeds its own SQLite (a map SDK, a document scanner...) cannot share it. With a library named `libsqlite.so` on both sides, the app ships **one** SQLite: the library only has to link `libsqlite.so` instead of compiling SQLite in, and neither side knows about the other.
 
@@ -65,9 +65,9 @@ native/build-sqlite.sh           # rebuilds libsqlite.so for the four ABIs into 
 
 The compile options are in `native/build-sqlite.sh` (`SQLITE_OPTIONS` overrides them for one build). The library is rebuilt by `native/build-android.sh` (so by `build.native` / `build.all`) too: published packages contain the pinned version.
 
-### WAL by default on Android
+### WAL (write-ahead logging)
 
-With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). The package sets `defaultOptions: { wal: true }` on Android: it adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). Opt out per database with `{ wal: false }`, or for all with `configure({ defaultOptions: { wal: false } })`. In-memory and read-only databases ignore it. iOS keeps SQLite's default.
+WAL is **off by default**, so existing databases open as before. Opt in with `{ wal: true }` per database, or for all with `configure({ defaultOptions: { wal: true } })`. With SQLite's default journal every commit creates, syncs and deletes a journal file, which made 500 awaited one-statement writes take 2.6 s on a phone (38 ms in WAL). WAL adds `-wal` / `-shm` files next to the database (`deleteDatabase` removes them). In-memory and read-only databases ignore it.
 
 ### Extensions
 

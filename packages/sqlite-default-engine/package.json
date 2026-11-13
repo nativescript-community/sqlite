@@ -1,7 +1,7 @@
 {
     "name": "@nativescript-community/sqlite-default-engine",
     "version": "4.1.1",
-    "description": "The default SQLite for @nativescript-community/sqlite-core: androidx sqlite-bundled on Android (WAL by default), the SQLite of the process on iOS.",
+    "description": "The default SQLite for @nativescript-community/sqlite-core: androidx sqlite-bundled on Android, the SQLite of the process on iOS.",
     "main": "index",
     "typings": "index.d.ts",
     "sideEffects": true,

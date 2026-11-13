@@ -13,7 +13,7 @@ on purpose. This page lists them.
 | `@nativescript-community/sqlite-core` | the TypeScript API and the native core. No SQLite library, no binding |
 | `@nativescript-community/sqlite-napi` | the Node-API binding (NativeScript 9.1+) |
 | `@nativescript-community/sqlite-bridge` | the JNI / Objective-C binding (NativeScript 8 and older, or when you want it) |
-| `@nativescript-community/sqlite-default-engine` | the SQLite library: androidx `sqlite-bundled` on Android (WAL on), the SQLite of the process on iOS |
+| `@nativescript-community/sqlite-default-engine` | the SQLite library: androidx `sqlite-bundled` on Android, the SQLite of the process on iOS |
 
 Which binding is used is chosen at run time: Node-API when the runtime has it, the bridge otherwise. Nothing to configure.
 
@@ -111,17 +111,19 @@ They are accepted so your code compiles, and ignored:
 * `cursorWindowSize`, `cursorWindowName`. There is no cursor window with androidx or the iOS SQLite: rows of any size can be
   read (3.x could not read a row over 2 MB without `cursorWindowSize`).
 
-### 8. Write-ahead logging is on by default on Android
+### 8. Write-ahead logging is opt-in
 
-New databases and existing ones opened by 4.0 switch to WAL. It makes writes much faster (500 separate inserts: seconds with
-the rollback journal, tens of ms with WAL), but the data of a database lives in `name.db` **plus** `name.db-wal` until a
-checkpoint. If your app **copies, exports or uploads the `.db` file**, either:
+WAL is **off by default**: a database opens with SQLite's default journal, so databases created before 4.0 keep working
+unchanged. Opt in with `wal: true` (or `configure({ defaultOptions: { wal: true } })`). It makes writes much faster
+(500 separate inserts: seconds with the rollback journal, tens of ms with WAL), but the data of a database then lives in
+`name.db` **plus** `name.db-wal` until a checkpoint, and the switch persists in the file. If your app **copies, exports or
+uploads the `.db` file**, either:
 
 ```ts
 await db.execute('PRAGMA wal_checkpoint(TRUNCATE)'); // before copying the file
 ```
 
-or open with `wal: false` (or `configure({ defaultOptions: { wal: false } })`). A read only database is never switched.
+or keep `wal` off. A read only database is never switched.
 
 ### 9. Errors are `SqliteError`
 

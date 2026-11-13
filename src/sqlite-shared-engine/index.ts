@@ -4,6 +4,6 @@ import { configure } from '@nativescript-community/sqlite-core';
 
 export const SHARED_ENGINE = 'libsqlite.so';
 
-// Android: WAL by default. With the DELETE journal every commit creates and syncs a file: 500 awaited writes took 2.6 s on a
-// phone, 38 ms in WAL (`{ wal: false }` opts out).
-configure({ defaultEngine: isAndroid ? SHARED_ENGINE : null, defaultOptions: isAndroid ? { wal: true } : undefined });
+// WAL is off by default: switching an existing database to WAL breaks apps made before the `wal` option existed.
+// Opt in per database with `{ wal: true }`, or for all with `configure({ defaultOptions: { wal: true } })`.
+configure({ defaultEngine: isAndroid ? SHARED_ENGINE : null });
