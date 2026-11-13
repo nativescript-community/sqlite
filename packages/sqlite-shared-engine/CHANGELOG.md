@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.2](https://github.com/nativescript-community/sqlite/compare/v4.1.1...v4.1.2) (2026-11-13)
+
+### Bug Fixes
+
+* default to wal: false ([5402691](https://github.com/nativescript-community/sqlite/commit/5402691007a73ec0c8b4f395d2e69756d4124a2d))
+
 ## [4.1.1](https://github.com/nativescript-community/sqlite/compare/v4.1.0...v4.1.1) (2026-10-23)
 
 **Note:** Version bump only for package @nativescript-community/sqlite-shared-engine
