@@ -48,12 +48,8 @@ CORE_HDR="$OUT/HeadersCore"; rm -rf "$CORE_HDR"; mkdir -p "$CORE_HDR"
 cp "$ROOT/core/nssqlite.h" "$ROOT/core/nssqlite_wire.h" "$ROOT/core/provider.h" "$CORE_HDR/" # for static SQLite glue (native/provider)
 BRIDGE_HDR="$OUT/HeadersBridge"; rm -rf "$BRIDGE_HDR"; mkdir -p "$BRIDGE_HDR"
 cp "$ROOT/binding/ios/NSSqliteBridge.h" "$BRIDGE_HDR/"
-cat > "$BRIDGE_HDR/module.modulemap" <<'MM'
-module NSSqlite {
-    header "NSSqliteBridge.h"
-    export *
-}
-MM
+# Xcode copies a bare module.modulemap to the shared include directory.
+# Leave only the bridge header so multiple library XCFrameworks can coexist.
 
 make_xcframework() { # <package> <product> [headers]
   pkg=$1; product=$2; hdr=$3
