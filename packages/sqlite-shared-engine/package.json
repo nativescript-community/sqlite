@@ -9,7 +9,7 @@
         "build": "npm run tsc && npm run readme",
         "build.all": "npm run build",
         "readme": "readme generate -c ../../tools/readme/blueprint.json",
-        "tsc": "tsc --build",
+        "tsc": "cpy '**/*.d.ts' '../../packages/sqlite-shared-engine' --parents --cwd=../../src/sqlite-shared-engine && tsc  --build",
         "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {

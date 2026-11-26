@@ -1,7 +1,7 @@
 # NativeScript
 hooks/
 node_modules/
-platforms
+demo*/platforms
 
 # NativeScript Template
 *.js.map
@@ -38,8 +38,6 @@ devices.js
 *.xcframework
 **/*.js.map
 src/**/*.js
-packages/**/*.js
-packages/**/*.d.ts
 bin
 build
 Pods
@@ -49,8 +47,8 @@ Pods
 /demo-snippets/**/*.aar
 *.xcuserdatad
 /packages/README.md
-packages/**/*js.map
 packages/**/*js
+packages/**/*.d.ts
 packages/typings
 packages/**/angular
 packages/**/*.ngsummary.json
@@ -59,24 +57,3 @@ packages/**/*.metadata.json
 /blueprint.md
 
 *.tsbuildinfo
-# Packaging: plugin sources under packages/*/platforms are tracked, built binaries are not
-!/packages/sqlite-core/platforms
-!/packages/sqlite/platforms
-/packages/sqlite-core/platforms/android/jniLibs/
-/packages/sqlite-core/platforms/ios/*.xcframework
-native/.build/
-
-# staged by hand from native/build-custom-sqlite.sh for the engine tests
-/spike/nssqlite-spike/App_Resources/Android/custom-libs/
-/spike/custom-sqlite-plugin/platforms/
-!/packages/sqlite-android-framework/platforms
-/packages/sqlite-android-framework/platforms/android/jniLibs/
-!/packages/sqlite-shared-engine/platforms
-/packages/sqlite-shared-engine/platforms/android/jniLibs/
-!/packages/sqlite-napi/platforms
-!/packages/sqlite-bridge/platforms
-/packages/sqlite-napi/platforms/android/jniLibs/
-/packages/sqlite-bridge/platforms/android/jniLibs/
-/packages/sqlite-napi/platforms/ios/*.xcframework
-/packages/sqlite-bridge/platforms/ios/*.xcframework
-!/packages/sqlite-default-engine/platforms

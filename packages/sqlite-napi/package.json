@@ -5,8 +5,11 @@
     "sideEffects": false,
     "scripts": {
         "prepack": "test -d platforms/ios/NSSqliteNapi.xcframework || (echo 'prepack: NSSqliteNapi.xcframework missing, run native/build-ios.sh (macOS) before publishing' >&2; exit 1)",
-        "build": "npm run readme",
-        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+        "build": "npm run tsc && npm run readme",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
+        "build.all": "npm run build",
+        "tsc": "cpy '**/*.d.ts' '../../packages/sqlite-napi' --parents --cwd=../../src/sqlite-napi && tsc  --build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {
         "platforms": {

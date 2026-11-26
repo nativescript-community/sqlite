@@ -47,7 +47,5 @@
         "vertical-alignment",
         "placeholder-color",
         "variant"
-    ],
-    "cmake.sourceDirectory": "/Volumes/dev/nativescript/sqlite/core",
-    "cmake.autoDetectSourceDirectory": false
+    ]
 }

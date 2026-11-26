@@ -5,8 +5,11 @@
     "sideEffects": false,
     "scripts": {
         "prepack": "test -d platforms/ios/NSSqliteBridge.xcframework || (echo 'prepack: NSSqliteBridge.xcframework missing, run native/build-ios.sh (macOS) before publishing' >&2; exit 1)",
-        "build": "npm run readme",
-        "readme": "readme generate -c ../../tools/readme/blueprint.json"
+        "build": "npm run tsc && npm run readme",
+        "readme": "readme generate -c ../../tools/readme/blueprint.json",
+        "build.all": "npm run build",
+        "tsc": "cpy '**/*.d.ts' '../../packages/sqlite-bridge' --parents --cwd=../../src/sqlite-bridge && tsc  --build",
+        "clean": "bin/rimraf ./*.d.ts ./*.js ./*.js.map ./*.tsbuildinfo ./*.mjs ./*.mjs.map ./angular ./svelte ./vue* ./react"
     },
     "nativescript": {
         "platforms": {
